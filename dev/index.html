@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>&lt;sf-i-form> Demo</title>
+    <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="../node_modules/lit/polyfill-support.js"></script>
+    <script type="module" src="../sf-i-form.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200;300;400;600&display=swap" rel="stylesheet">
+    <script type="module">
+        import {SfISelect} from 'https://unpkg.com/sf-i-select@1.0.12/sf-i-select.js?module';
+        import {SfISubSelect} from 'https://unpkg.com/sf-i-sub-select@1.0.22/sf-i-sub-select.js?module';
+    </script>
+    <style>
+      
+      body {
+        background-color: #efefef;
+        margin: 0px;
+        font-family: 'Source Sans Pro';
+      }
+      
+      sf-i-form:not(:defined) {
+        display: none;
+      }
+
+    </style>
+  </head>
+  <body>
+    <sf-i-form 
+      apiId="0ttw06uwzb"
+      dependencies="[{&quot;parent&quot;: &quot;sf-i-countries&quot;, &quot;child&quot;: &quot;sf-i-states&quot;}]"
+      inputs="[&quot;sf-i-countries&quot;, &quot;sf-i-states&quot;, &quot;name&quot;]"
+      fields="[&quot;country&quot;,&quot;state&quot;,&quot;name&quot;]"
+      searchIndex="name"
+      searchFields="[&quot;country&quot;,&quot;state&quot;]"
+      
+      mode="create"
+      >
+      <!-- selectedId="1234"
+      selectedValues="[&quot;82bf2c68-6455-4765-a6f4-f8edada7a2c0&quot;,&quot;2c995940-9e31-478f-883c-f4c267e9139e&quot;,&quot;labour law&quot;]" -->
+      <div slot="form">
+        <sf-i-select id="sf-i-countries" apiId="zu3kh9cq2c" name="Countries" label="Select Country">
+        </sf-i-select>
+        <sf-i-sub-select id="sf-i-states" apiId="clnu4kk1ah" name="States" label="Select States">
+        </sf-i-sub-select>
+        <input id="name" type="text" />
+      </div>
+
+    </sf-i-form>
+    <script>
+      
+    </script>
+  </body>
+</html>
