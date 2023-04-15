@@ -39,16 +39,19 @@ export class SfIForm extends LitElement {
   mode!: string;
 
   @property()
+  searchString!: string;
+
+  @property()
+  selectProjection!: string;
+
+  @property()
   dependencies: string = "[]";
 
   @property()
-  inputs: string = "[]";
+  inputIds: string = "[]";
 
   @property()
   fields: string = "[]";
-
-  @property()
-  searchFields: string = "[]";
 
   @property()
   selectedValues: string = "[]";
@@ -65,15 +68,17 @@ export class SfIForm extends LitElement {
   @property()
   selectedId!: string;
 
-  
-  // @property()
-  // label!: string;
+  @property()
+  selectedSearchId!: string;
 
-  // @property()
-  // name!: string;
+  @property()
+  label!: string;
 
-  
-  
+  @property()
+  name!: string;
+
+  @property()
+  selectedSearchStrings: any = {};
 
   // @property()
   // selectedValue = () => {
@@ -97,7 +102,7 @@ export class SfIForm extends LitElement {
       padding-bottom: 5px;
     }
 
-    .SfIFormC div{
+    .SfIFormC > div{
       display: flex;
       align-items: center;
     }
@@ -106,8 +111,60 @@ export class SfIForm extends LitElement {
       flex-grow: 1;
     }
 
+    .flex-grow {
+      flex-grow: 1;
+    }
+
+    .link {
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .gone {
+      display: none
+    }
+
     .loader-element {
       margin-left: 5px;
+    }
+
+    .align-start {
+      align-items: flex-start;
+    }
+
+    .align-end {
+      align-items: flex-end;
+    }
+
+    .align-center {
+      align-items: center;
+    }
+
+    #search-list-container {
+      overflow-x: auto;
+    }
+
+    #logs-list-container {
+      overflow-x: auto;
+    }
+
+    #input-search {
+      margin-bottom: 5px;
+    }
+    
+    .button-icon {
+      padding-top: 3px;
+      margin-left: 5px;
+    }
+
+    .button-icon-small {
+      padding: 0px;
+      margin: 0px;
+      font-size: 85%;
+    }
+
+    .SfIFormC td {
+      vertical-align: top;
     }
 
     .lds-dual-ring {
@@ -144,31 +201,52 @@ export class SfIForm extends LitElement {
       animation: lds-dual-ring 0.8s linear infinite;
     }
 
+    td {
+      white-space: nowrap;
+    }
+
     .div-row-error {
+      display: flex;
+      justify-content: center;
+      position: fixed;
+      position: fixed;
+      top: 0px;
+      right: 0px;
+      margin-top: 20px;
+      margin-right: 20px;
       display: none;
       align-items:center;
+      background-color: white;
+      border: dashed 1px red;
+      padding: 20px;
     }
 
     .div-row-error-message {
       color: red;
       padding: 5px;
       background-color: white;
-      border: dashed 1px red;
-      width: 100%;
       text-align: center;
     }
 
     .div-row-success {
+      display: flex;
+      justify-content: center;
+      position: fixed;
+      top: 0px;
+      right: 0px;
+      margin-top: 20px;
+      margin-right: 20px;
       display: none;
       align-items:center;
+      background-color: white;
+      border: dashed 1px green;
+      padding: 20px;
     }
 
     .div-row-success-message {
       color: green;
       padding: 5px;
       background-color: white;
-      border: dashed 1px green;
-      width: 100%;
       text-align: center;
     }
 
@@ -182,6 +260,10 @@ export class SfIForm extends LitElement {
 
     .justify-center {
       justify-content: center;
+    }
+
+    .justify-between {
+      justify-content: space-between;
     }
 
     .justify-end {
@@ -203,6 +285,17 @@ export class SfIForm extends LitElement {
 
     .badge {
       border: dashed 1px;
+      padding-top: 1px;
+      padding-bottom: 1px;
+      padding-left: 10px;
+      padding-right: 10px;
+      border-radius: 20px;
+      margin-top: -20px;
+    }
+
+    .badge-filled {
+      border: solid 1px gray;
+      background-color: white;
       padding-top: 1px;
       padding-bottom: 1px;
       padding-left: 10px;
@@ -243,21 +336,32 @@ export class SfIForm extends LitElement {
       overflow-x: auto;
     }
 
+    
+
     @media (orientation: landscape) {
 
       .lb {
-        width: 25%
+        width: 30%
       }
       .rb {
-        width: 25%
+        width: 30%
       }
 
     }
 
   `;
 
-  @query('#sf-button-submit')
+  @query('#button-submit')
   _sfButtonSubmit: any;
+
+  @query('#button-trail')
+  _sfButtonTrail: any;
+
+  @query('#input-search')
+  _sfInputSearch: any;
+
+  @query('#input-select')
+  _sfInputSelect: any;
 
   @query('#sf-button-delete')
   _sfButtonDelete: any;
@@ -277,230 +381,38 @@ export class SfIForm extends LitElement {
   @query('.loader-element')
   _SfLoader: any;
 
+  @query('#search-list-container')
+  _SfSearchListContainer: any;
+
+  @query('#logs-list-container')
+  _SfLogsListContainer: any;
+
+  @query('#button-back')
+  _SfButtonBack: any;
+
+  @query('#button-edit')
+  _SfButtonEdit: any;
+
+  @query('#button-delete')
+  _SfButtonDelete: any;
+
+  @query('#button-new')
+  _SfButtonNew: any;
+
+  @query('#button-delete-confirm')
+  _SfButtonDeleteConfirm: any;
+
+  @query('#button-edit-cancel')
+  _SfButtonEditCancel: any;
+
+  @query('#button-delete-cancel')
+  _SfButtonDeleteCancel: any;
+
   @queryAssignedElements({slot: 'form'})
   _SfFormC: any;
 
-  // @query('.newC')
-  // _SfNewC: any;
-
-  // @query('.input-new')
-  // _SfInputNew: any;
-
-  // @query('#input-select')
-  // _SfInputSelect: any;
-
-  
-
-
-  
-
-  // dispatchMyEvent = (ev: string, args?: any) => {
-
-  //   const event = new CustomEvent(ev, {detail: args, bubbles: true, composed: true});
-  //   this.dispatchEvent(event);
-
-  // }
-
-  // renderList = (values: Array<any>) => {
-
-  //   if(this.mode == "admin") {
-
-  //     var innerHTML = '';
-
-  //     innerHTML = '<table><tr><th>Id</th><th>Name</th><th>Action</th></tr>'
-
-  //     for(var i = 0; i < values.length; i++) {
-
-  //       innerHTML += '<tr>';
-  //       innerHTML += '<td class="tcId">';
-  //       innerHTML += values[i].id;
-  //       innerHTML += '</td>';
-  //       innerHTML += '<td class="tcName">';
-  //       innerHTML += '<span id="text-'+values[i].id+'">' + values[i].name + '</span>';
-  //       innerHTML += '<input class="hide" id="input-'+values[i].id+'" type="text" value="'+values[i].name+'" />';
-  //       innerHTML += '</td>';
-  //       innerHTML += '<td class="tcActions">';
-  //       innerHTML += '<button id="edit-'+values[i].id+'">Edit</button>';
-  //       innerHTML += '<button id="cancel-'+values[i].id+'" class="hide">Cancel</button>';
-  //       innerHTML += '<button id="submit-'+values[i].id+'" class="hide">Submit</button>';
-  //       innerHTML += '<button id="delete-'+values[i].id+'">Delete</button>';
-  //       innerHTML += '<button id="canceld-'+values[i].id+'" class="hide">Cancel</button>';
-  //       innerHTML += '<button id="confirm-'+values[i].id+'" class="hide">Confirm Delete</button>';
-  //       innerHTML += '</td>';
-  //       innerHTML += '</tr>';
-
-  //     }
-
-  //     this._SfTableC.innerHTML = innerHTML;
-
-  //     for(var i = 0; i < values.length; i++) {
-  //       this._SfTableC.querySelector('#edit-'+values[i].id+'').addEventListener('click', (event: any)=> {
-  //         const id = event.target?.id.replace('edit-', '');
-  //         this._SfTableC.querySelector('#edit-'+id+'').style.display = 'none';
-  //         this._SfTableC.querySelector('#delete-'+id+'').style.display = 'none';
-  //         this._SfTableC.querySelector('#text-'+id+'').style.display = 'none';
-  //         this._SfTableC.querySelector('#cancel-'+id+'').style.display = 'inline';
-  //         this._SfTableC.querySelector('#submit-'+id+'').style.display = 'inline';
-  //         this._SfTableC.querySelector('#input-'+id+'').style.display = 'inline';
-  //       })
-  //       this._SfTableC.querySelector('#cancel-'+values[i].id+'').addEventListener('click', (event: any)=> {
-  //         const id = event.target?.id.replace('cancel-', '');
-  //         this._SfTableC.querySelector('#edit-'+id+'').style.display = 'inline';
-  //         this._SfTableC.querySelector('#delete-'+id+'').style.display = 'inline';
-  //         this._SfTableC.querySelector('#text-'+id+'').style.display = 'inline';
-  //         this._SfTableC.querySelector('#cancel-'+id+'').style.display = 'none';
-  //         this._SfTableC.querySelector('#submit-'+id+'').style.display = 'none';
-  //         this._SfTableC.querySelector('#input-'+id+'').style.display = 'none';
-  //       })
-  //       this._SfTableC.querySelector('#input-'+values[i].id+'').addEventListener('keyup', (event: any)=> {
-  //         const id = event.target?.id.replace('input-', '');
-  //         const name = event.target.value;
-  //         if(Util.validateName(name)) {
-  //           this._SfTableC.querySelector('#submit-'+id+'').removeAttribute('disabled');
-  //         } else {
-  //           this._SfTableC.querySelector('#submit-'+id+'').setAttribute('disabled', true);
-  //         }
-  //       });
-  //       this._SfTableC.querySelector('#confirm-'+values[i].id+'').addEventListener('click', async (event: any)=> {
-  //         this.clearMessages();
-  //         const id = event.target?.id.replace('confirm-', '');
-  //         const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
-  //         const xhr : any = (await this.prepareXhr({"id": id}, "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/delete", this._SfLoader, authorization)) as any;
-  //         this._SfLoader.innerHTML = '';
-  //         if(xhr.status == 200) {
-  //           this.setSuccess('Operation Successful!');
-  //           setTimeout(() => {
-  //             this.clearMessages();
-  //             this._SfNewC.querySelector('.input-new').value = "";
-  //             this.populateList();
-  //           }, 1000);
-            
-  //         } else {
-  //           const jsonRespose = JSON.parse(xhr.responseText);
-  //           this.setError(jsonRespose.error);
-  //         }
-  //       });
-  //       this._SfTableC.querySelector('#delete-'+values[i].id+'').addEventListener('click', async (event: any)=> {
-  //         const id = event.target?.id.replace('delete-', '');
-  //         event.target.style.display = 'none';
-  //         this._SfTableC.querySelector('#edit-'+id+'').style.display = 'none';
-  //         this._SfTableC.querySelector('#confirm-'+id+'').style.display = 'inline';
-  //         this._SfTableC.querySelector('#canceld-'+id+'').style.display = 'inline';
-          
-  //       });
-  //       this._SfTableC.querySelector('#canceld-'+values[i].id+'').addEventListener('click', async (event: any)=> {
-  //         const id = event.target?.id.replace('canceld-', '');
-  //         event.target.style.display = 'none';
-  //         this._SfTableC.querySelector('#edit-'+id+'').style.display = 'inline';
-  //         this._SfTableC.querySelector('#delete-'+id+'').style.display = 'inline';
-  //         this._SfTableC.querySelector('#confirm-'+id+'').style.display = 'none';
-  //         this._SfTableC.querySelector('#canceld-'+id+'').style.display = 'none';
-          
-  //       });
-  //       this._SfTableC.querySelector('#submit-'+values[i].id+'').addEventListener('click', async (event: any)=> {
-  //         this.clearMessages();
-  //         const id = event.target?.id.replace('submit-', '');
-  //         const name = this._SfTableC.querySelector('#input-'+id+'').value;
-  //         const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
-  //         const xhr : any = (await this.prepareXhr({"name": name, "id": id}, "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/update", this._SfLoader, authorization)) as any;
-  //         this._SfLoader.innerHTML = '';
-  //         if(xhr.status == 200) {
-  //           this.setSuccess('Operation Successful!');
-  //           setTimeout(() => {
-  //             this.clearMessages();
-  //             this._SfNewC.querySelector('.input-new').value = "";
-  //             this.populateList();
-  //           }, 1000);
-            
-  //         } else {
-  //           const jsonRespose = JSON.parse(xhr.responseText);
-  //           this.setError(jsonRespose.error);
-  //         }
-  //       });
-  //     }
-
-  //     this._SfNewC.querySelector('.button-new').addEventListener('click', ()=> {
-  //       this._SfNewC.querySelector('.button-new').style.display = 'none';
-  //       this._SfNewC.querySelector('.button-submit').style.display = 'inline';
-  //       this._SfNewC.querySelector('.button-cancel').style.display = 'inline';
-  //       this._SfNewC.querySelector('.input-new').style.display = 'inline';
-  //     })
-
-  //     this._SfNewC.querySelector('.button-cancel').addEventListener('click', ()=> {
-  //       this._SfNewC.querySelector('.button-new').style.display = 'inline';
-  //       this._SfNewC.querySelector('.button-submit').style.display = 'none';
-  //       this._SfNewC.querySelector('.button-cancel').style.display = 'none';
-  //       this._SfNewC.querySelector('.input-new').style.display = 'none';
-  //     })
-
-  //     this._SfNewC.querySelector('.input-new').addEventListener('keyup', ()=> {
-  //       const name = this._SfNewC.querySelector('.input-new').value;
-  //       if(Util.validateName(name)) {
-  //         this._SfNewC.querySelector('.button-submit').removeAttribute('disabled');
-  //       } else {
-  //         this._SfNewC.querySelector('.button-submit').setAttribute('disabled', true);
-  //       }
-  //     });
-
-  //     this._SfNewC.querySelector('.button-submit').addEventListener('click', async ()=> {
-
-  
-        
-  //     });
-      
-
-  //   } else {
-
-  //     var innerHTML = '';
-
-  //     for(var i = 0; i < values.length; i++) {
-  //       if(this.selectedId != null && this.selectedId.length > 0) {
-  //         if(values[i].id == this.selectedId) {
-  //           innerHTML += '<option value="'+values[i].id+'" selected>'+values[i].name+'</option>'
-  //           continue;
-  //         }
-  //       }
-  //       innerHTML += '<option value="'+values[i].id+'">'+values[i].name+'</option>'
-  //     }
-
-  //     this._sfSelect.innerHTML = innerHTML;
-  //     console.log('renderlist', innerHTML);
-  //     this.dispatchMyEvent("renderComplete", {});
-
-  //   }
-
-  // }
-
-  // onChangeSelect = (ev: any) => {
-  //   this.dispatchMyEvent("valueChanged", {newValue: ev.target.value});
-  // }
-
-  // populateList = async () => {
-
-  //   console.log('pop list');
-  //   const xhr : any = (await this.prepareXhr({}, "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/list", this._SfLoader, null)) as any;
-  //   this._SfLoader.innerHTML = '';
-  //   if(xhr.status == 200) {
-  //     const jsonRespose = JSON.parse(xhr.responseText);
-  //     const values = jsonRespose.data.values;
-  //     this.renderList(values)
-  //   }
-  // }
-
-  // initState = async () => {
-
-  //   console.log('mode', this.mode);
-  //   if(this.mode == "read") {
-  //     this._sfSelect.setAttribute("disabled", true);
-  //   }
-  // }
-
   getSelectedValues = () => {
     return JSON.parse(this.selectedValues);
-  }
-
-  getSearchFields = () => {
-    return JSON.parse(this.searchFields);
   }
 
   getFields = () => {
@@ -512,7 +424,16 @@ export class SfIForm extends LitElement {
   }
 
   getInputs = () => {
-    return JSON.parse(this.inputs);
+    return JSON.parse(this.inputIds);
+  }
+
+  onChangeSelect = (ev: any) => {
+    console.log(ev.target.value);
+    //this.dispatchMyEvent("valueChanged", {newValue: ev.target.value});
+  }
+
+  getSelectedSearchId = () => {
+    return this.selectedSearchId;
   }
 
   getInputValue = (id: string) => {
@@ -574,52 +495,346 @@ export class SfIForm extends LitElement {
     this._SfRowSuccessMessage.innerHTML = msg;
   }
 
-  submit = async () => {
+  renderSearch = (values: any) => {
+
+
+    let html = '';
+
+    if(values.length > 0) {
+
+      html += '<h3>Search Results ('+values.length+')</h3>'
+      
+      html += '<table>';
+      console.log('search', values);
+      for(var i = 0; i < values.length; i++) {
+
+        console.log(JSON.parse(values[i].fields.data));
+        let data = JSON.parse(values[i].fields.data);
+
+        html += '<tr>';
+        html += '<td class="link">';
+        html += '<div id="search-'+i+'"><strong>' + values[i].fields.name[0] + '</strong></div>';
+        html += '</td>';
+        html += '<td>&nbsp;→&nbsp;</td>'
+        for(var j = 0; j < data.length; j++) {
+          html += '<td>&nbsp;';
+          html += '<span>' + data[j] + '</span>';
+          html += '&nbsp;</td>';
+        }
+        html += '</tr>';
+
+      }
+      html += '</table>';
+      this._SfSearchListContainer.innerHTML = html;
+
+      for(var i = 0; i < values.length; i++) {
+
+        console.log(this._SfSearchListContainer.querySelector('#search-' + i))
+        this._SfSearchListContainer.querySelector('#search-' + i).addEventListener('click', (ev: any) => {
+          console.log('id', ev.currentTarget.id)
+          this.selectedId = values[parseInt((ev.currentTarget.id + "").split('-')[1])].id
+          this.mode = "detail";
+          this.loadMode();
+        });
+
+      }
+
+    } else {
+
+      html += '<h3>No Records Found</h3>'
+      this._SfSearchListContainer.innerHTML = html;
+
+    }
+
+  }
+
+  renderSelect = (values: any) => {
+
+    var html = '';
+
+    for(var i = 0; i < values.length; i++) {
+
+      const fields = values[i].fields;
+      const id =  values[i].id;
+
+      html += '<option id="'+id+'" '+ (this.selectedSearchId == id ? 'selected' : '') +'>'+fields[this.selectProjection]+'</option>';
+
+    }
+
+    this._sfInputSelect.innerHTML = html;
+
+  }
+
+  renderLogs = (values: any) => {
+
+    console.log('values', values);
+
+    let html = '';
+
+    if(values.length > 0) {
+
+      html += '<h3>Logs Results ('+values.length+')</h3>'
+      
+      for(var i = 0; i < values.length; i++) {
+
+        console.log('timestamp', (new Date(values[i].timestamp)));
+
+        html += '<table>';
+        html += '<tr>';
+        html += '<td>';
+        html += '<div><button id="button-collapse-'+i+'" class="material-icons gone button-icon-small">expand_less</button><button id="button-expand-'+i+'" class="material-icons button-icon-small">expand_more</button></div>';
+        html += '</td>';
+        html += '<td class="link">';
+        html += '<div id="search-'+i+'"><strong>' + (new Date(values[i].timestamp) + "").split(' (')[0] + '</strong></div>';
+        html += '</td>';
+        html += '<td>';
+        html += '<div>&nbsp;' + JSON.parse(values[i].message).userId + '</div>';
+        html += '</td>';
+        html += '<td>';
+        html += '<div>&nbsp;' + JSON.parse(values[i].message).op + '</div>';
+        html += '</td>';
+        html += '<td>';
+        html += '<div>&nbsp;' + JSON.parse(values[i].message).httpCode + '</div>';
+        html += '</td>';
+        html += '</tr>';
+        html += '</table>';
+
+        html += '<table>';
+        html += '<tr>';
+        html += '<td>';
+        html += '<div id="row-expand-'+i+'" class="gone"><small>';
+        html += '<strong>Request</strong> - ' + JSON.stringify(JSON.parse(values[i].message).req.body) + '<br />';
+        html += '<strong>Response</strong> - ' + JSON.stringify(JSON.parse(values[i].message).resp.body) + '';
+        html += '</small></div>';
+        html += '</td>';
+        html += '</tr>';
+        html += '</table>';
+
+      }
+      this._SfLogsListContainer.innerHTML = html;
+
+      for(var i = 0; i < values.length; i++) {
+
+        this._SfLogsListContainer.querySelector('#button-expand-'+i).addEventListener('click', (ev: any) => {
+          const id = (ev.currentTarget as HTMLElement).id;
+          this._SfLogsListContainer.querySelector('#row-expand-'+id.split('-')[2]).style.display = 'block';
+          this._SfLogsListContainer.querySelector('#button-collapse-'+id.split('-')[2]).style.display = 'block';
+          this._SfLogsListContainer.querySelector('#button-expand-'+id.split('-')[2]).style.display = 'none';
+        });
+
+        this._SfLogsListContainer.querySelector('#button-collapse-'+i).addEventListener('click', (ev: any) => {
+          const id = (ev.currentTarget as HTMLElement).id;
+          this._SfLogsListContainer.querySelector('#row-expand-'+id.split('-')[2]).style.display = 'none';
+          this._SfLogsListContainer.querySelector('#button-collapse-'+id.split('-')[2]).style.display = 'none';
+          this._SfLogsListContainer.querySelector('#button-expand-'+id.split('-')[2]).style.display = 'block';
+        });
+
+      }
+
+    } else {
+
+      html += '<h3>No Records Found</h3>'
+      this._SfLogsListContainer.innerHTML = html;
+
+    }
+
+  }
+
+  renderDetail = (value: any) => {
+
+    var sValues = '';
+
+    sValues += '[';
+    for(var i = 0; i < this.getFields().length; i++) {
+      sValues += '"';
+      sValues += value[this.getFields()[i]];
+      sValues += '",';
+    }
+    sValues = sValues.replace(/(^,)|(,$)/g, "")
+    sValues += ']';
+
+    console.log('selected values', sValues);
+
+    this.selectedValues = sValues;
+    
+
+  }
+
+  fetchSearch = async () => {
+
+    this.clearMessages();
+
+    const body: any = {"searchstring": this._sfInputSearch.value + "*"};
+    let url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/list";
+
+    const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
+    const xhr : any = (await this.prepareXhr(body, url, this._SfLoader, authorization)) as any;
+    this._SfLoader.innerHTML = '';
+    if(xhr.status == 200) {
+      const jsonRespose = JSON.parse(xhr.responseText);
+      console.log(jsonRespose);
+      this.renderSearch(jsonRespose.values);
+      
+    } else {
+      const jsonRespose = JSON.parse(xhr.responseText);
+      this.setError(jsonRespose.error);
+    }
+
+  }
+
+  fetchSearchSelect = async () => {
+
+    const body: any = {"searchstring": this.searchString + "*"};
+    let url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/list";
+
+    const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
+    const xhr : any = (await this.prepareXhr(body, url, this._SfLoader, authorization)) as any;
+    this._SfLoader.innerHTML = '';
+    if(xhr.status == 200) {
+      const jsonRespose = JSON.parse(xhr.responseText);
+      console.log(jsonRespose);
+      this.renderSelect(jsonRespose.values);
+    } else {
+      const jsonRespose = JSON.parse(xhr.responseText);
+      this.setError(jsonRespose.error);
+    }
+
+  }
+
+
+  fetchDetail = async () => {
+
+    const body: any = {"id": this.selectedId};
+    let url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/detail";
+
+    const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
+    const xhr : any = (await this.prepareXhr(body, url, this._SfLoader, authorization)) as any;
+    this._SfLoader.innerHTML = '';
+    if(xhr.status == 200) {
+      const jsonRespose = JSON.parse(xhr.responseText);
+      console.log(jsonRespose);
+      this.renderDetail(jsonRespose.data.value);
+      
+    } else {
+      const jsonRespose = JSON.parse(xhr.responseText);
+      this.setError(jsonRespose.error);
+    }
+
+  }
+
+  fetchLogs = async () => {
+
+    let url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/logs";
+    const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
+    const xhr : any = (await this.prepareXhr({}, url, this._SfLoader, authorization)) as any;
+    this._SfLoader.innerHTML = '';
+    if(xhr.status == 200) {
+      const jsonRespose = JSON.parse(xhr.responseText);
+      console.log(jsonRespose);
+      this.renderLogs(jsonRespose.data);
+      
+    } else {
+      const jsonRespose = JSON.parse(xhr.responseText);
+      this.setError(jsonRespose.error);
+    }
+
+  }
+
+  submitDelete = async () => {
 
     this.clearMessages();
 
     const body: any = {};
     let url = "";
 
-    if(this.mode == "edit" || this.mode == "create") {
+    body["id"] = this.selectedId;
+    url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/delete";
 
-      const values: any = {};
-
-      for(var i = 0; i < this.getFields().length; i++) {
-  
-        const field = this.getFields()[i] as string;
-        values[field] = this.getInputValue(this.getInputs()[i])
-  
-      }
-  
-      body["values"] = values;
-      body["searchindex"] = this.searchIndex;
-      body["searchfields"] = this.getSearchFields();
-
-      if(this.mode == "edit") {
-        body["id"] = this.selectedId;
-        url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/edit";
-      } else {
-        url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/create";
-      }
-
-    } else if (this.mode == "delete") {
-
-      body["id"] = this.selectedId;
-      url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/delete";
-
-    }
-
-    console.log(body);
-
-    // const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
-    const xhr : any = (await this.prepareXhr(body, url, this._SfLoader, null)) as any;
+    const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
+    const xhr : any = (await this.prepareXhr(body, url, this._SfLoader, authorization)) as any;
     this._SfLoader.innerHTML = '';
     if(xhr.status == 200) {
       this.setSuccess('Operation Successful!');
       setTimeout(() => {
         this.clearMessages();
-      }, 1000);
+        this._SfButtonBack.dispatchEvent(new Event('click'));
+      }, 2000);
+      
+    } else {
+      const jsonRespose = JSON.parse(xhr.responseText);
+      this.setError(jsonRespose.error);
+    }
+
+  }
+
+  submitNew = async () => {
+
+    this.clearMessages();
+
+    const body: any = {};
+    let url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/create";
+
+    const values: any = {};
+
+    for(var i = 0; i < this.getFields().length; i++) {
+
+      const field = this.getFields()[i] as string;
+      values[field] = this.getInputValue(this.getInputs()[i])
+
+    }
+
+    body["values"] = values;
+
+    console.log(body);
+
+    const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
+    const xhr : any = (await this.prepareXhr(body, url, this._SfLoader, authorization)) as any;
+    this._SfLoader.innerHTML = '';
+    if(xhr.status == 200) {
+      this.setSuccess('Operation Successful!');
+      this.clearInputs();
+      setTimeout(() => {
+        this.clearMessages();
+      }, 3000);
+      
+    } else {
+      const jsonRespose = JSON.parse(xhr.responseText);
+      this.setError(jsonRespose.error);
+      setTimeout(() => {
+        this.clearMessages();
+      }, 3000);
+    }
+
+  }
+
+  submitEdit = async () => {
+
+    this.clearMessages();
+
+    const body: any = {};
+    let url = "";
+
+    const values: any = {};
+
+    for(var i = 0; i < this.getFields().length; i++) {
+
+      const field = this.getFields()[i] as string;
+      values[field] = this.getInputValue(this.getInputs()[i])
+
+    }
+
+    body["values"] = values;
+    body["id"] = this.selectedId;
+    url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/update";
+
+    const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
+    const xhr : any = (await this.prepareXhr(body, url, this._SfLoader, authorization)) as any;
+    this._SfLoader.innerHTML = '';
+    if(xhr.status == 200) {
+      this.setSuccess('Operation Successful!');
+      setTimeout(() => {
+        this.clearMessages();
+      }, 3000);
       
     } else {
       const jsonRespose = JSON.parse(xhr.responseText);
@@ -659,14 +874,14 @@ export class SfIForm extends LitElement {
             break;
           }
         }
-      } else {
+      } else if(element.nodeName.toLowerCase() == "sf-i-form") {
+        
+      }else {
         if((element as HTMLInputElement).value.length === 0) {
           evaluate = false;
           break;
         }
       }
-
-      console.log(element.nodeName, evaluate);
 
     }
 
@@ -678,37 +893,280 @@ export class SfIForm extends LitElement {
 
   }
 
+  disableConfirm = (value: boolean) => {
+
+    if(!value) {
+      (this._sfButtonTrail as HTMLButtonElement).style.display = 'none';
+      (this._SfButtonEditCancel as HTMLButtonElement).style.display = 'none';
+      (this._SfButtonDeleteConfirm as HTMLButtonElement).style.display = 'block';
+      (this._SfButtonDeleteCancel as HTMLButtonElement).style.display = 'block';
+      (this._SfButtonEdit as HTMLButtonElement).style.display = 'none';
+      (this._SfButtonDelete as HTMLButtonElement).style.display = 'none';
+      (this._sfButtonSubmit as HTMLButtonElement).style.display = 'none';
+    } else {
+      this.disableEdit(true);
+    }
+
+  }
+
+  disableEdit = (value: boolean) => {
+
+    if(value) {
+      (this._sfButtonTrail as HTMLButtonElement).style.display = 'block';
+      (this._SfButtonEditCancel as HTMLButtonElement).style.display = 'none';
+      (this._SfButtonDeleteConfirm as HTMLButtonElement).style.display = 'none';
+      (this._SfButtonDeleteCancel as HTMLButtonElement).style.display = 'none';
+      (this._SfButtonEdit as HTMLButtonElement).style.display = 'block';
+      (this._SfButtonDelete as HTMLButtonElement).style.display = 'block';
+      (this._sfButtonSubmit as HTMLButtonElement).style.display = 'none';
+    } else {
+      (this._sfButtonTrail as HTMLButtonElement).style.display = 'none';
+      (this._SfButtonEditCancel as HTMLButtonElement).style.display = 'block';
+      (this._SfButtonDeleteConfirm as HTMLButtonElement).style.display = 'none';
+      (this._SfButtonDeleteCancel as HTMLButtonElement).style.display = 'none';
+      (this._SfButtonEdit as HTMLButtonElement).style.display = 'none';
+      (this._SfButtonDelete as HTMLButtonElement).style.display = 'none';
+      (this._sfButtonSubmit as HTMLButtonElement).style.display = 'block';
+    }
+
+  }
+
+  formatSearchString = () => {
+
+    var searchStr = "";
+
+    for(var i = 0; i < Object.keys(this.selectedSearchStrings).length; i++) {
+      searchStr += (this.selectedSearchStrings[Object.keys(this.selectedSearchStrings)[i]])
+      if(i < (Object.keys(this.selectedSearchStrings).length - 1)) {
+        searchStr += '|'
+      }
+    }
+
+    this.searchString = searchStr;
+
+    console.log('setting search string', this.searchString);
+  }
+
+  updateSelectedSearchString = (parents: any, childElement: any) => {
+
+    for(var k = 0; k < parents.length; k++) {
+
+      const parentElement = (this._sfSlottedForm[0].querySelector('#' + parents[k]) as HTMLElement);
+      if(parentElement.nodeName.toLowerCase() == "sf-i-select") {
+        childElement.selectedSearchStrings[parentElement.id] = (parentElement as SfISelect).selectedText()
+      } else if(parentElement.nodeName.toLowerCase() == "sf-i-sub-select") {
+        childElement.selectedSearchStrings[parentElement.id] = (parentElement as SfISubSelect).selectedText()
+      }
+
+    }
+    childElement.formatSearchString();
+    childElement.loadMode();
+
+  }
+
   processDependencies = () => {
 
     for(var i = 0; i < this.getDependencies().length; i++) {
       
-      const parent = this.getDependencies()[i].parent;
-      const child = this.getDependencies()[i].child;
+      const type = this.getDependencies()[i].type;
 
-      const parentElement = (this._sfSlottedForm[0].querySelector('#' + parent) as SfISelect);
-      const childElement = (this._sfSlottedForm[0].querySelector('#' + child) as SfISubSelect);
+      if(type == "searchable") {
 
-      console.log('parent', parentElement)
-      console.log('child', this._sfSlottedForm[0], child)
+        const parents = this.getDependencies()[i].parents;
+        const child = this.getDependencies()[i].child;
+        const childElement = (this._sfSlottedForm[0].querySelector('#' + child) as SfIForm);
 
-      parentElement?.addEventListener('valueChanged', (ev: any) => {
-        childElement.filterId = ev.detail.newValue;
+        for(var j = 0; j < parents.length; j++) {
+
+          const parent = parents[j];
+          const parentElement = (this._sfSlottedForm[0].querySelector('#' + parent) as HTMLElement);
+
+          parentElement?.addEventListener('valueChanged', () => {
+            this.updateSelectedSearchString(parents, childElement);
+          });
+
+          parentElement?.addEventListener('renderComplete', () => {
+            this.updateSelectedSearchString(parents, childElement);
+          });
+
+        }
+
+      } else {
+
+        const parent = this.getDependencies()[i].parent;
+        const child = this.getDependencies()[i].child;
+  
+        const parentElement = (this._sfSlottedForm[0].querySelector('#' + parent) as SfISelect);
+        const childElement = (this._sfSlottedForm[0].querySelector('#' + child) as SfISubSelect);
+  
+        parentElement?.addEventListener('valueChanged', (ev: any) => {
+          childElement.filterId = ev.detail.newValue;
+          childElement.populateList();
+        });
+  
+        childElement.filterId = parentElement.selectedValue();
         childElement.populateList();
-      });
+
+      }
+
 
     }
 
   }
 
-  initListeners = () => {
+  initDisableInputs = (value: boolean) => {
 
-    this._sfButtonSubmit?.addEventListener('click', () => {
-      this.submit();
+    for(var i = 0; i < this.getInputs().length; i++) {
+
+      const element = this._sfSlottedForm[0].querySelector('#' + this.getInputs()[i]);
+
+      if(element.nodeName.toLowerCase() == "sf-i-select") {
+        (element as SfISelect).mode = value ? "read" : "";
+        (element as SfISelect).initState();
+      } else if (element.nodeName.toLowerCase() == "sf-i-sub-select") {
+        (element as SfISubSelect).mode = value ? "read" : "";
+        (element as SfISubSelect).initState();
+      } else {
+        if(value) {
+          (element as HTMLInputElement).setAttribute('disabled', 'disabled');
+        } else {
+          (element as HTMLInputElement).removeAttribute('disabled');
+        }
+        
+      }
+
+    }
+
+  }
+
+  clearInputs = () => {
+
+    for(var i = 0; i < this.getInputs().length; i++) {
+
+      const element = this._sfSlottedForm[0].querySelector('#' + this.getInputs()[i]);
+
+      if(element.nodeName.toLowerCase() == "sf-i-select") {
+
+      } else if (element.nodeName.toLowerCase() == "sf-i-sub-select") {
+
+      } else {
+
+        (element as HTMLInputElement).value = "";
+
+      }
+
+    }
+
+  }
+
+  processFormLayouting = () => {
+
+    for(var i = 0; i < this.getInputs().length; i++) {
+
+      const element = this._sfSlottedForm[0].querySelector('#' + this.getInputs()[i]);
+
+      if(element.nodeName.toLowerCase() == "sf-i-select") {
+
+      } else if (element.nodeName.toLowerCase() == "sf-i-sub-select") {
+
+      } else {
+
+        (element as HTMLInputElement).style.width = '98%';
+
+      }
+
+    }
+
+    this._sfButtonSubmit.style.width = '100%';
+
+  }
+
+  initListenersView = () => {
+
+    console.log('init listeners view');
+
+    this._sfInputSearch?.addEventListener('keyup', () => {
+
+      console.log('keyup called');
+      this.searchString = this._sfInputSearch.value;
+      if(this._sfInputSearch.value.length > 2) {
+        this.fetchSearch();
+      }
+      
     });
 
-    this._sfButtonDelete?.addEventListener('click', () => {
-      this.submit();
+    this._SfButtonNew?.addEventListener('click', () => {
+      this.mode = "new";
+      this.loadMode();
     });
+
+    this._sfButtonTrail.addEventListener('click', () => {
+      console.log('trail clicked');
+      this.mode = "trail";
+      this.loadMode();
+    });
+
+
+  }
+
+  // initListeners = () => {
+
+  //   this._sfButtonSubmit?.addEventListener('click', () => {
+  //     this.submit();
+  //   });
+
+  //   this._sfButtonDelete?.addEventListener('click', () => {
+  //     this.submit();
+  //   });
+
+  //   for(var i = 0; i < this.getInputs().length; i++) {
+
+  //     const element = this._sfSlottedForm[0].querySelector('#' + this.getInputs()[i]);
+
+  //     if(element.nodeName.toLowerCase() == "sf-i-select") {
+
+  //       element.addEventListener('valueChanged', () => {
+  //         this.evalSubmit();
+  //       });
+
+  //     } else if (element.nodeName.toLowerCase() == "sf-i-sub-select") {
+
+  //       element.addEventListener('valueChanged', () => {
+  //         this.evalSubmit();
+  //       });
+
+  //     } else {
+
+  //       element.addEventListener('keyup', () => {
+  //         this.evalSubmit();
+  //       });
+
+  //     }
+
+  //   }
+
+  // }
+
+  initListenersTrail = () => {
+
+    this._SfButtonBack.addEventListener('click', () => {
+      this.mode = "view";
+      this.loadMode();
+    });
+
+  }
+
+  initListenersNew = () => {
+
+    this._SfButtonBack.addEventListener('click', () => {
+      this.mode = "view";
+      this.loadMode();
+    });
+
+    this._sfButtonSubmit.addEventListener('click', () => {
+      this.submitNew();
+    });
+
 
     for(var i = 0; i < this.getInputs().length; i++) {
 
@@ -738,7 +1196,62 @@ export class SfIForm extends LitElement {
 
   }
 
+  initListenersDetail = () => {
+    this._SfButtonBack.addEventListener('click', () => {
+      this.mode = "view";
+      this.loadMode();
+    });
+    this._SfButtonEdit.addEventListener('click', () => {
+      this.disableEdit(false);
+      this.initDisableInputs(false)
+    })
+    this._SfButtonEditCancel.addEventListener('click', () => {
+      this.disableEdit(true);
+      this.initDisableInputs(true)
+    })
+    this._SfButtonDelete.addEventListener('click', () => {
+      this.disableConfirm(false);
+    })
+    this._SfButtonDeleteCancel.addEventListener('click', () => {
+      this.disableConfirm(true);
+    })
+    this._sfButtonSubmit?.addEventListener('click', () => {
+      console.log('submit clicked');
+      this.submitEdit();
+    });
+    this._SfButtonDeleteConfirm.addEventListener('click', () => {
+      this.submitDelete();
+    })
+    for(var i = 0; i < this.getInputs().length; i++) {
+
+      const element = this._sfSlottedForm[0].querySelector('#' + this.getInputs()[i]);
+
+      if(element.nodeName.toLowerCase() == "sf-i-select") {
+
+        element.addEventListener('valueChanged', () => {
+          this.evalSubmit();
+        });
+
+      } else if (element.nodeName.toLowerCase() == "sf-i-sub-select") {
+
+        element.addEventListener('valueChanged', () => {
+          this.evalSubmit();
+        });
+
+      } else {
+
+        element.addEventListener('keyup', () => {
+          this.evalSubmit();
+        });
+
+      }
+
+    }
+  }
+
   populateSelectedValues = () => {
+
+    console.log('populating selected', this.getSelectedValues());
 
     for(var i = 0; i < this.getInputs().length; i++) {
 
@@ -775,19 +1288,76 @@ export class SfIForm extends LitElement {
 
   }
 
+  loadMode = async () => {
+
+    if(this.mode == "select") {
+
+      setTimeout(() => {
+        // this.initListenersTrail();
+        this.fetchSearchSelect();
+      }, 500)
+
+    } else if(this.mode == "trail") {
+
+      setTimeout(() => {
+        this.initListenersTrail();
+        this.fetchLogs();
+      }, 500)
+
+    } else if(this.mode == "new") {
+
+      setTimeout(() => {
+        this.initDisableInputs(false);
+        this.initListenersNew();
+        this.processDependencies();
+        this.processFormLayouting();
+      }, 500)
+
+    } else if(this.mode == "view") {
+
+      setTimeout(() => {
+        this.initListenersView();
+        this._sfInputSearch.value = this.searchString == null ? "" : this.searchString;
+        var event = new Event('keyup');
+        this._sfInputSearch.dispatchEvent(event);
+      }, 500)
+      
+
+    } else if (this.mode == "detail") {
+      
+      setTimeout(async () => {  
+        this.disableEdit(true);
+        this.initDisableInputs(true);
+        this.processDependencies();
+        await this.fetchDetail();
+        this.populateSelectedValues();
+        this.initListenersDetail();
+        this.processFormLayouting();
+      }, 500)
+
+    }
+      
+    // } else {
+
+    //   this.initListeners();
+    //   this.processDependencies();
+    //   if(this.mode == "edit" || this.mode == "delete") {
+    //     this.populateSelectedValues();
+    //   }
+    //   this.processDisabled();
+    //   this.clearMessages();
+
+    // }
+
+  }
+
   constructor() {
     super();
   }
 
   protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 
-    this.initListeners();
-    this.processDependencies();
-    this.clearMessages();
-    if(this.mode == "edit" || this.mode == "view") {
-      this.populateSelectedValues();
-    }
-    this.processDisabled();
+    this.loadMode();
 
   }
   
@@ -797,82 +1367,254 @@ export class SfIForm extends LitElement {
   
   override render() {
 
-    let submit = (this.mode == "edit" || this.mode == "create") ? html`<button id="sf-button-submit" disabled>Submit</button>` : html``;
-    let del = this.mode == "delete" ? html`<button id="sf-button-delete">Delete</button>` : html``;
+    //let submit = (this.mode == "edit" || this.mode == "create") ? html`<button id="sf-button-submit" disabled>Submit</button>` : html``;
+    //let del = this.mode == "delete" ? html`<button id="sf-button-delete">Delete</button>` : html``;
 
-    return html`
-      <div class="SfIFormC">
-        <div class="d-flex justify-center">
-          <div class="lb"></div>
-          <div class="d-flex flex-col">
-            <slot name="form"></slot>
-            <div class="div-row-error div-row-submit">
-              <div part="errormsg" class="div-row-error-message"></div>
-            </div>
-            <div class="div-row-success div-row-submit">
-              <div part="successmsg" class="div-row-success-message"></div>
-            </div>
-            <div class="d-flex justify-center">
-              <div class="loader-element"></div>
-            </div>
-            ${submit}
-            ${del}
+    if(this.mode == "select") {
+
+      return html`
+        
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <div class="SfIFormC">
+          <label>${this.label}</label>
+          <div>
+            <select id="input-select" @change="${this.onChangeSelect}">
+            </select>
+            <div class="loader-element"></div>
           </div>
-          <div class="rb"></div>
         </div>
-      </div>
-    `;
+      
+      `;
 
-    // if(this.mode == "admin") {
+    } else if(this.mode == "trail") {
 
-    //   return html`
-    //     <div class="SfIFormCAdmin">
-    //       <div class="d-flex justify-center">
-    //         <h1 part="title">${this.name}</h1>
-    //       </div>
-    //       <div class="d-flex justify-center">
-    //         <div part="badge" class="badge">Admin</div>
-    //       </div>
-    //       <br />
-    //       <div class="newC">
-    //         <div class="d-flex justify-center">
-    //           <div class="lb"></div>
-    //           <button class="button-new">New</button>
-    //           <input class="input-new hide" type="text" placeholder="Name ..."/>
-    //           <button class="button-cancel hide">Cancel</button>
-    //           <button class="button-submit hide" disabled>Submit</button>
-    //           <div class="rb"></div>
-    //         </div>
-    //       </div>
-    //       <br />
-    //       <div class="d-flex justify-center">
-    //         <div class="loader-element"></div>
-    //       </div>
-    
-    //       <br />
-    //       <div class="d-flex justify-center">
-    //         <div class="lb"></div>
-    //         <div class="tableC">
-    //         </div>
-    //         <div class="rb"></div>
-    //       </div>
-    //     </div>
-    //   `;
+      return html`
+        
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <div class="SfIFormC">
+          <div class="d-flex justify-center">
+              <h1 part="title">${this.name}</h1>
+          </div>
+          <div class="d-flex justify-center">
+            <div part="badge" class="badge">Log Trail</div>
+          </div>
+          <br />
+          <div class="d-flex justify-between">
+            <div class="lb"></div>
+            <div id="button-back" class="link">← Back</div>
+            <div class="rb"></div>
+          </div>
+          <br />
+          <div class="d-flex justify-center">
+            <div class="loader-element"></div>
+          </div>
+          <div class="d-flex">
+            <div class="lb"></div>
+            <div id="logs-list-container"></div>
+            <div class="rb"></div>
+          </div>
+          
+        </div>
+      
+      `;
 
-    // } else {
+    } else if(this.mode == "new") {
 
-    //   return html`
-    //     <div class="SfIFormC">
-    //       <label>${this.label}</label>
-    //       <div>
-    //         <select id="input-select" @change="${this.onChangeSelect}">
-    //         </select>
-    //         <div class="loader-element"></div>
-    //       </div>
-    //     </div>
-    //   `;
-    // }
+      return html`
+        
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <div class="SfIFormC">
+          <div class="d-flex justify-center">
+              <h1 part="title">${this.name}</h1>
+          </div>
+          <div class="d-flex justify-center">
+            <div part="badge" class="badge">Create New</div>
+          </div>
+          <br />
+          <div class="d-flex justify-between">
+            <div class="lb"></div>
+            <div id="button-back" class="link">← Back</div>
+            <div class="rb"></div>
+          </div>
+          <br /><br />
+          <div class="d-flex justify-center">
+            <div class="loader-element"></div>
+          </div>
+          <div class="d-flex justify-center">
+            <div class="lb"></div>
+            <div class="flex-grow">
+              <slot name="form"></slot>
+            </div>
+            <div class="rb"></div>
+          </div>
+          <div class="d-flex justify-between">
+            <div class="lb"></div>
+            <div>
+              <div class="div-row-error div-row-submit gone">
+                <div part="errormsg" class="div-row-error-message"></div>
+              </div>
+              <div class="div-row-success div-row-submit gone">
+                <div part="successmsg" class="div-row-success-message"></div>
+              </div>
+            </div>
+            <div class="rb"></div>
+          </div>
+          <br />
+          <br />
+          <div class="d-flex justify-center">
+            <div class="lb"></div>
+            <div class="flex-grow">
+              <button id="button-submit" disabled>Submit</button>
+            </div>
+            <div class="rb"></div>
+          </div>
+          
+        </div>
+      
+      `;
 
+    } else if(this.mode == "view") {
+
+      return html`
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <div class="SfIFormC">
+          <div class="d-flex justify-center">
+              <h1 part="title">${this.name}</h1>
+          </div>
+          <div class="d-flex justify-center">
+            <div part="badge" class="badge">Search</div>
+          </div>
+          <br />
+          <div class="d-flex">
+            <div class="lb"></div>
+            <div class="d-flex align-center justify-between flex-grow">
+              <div class="d-flex flex-col">
+                <label>Search</label>
+                <input id="input-search" type="text" placeholder="3 or more characters"/>
+                <div class="loader-element"></div>
+              </div>
+              <div>
+                <button id="button-trail" class="material-icons button-icon">receipt_long</button>
+                <button id="button-new" class="material-icons button-icon">add</button>
+              </div>
+            </div>
+            <div class="rb"></div>
+          </div>
+          <div class="d-flex justify-center">
+            <div class="lb"></div>
+            <div class="d-flex flex-col">
+              
+              <div class="d-flex justify-center gone">
+                
+              </div>
+              <div class="div-row-error div-row-submit gone">
+                <div part="errormsg" class="div-row-error-message"></div>
+              </div>
+              <div class="div-row-success div-row-submit">
+                <div part="successmsg" class="div-row-success-message"></div>
+              </div>
+            </div>
+            <div class="rb"></div>
+          </div>
+          <div class="d-flex">
+            <div class="lb"></div>
+            <div id="search-list-container"></div>
+            <div class="rb"></div>
+          </div>
+        </div>
+      `;
+
+    } else if(this.mode == "detail") {
+
+      return html`
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <div class="SfIFormC">
+          <div class="d-flex justify-center">
+              <h1 part="title">${this.name}</h1>
+          </div>
+          <div class="d-flex justify-center">
+            <div part="badge" class="badge">View Detail</div>
+          </div>
+          <br />
+          <div class="d-flex">
+            <div class="lb"></div>
+            <div class="d-flex flex-grow justify-between">
+              <div id="button-back" class="link">← Back</div>
+              <div class="d-flex">
+                <button id="button-trail" class="button-icon"><span class="material-icons">receipt_long</span></button>
+                <button id="button-edit" class="button-icon"><span class="material-icons">edit</span></button>
+                <button id="button-edit-cancel" class="button-icon"><span class="material-icons">edit_off</span></button>
+                <button id="button-delete" class="button-icon"><span class="material-icons">delete</span></button>
+                <button id="button-delete-cancel" class="button-icon"><span class="material-icons">close</span></button>
+                <button id="button-delete-confirm" class="button-icon"><span class="material-icons">delete</span><span class="material-icons">done</span></button>
+              </div>
+            </div>
+            <div class="rb"></div>
+          </div>
+          <br />
+          <div class="d-flex justify-center">
+            <div class="loader-element"></div>
+          </div>
+          <div class="d-flex justify-center">
+            <div class="lb"></div>
+            <div class="flex-grow">
+              <slot name="form"></slot>
+            </div>
+            <div class="rb"></div>
+          </div>
+          <div class="d-flex justify-between">
+            <div class="lb"></div>
+            <div>
+              <div class="div-row-error div-row-submit gone">
+                <div part="errormsg" class="div-row-error-message"></div>
+              </div>
+              <div class="div-row-success div-row-submit gone">
+                <div part="successmsg" class="div-row-success-message"></div>
+              </div>
+            </div>
+            <div class="rb"></div>
+          </div>
+          <br />
+          <br />
+          <div class="d-flex justify-center">
+            <div class="lb"></div>
+            <div class="flex-grow">
+              <button id="button-submit" disabled>Submit</button>
+            </div>
+            <div class="rb"></div>
+          </div>
+          
+          
+        </div>
+      `;
+      
+      
+    } 
+    else {
+
+      return html`
+        <div class="SfIFormC">
+          <div class="d-flex justify-center">
+            <div class="lb"></div>
+            <div class="d-flex flex-col">
+              <slot name="form"></slot>
+              <div class="div-row-error div-row-submit">
+                <div part="errormsg" class="div-row-error-message"></div>
+              </div>
+              <div class="div-row-success div-row-submit">
+                <div part="successmsg" class="div-row-success-message"></div>
+              </div>
+              <div class="d-flex justify-center">
+                <div class="loader-element"></div>
+              </div>
+             
+            </div>
+            <div class="rb"></div>
+          </div>
+        </div>
+      `;
+
+    }
   }
 
 }
