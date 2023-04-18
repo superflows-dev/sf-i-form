@@ -39,7 +39,10 @@ export class SfIForm extends LitElement {
   mode!: string;
 
   @property()
-  searchString!: string;
+  flow: string = "";
+
+  @property()
+  searchPhrase!: string;
 
   @property()
   selectProjection!: string;
@@ -54,7 +57,13 @@ export class SfIForm extends LitElement {
   fields: string = "[]";
 
   @property()
-  selectedValues: string = "[]";
+  selectedViewToDetailValues: string = "[]";
+
+  @property()
+  unitFiltersNew: string = "[]";
+
+  @property()
+  unitFiltersDetail: string = "[]";
 
   @queryAssignedElements({slot: 'form'})
   _sfSlottedForm: any;
@@ -78,7 +87,49 @@ export class SfIForm extends LitElement {
   name!: string;
 
   @property()
-  selectedSearchStrings: any = {};
+  shortlistedSearchPhrases: any = {};
+
+  @property()
+  removedValues: string[] = [];
+
+  selectedValues = () => {
+
+    const values = [];
+
+    const len = this._sfInputSelect.options.length;
+    for (var i = 0; i < len; i++) {
+      const opt = this._sfInputSelect.options[i];
+      if (opt.selected) {
+        values.push(opt.value);
+      }
+    }
+
+    console.log('returning values', values);
+
+    return values;
+  }
+
+  selectedTexts = () => {
+
+    const values = [];
+
+    const len = this._sfInputSelect.options.length;
+    for (var i = 0; i < len; i++) {
+      const opt = this._sfInputSelect.options[i];
+      if (opt.selected) {
+        values.push(this._sfInputSelect.options[i].text)
+      }
+    }
+
+    return values;
+
+  }
+
+  // @property()
+  // selectedListSearchItemsValues: any[] = [];
+
+  // @property()
+  // selectedListSearchItemsTexts: any[] = [];
 
   // @property()
   // selectedValue = () => {
@@ -109,6 +160,10 @@ export class SfIForm extends LitElement {
 
     .SfIFormC > div > select{
       flex-grow: 1;
+    }
+
+    ul {
+      list-style-type:none;
     }
 
     .flex-grow {
@@ -142,6 +197,7 @@ export class SfIForm extends LitElement {
 
     #search-list-container {
       overflow-x: auto;
+      width: 90%;
     }
 
     #logs-list-container {
@@ -347,6 +403,10 @@ export class SfIForm extends LitElement {
         width: 30%
       }
 
+      #search-list-container {
+        overflow-x: auto;
+        width: 40%;
+      }
     }
 
   `;
@@ -362,6 +422,9 @@ export class SfIForm extends LitElement {
 
   @query('#input-select')
   _sfInputSelect: any;
+
+  @query('#input-list')
+  _sfInputList: any;
 
   @query('#sf-button-delete')
   _sfButtonDelete: any;
@@ -411,8 +474,16 @@ export class SfIForm extends LitElement {
   @queryAssignedElements({slot: 'form'})
   _SfFormC: any;
 
-  getSelectedValues = () => {
-    return JSON.parse(this.selectedValues);
+  getUnitFiltersNew = () => {
+    return JSON.parse(this.unitFiltersNew);
+  }
+
+  getUnitFiltersDetail = () => {
+    return JSON.parse(this.unitFiltersDetail);
+  }
+
+  getSelectedViewToDetailValues = () => {
+    return JSON.parse(this.selectedViewToDetailValues);
   }
 
   getFields = () => {
@@ -427,13 +498,63 @@ export class SfIForm extends LitElement {
     return JSON.parse(this.inputIds);
   }
 
-  onChangeSelect = (ev: any) => {
-    console.log(ev.target.value);
-    //this.dispatchMyEvent("valueChanged", {newValue: ev.target.value});
+  dispatchMyEvent = (ev: string, args?: any) => {
+
+    console.log('dispatching event', ev);
+    const event = new CustomEvent(ev, {detail: args, bubbles: true, composed: true});
+    this.dispatchEvent(event);
+
   }
 
-  getSelectedSearchId = () => {
-    return this.selectedSearchId;
+  onChangeSelect = (ev: any) => {
+
+    // this.selectedListSearchItemsValues = [];
+    // this.selectedListSearchItemsTexts = [];
+
+    // const len = ev.target.options.length;
+    // for (var i = 0; i < len; i++) {
+    //   const opt = ev.target.options[i];
+    //   if (opt.selected) {
+    //     this.selectedListSearchItemsValues.push(opt.value);
+    //     this.selectedListSearchItemsTexts.push(ev.target.options[i].text)
+    //   } else {
+    //     var index = this.selectedListSearchItemsValues.indexOf(opt.value);
+    //     if (index !== -1) {
+    //       this.selectedListSearchItemsValues.splice(index, 1);
+    //       this.selectedListSearchItemsTexts.splice(index, 1);
+    //     }
+    //   }
+    // }
+
+    this.dispatchMyEvent("valueChanged", {newValue: ev.target.value, newText: ev.target.options[ev.target.selectedIndex].text});
+
+    // console.log('change', this.selectedListSearchItemsTexts, this.selectedListSearchItemsValues);
+
+  }
+
+  clearSelection = () => {
+    if(this.mode == "select" || this.mode == "list") {
+      this._sfInputSelect.value = 'noselect';
+    }
+    // if(this.mode == "list") {
+    //   this._sfInputList.value = 'noselect';
+    // }
+  }
+
+  // getSelectedSearchId = () => {
+  //   return this.selectedSearchId;
+  // }
+
+  // getSelectedSearchValue = () => {
+  //   return (this._sfInputSelect as HTMLSelectElement).value;
+  // }
+  
+  getSelectedSearchText = () => {
+    if(this._sfInputSelect.selectedIndex >= 0) {
+      return this._sfInputSelect.options[this._sfInputSelect.selectedIndex].text;
+    } else {
+      return null;
+    }
   }
 
   getInputValue = (id: string) => {
@@ -444,14 +565,20 @@ export class SfIForm extends LitElement {
     if((this._SfFormC[0].querySelector('#' + id) as HTMLElement).tagName.toLowerCase() == "sf-i-select") {
       value = {
         type: "sf-i-select",
-        value: (this._SfFormC[0].querySelector('#' + id) as SfISelect).selectedValue(),
-        text: (this._SfFormC[0].querySelector('#' + id) as SfISelect).selectedText()  
+        value: (this._SfFormC[0].querySelector('#' + id) as SfISelect).selectedValues(),
+        text: (this._SfFormC[0].querySelector('#' + id) as SfISelect).selectedTexts()  
       }
     } else if ((this._SfFormC[0].querySelector('#' + id) as HTMLElement).tagName.toLowerCase() == "sf-i-sub-select") {
       value = {
         type: "sf-i-sub-select",
-        value: (this._SfFormC[0].querySelector('#' + id) as SfISubSelect).selectedValue(),
-        text: (this._SfFormC[0].querySelector('#' + id) as SfISubSelect).selectedText()  
+        value: (this._SfFormC[0].querySelector('#' + id) as SfISubSelect).selectedValues(),
+        text: (this._SfFormC[0].querySelector('#' + id) as SfISubSelect).selectedTexts()  
+      }
+    } else if ((this._SfFormC[0].querySelector('#' + id) as HTMLElement).tagName.toLowerCase() == "sf-i-form") {
+      value = {
+        type: "sf-i-form",
+        value: (this._SfFormC[0].querySelector('#' + id) as SfIForm).selectedValues(),
+        text: (this._SfFormC[0].querySelector('#' + id) as SfIForm).selectedTexts()  
       }
     } else {
       value = (this._SfFormC[0].querySelector('#' + id)).value;
@@ -495,6 +622,24 @@ export class SfIForm extends LitElement {
     this._SfRowSuccessMessage.innerHTML = msg;
   }
 
+  setListSelection = (value: string, text: string) => {
+    
+    // if(!this.selectedListSearchItemsValues.includes(value)) {
+    //   this.selectedListSearchItemsValues.push(value);
+    //   this.selectedListSearchItemsTexts.push(text);
+    // } else {
+    //   var index = this.selectedListSearchItemsValues.indexOf(value);
+    //   if (index !== -1) {
+    //     this.selectedListSearchItemsValues.splice(index, 1);
+    //     this.selectedListSearchItemsTexts.splice(index, 1);
+    //   }
+    // }
+
+    this.dispatchMyEvent("valueChanged", {newValue: value, newText: text});
+    // console.log(this.selectedListSearchItemsTexts, this.selectedListSearchItemsValues);
+
+  }
+
   renderSearch = (values: any) => {
 
 
@@ -517,8 +662,24 @@ export class SfIForm extends LitElement {
         html += '</td>';
         html += '<td>&nbsp;→&nbsp;</td>'
         for(var j = 0; j < data.length; j++) {
+
+          console.log('data', data[j]);
+
           html += '<td>&nbsp;';
-          html += '<span>' + data[j] + '</span>';
+          html += '<span>';
+          if(Array.isArray(data[j])) {
+
+            for(var k = 0; k < data[j].length; k++) {
+              html += data[j][k];
+              if(k < (data[j].length - 1)) {
+                html += " &nbsp; ";
+              }
+            }
+
+          } else {
+            html += data[j]
+          }
+          html += '</span>';
           html += '&nbsp;</td>';
         }
         html += '</tr>';
@@ -552,16 +713,55 @@ export class SfIForm extends LitElement {
 
     var html = '';
 
+    html += '<option value="noselect" '+ ((this.selectedSearchId == null || this.selectedSearchId.length === 0) ? 'selected' : '') +' hidden disabled>Select</option>'
+
     for(var i = 0; i < values.length; i++) {
 
       const fields = values[i].fields;
       const id =  values[i].id;
 
-      html += '<option id="'+id+'" '+ (this.selectedSearchId == id ? 'selected' : '') +'>'+fields[this.selectProjection]+'</option>';
+      if(this.removedValues.includes(id)) continue;
+
+      html += '<option value="'+id+'" '+ (this.selectedSearchId == id ? 'selected' : '') +'>'+fields[this.selectProjection]+'</option>';
 
     }
 
     this._sfInputSelect.innerHTML = html;
+
+  }
+
+  renderList = (values: any) => {
+
+    var html = '';
+
+    //html += '<li value="noselect" '+ ((this.selectedSearchId == null || this.selectedSearchId.length === 0) ? 'selected' : '') +' hidden disabled>Select</li>'
+
+    for(var i = 0; i < values.length; i++) {
+
+      const fields = values[i].fields;
+      const id =  values[i].id;
+      const data = JSON.parse(fields.data);
+
+      if(this.removedValues.includes(id)) continue;
+
+      html += '<li value="'+id+'" '+ (this.selectedSearchId == id ? 'selected' : '') +' class="d-flex align-center">';
+      html += '<input id="checkbox-'+i+'" type="checkbox" />&nbsp;'
+      html += '<div><strong>'+fields[this.selectProjection]+'</strong>&nbsp;&nbsp;&nbsp;→&nbsp;&nbsp;&nbsp;</div>';
+      for(var j = 0; j < data.length; j++) {
+        html += '<div>' + data[j] + ' &nbsp;&nbsp;</div>';
+      }
+      html += '</li>';
+
+    }
+
+    this._sfInputList.innerHTML = html;
+
+    for(var i = 0; i < values.length; i++) {
+      (this._sfInputList as HTMLElement).querySelector('#checkbox-' + i)?.addEventListener('click', (ev: any) => {
+        const i = ev.target.id.split("-")[1];
+        this.setListSelection(values[i].id, values[i].fields[this.selectProjection]);
+      });
+    }
 
   }
 
@@ -646,16 +846,40 @@ export class SfIForm extends LitElement {
 
     sValues += '[';
     for(var i = 0; i < this.getFields().length; i++) {
-      sValues += '"';
-      sValues += value[this.getFields()[i]];
-      sValues += '",';
+
+      console.log('fields', value[this.getFields()[i]], Array.isArray(JSON.parse(value[this.getFields()[i]])));
+
+      if(Array.isArray(JSON.parse(value[this.getFields()[i]]))) {
+
+        sValues += '[';
+
+        for(var j = 0; j < JSON.parse(value[this.getFields()[i]]).length; j++) {
+
+          sValues += '"';
+          sValues += JSON.parse(value[this.getFields()[i]])[j];
+          sValues += '",';
+
+        }
+
+        sValues = sValues.replace(/(^,)|(,$)/g, "")
+        sValues += '],';
+
+      } else {
+
+        //sValues += '"';
+        sValues += value[this.getFields()[i]];
+        //sValues += '",';
+        sValues += ',';
+
+      }
+
     }
     sValues = sValues.replace(/(^,)|(,$)/g, "")
     sValues += ']';
 
     console.log('selected values', sValues);
 
-    this.selectedValues = sValues;
+    this.selectedViewToDetailValues = sValues;
     
 
   }
@@ -684,7 +908,7 @@ export class SfIForm extends LitElement {
 
   fetchSearchSelect = async () => {
 
-    const body: any = {"searchstring": this.searchString + "*"};
+    const body: any = {"searchstring": this.searchPhrase + "*"};
     let url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/list";
 
     const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
@@ -701,6 +925,24 @@ export class SfIForm extends LitElement {
 
   }
 
+  fetchSearchList = async () => {
+
+    const body: any = {"searchstring": this.searchPhrase + "*"};
+    let url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/list";
+
+    const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
+    const xhr : any = (await this.prepareXhr(body, url, this._SfLoader, authorization)) as any;
+    this._SfLoader.innerHTML = '';
+    if(xhr.status == 200) {
+      const jsonRespose = JSON.parse(xhr.responseText);
+      console.log(jsonRespose);
+      this.renderList(jsonRespose.values);
+    } else {
+      const jsonRespose = JSON.parse(xhr.responseText);
+      this.setError(jsonRespose.error);
+    }
+
+  }
 
   fetchDetail = async () => {
 
@@ -712,7 +954,7 @@ export class SfIForm extends LitElement {
     this._SfLoader.innerHTML = '';
     if(xhr.status == 200) {
       const jsonRespose = JSON.parse(xhr.responseText);
-      console.log(jsonRespose);
+      console.log('detail', jsonRespose);
       this.renderDetail(jsonRespose.data.value);
       
     } else {
@@ -783,9 +1025,9 @@ export class SfIForm extends LitElement {
 
     }
 
-    body["values"] = values;
+    body["values"] = values; 
 
-    console.log(body);
+    console.log(JSON.stringify(body));
 
     const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
     const xhr : any = (await this.prepareXhr(body, url, this._SfLoader, authorization)) as any;
@@ -795,14 +1037,14 @@ export class SfIForm extends LitElement {
       this.clearInputs();
       setTimeout(() => {
         this.clearMessages();
-      }, 3000);
+      }, 2000);
       
     } else {
       const jsonRespose = JSON.parse(xhr.responseText);
       this.setError(jsonRespose.error);
       setTimeout(() => {
         this.clearMessages();
-      }, 3000);
+      }, 2000);
     }
 
   }
@@ -833,8 +1075,8 @@ export class SfIForm extends LitElement {
     if(xhr.status == 200) {
       this.setSuccess('Operation Successful!');
       setTimeout(() => {
-        this.clearMessages();
-      }, 3000);
+        this._SfButtonBack.click();
+      }, 2000);
       
     } else {
       const jsonRespose = JSON.parse(xhr.responseText);
@@ -847,6 +1089,8 @@ export class SfIForm extends LitElement {
 
     var evaluate = true;
 
+    console.log('inputs', this.getInputs());
+
     for(var i = 0; i < this.getInputs().length; i++) {
 
       const id = this.getInputs()[i];
@@ -854,36 +1098,41 @@ export class SfIForm extends LitElement {
 
       if(element.nodeName.toLowerCase() == "sf-i-select") {
         const elementSfISelect = element as SfISelect;
-        if(elementSfISelect.selectedValue() == null) {
+        if(element.hasAttribute('mandatory') && (elementSfISelect.selectedValues().length === 0 || elementSfISelect.selectedIndex() === 0)) {
+          console.log('evaluate false return', element, elementSfISelect.selectedValues().length, elementSfISelect.selectedIndex())
           evaluate = false;
           break;
-        } else {
-          if(elementSfISelect.selectedValue() == "") {
-            evaluate = false;
-            break;
-          }
         }
       } else if(element.nodeName.toLowerCase() == "sf-i-sub-select") {
         const elementSfISubSelect = element as SfISubSelect;
-        if(elementSfISubSelect.selectedValue() == null) {
+        if(element.hasAttribute('mandatory') && (elementSfISubSelect.selectedValues().length === 0 || elementSfISubSelect.selectedIndex() === 0)) {
+          console.log('evaluate false return', element, elementSfISubSelect.selectedValues().length, elementSfISubSelect.selectedIndex())
           evaluate = false;
           break;
-        } else {
-          if(elementSfISubSelect.selectedValue() == "") {
-            evaluate = false;
-            break;
-          }
-        }
+        } 
       } else if(element.nodeName.toLowerCase() == "sf-i-form") {
+        const elementSfIForm = element as SfIForm;
+
+        console.log('evalsubmit', elementSfIForm.mode, element.hasAttribute('mandatory'), elementSfIForm.selectedValues().length);
+
+        if(element.hasAttribute('mandatory') && elementSfIForm.selectedValues().length === 0) {
+          console.log('evaluate false return', element)
+          evaluate = false;
+          break;
+        }
         
-      }else {
-        if((element as HTMLInputElement).value.length === 0) {
+      } else {
+
+        if(element.hasAttribute('mandatory') && (element as HTMLInputElement).value.length === 0) {
+          console.log('evaluate false return', element)
           evaluate = false;
           break;
         }
       }
 
     }
+
+    console.log('evaluate', evaluate);
 
     if(evaluate) {
       this._sfButtonSubmit?.removeAttribute('disabled');
@@ -896,7 +1145,7 @@ export class SfIForm extends LitElement {
   disableConfirm = (value: boolean) => {
 
     if(!value) {
-      (this._sfButtonTrail as HTMLButtonElement).style.display = 'none';
+      //(this._sfButtonTrail as HTMLButtonElement).style.display = 'none';
       (this._SfButtonEditCancel as HTMLButtonElement).style.display = 'none';
       (this._SfButtonDeleteConfirm as HTMLButtonElement).style.display = 'block';
       (this._SfButtonDeleteCancel as HTMLButtonElement).style.display = 'block';
@@ -912,7 +1161,7 @@ export class SfIForm extends LitElement {
   disableEdit = (value: boolean) => {
 
     if(value) {
-      (this._sfButtonTrail as HTMLButtonElement).style.display = 'block';
+      // (this._sfButtonTrail as HTMLButtonElement).style.display = 'block';
       (this._SfButtonEditCancel as HTMLButtonElement).style.display = 'none';
       (this._SfButtonDeleteConfirm as HTMLButtonElement).style.display = 'none';
       (this._SfButtonDeleteCancel as HTMLButtonElement).style.display = 'none';
@@ -920,46 +1169,64 @@ export class SfIForm extends LitElement {
       (this._SfButtonDelete as HTMLButtonElement).style.display = 'block';
       (this._sfButtonSubmit as HTMLButtonElement).style.display = 'none';
     } else {
-      (this._sfButtonTrail as HTMLButtonElement).style.display = 'none';
+      // (this._sfButtonTrail as HTMLButtonElement).style.display = 'none';
       (this._SfButtonEditCancel as HTMLButtonElement).style.display = 'block';
       (this._SfButtonDeleteConfirm as HTMLButtonElement).style.display = 'none';
       (this._SfButtonDeleteCancel as HTMLButtonElement).style.display = 'none';
       (this._SfButtonEdit as HTMLButtonElement).style.display = 'none';
       (this._SfButtonDelete as HTMLButtonElement).style.display = 'none';
       (this._sfButtonSubmit as HTMLButtonElement).style.display = 'block';
+      
     }
 
   }
 
-  formatSearchString = () => {
+  formatShortlistedSearchPhrase = () => {
 
     var searchStr = "";
 
-    for(var i = 0; i < Object.keys(this.selectedSearchStrings).length; i++) {
-      searchStr += (this.selectedSearchStrings[Object.keys(this.selectedSearchStrings)[i]])
-      if(i < (Object.keys(this.selectedSearchStrings).length - 1)) {
+    for(var i = 0; i < Object.keys(this.shortlistedSearchPhrases).length; i++) {
+      searchStr += (this.shortlistedSearchPhrases[Object.keys(this.shortlistedSearchPhrases)[i]])
+      if(i < (Object.keys(this.shortlistedSearchPhrases).length - 1)) {
         searchStr += '|'
       }
     }
 
-    this.searchString = searchStr;
+    this.searchPhrase = searchStr;
 
-    console.log('setting search string', this.searchString);
   }
 
-  updateSelectedSearchString = (parents: any, childElement: any) => {
+  updateShortlistedSearchPhrase = (parents: any, childElement: any) => {
 
     for(var k = 0; k < parents.length; k++) {
 
       const parentElement = (this._sfSlottedForm[0].querySelector('#' + parents[k]) as HTMLElement);
       if(parentElement.nodeName.toLowerCase() == "sf-i-select") {
-        childElement.selectedSearchStrings[parentElement.id] = (parentElement as SfISelect).selectedText()
+
+        var selText = '';
+        for(var l = 0; l < (parentElement as SfISelect).selectedTexts().length; l++) {
+          selText += (parentElement as SfISelect).selectedTexts()[l]
+          if(l < ((parentElement as SfISelect).selectedTexts().length - 1)) {
+            selText += '|'
+          }
+        }
+        childElement.shortlistedSearchPhrases[parentElement.id] = selText
+
       } else if(parentElement.nodeName.toLowerCase() == "sf-i-sub-select") {
-        childElement.selectedSearchStrings[parentElement.id] = (parentElement as SfISubSelect).selectedText()
+
+        var selText = '';
+        for(var l = 0; l < (parentElement as SfISubSelect).selectedTexts().length; l++) {
+          selText += (parentElement as SfISubSelect).selectedTexts()[l]
+          if(l < ((parentElement as SfISubSelect).selectedTexts().length - 1)) {
+            selText += '|'
+          }
+        }
+        childElement.shortlistedSearchPhrases[parentElement.id] = selText
+
       }
 
     }
-    childElement.formatSearchString();
+    childElement.formatShortlistedSearchPhrase();
     childElement.loadMode();
 
   }
@@ -982,11 +1249,11 @@ export class SfIForm extends LitElement {
           const parentElement = (this._sfSlottedForm[0].querySelector('#' + parent) as HTMLElement);
 
           parentElement?.addEventListener('valueChanged', () => {
-            this.updateSelectedSearchString(parents, childElement);
+            this.updateShortlistedSearchPhrase(parents, childElement);
           });
 
           parentElement?.addEventListener('renderComplete', () => {
-            this.updateSelectedSearchString(parents, childElement);
+            this.updateShortlistedSearchPhrase(parents, childElement);
           });
 
         }
@@ -1004,7 +1271,7 @@ export class SfIForm extends LitElement {
           childElement.populateList();
         });
   
-        childElement.filterId = parentElement.selectedValue();
+        childElement.filterId = parentElement.selectedValues()[0];
         childElement.populateList();
 
       }
@@ -1026,6 +1293,11 @@ export class SfIForm extends LitElement {
       } else if (element.nodeName.toLowerCase() == "sf-i-sub-select") {
         (element as SfISubSelect).mode = value ? "read" : "";
         (element as SfISubSelect).initState();
+      } else if (element.nodeName.toLowerCase() == "sf-i-form") {
+        console.log('init disabling form', (element as SfIForm).mode);
+        (element as SfIForm).flow = value ? "read" : "";
+        (element as SfIForm).loadMode();
+        //(element as SfIForm).initState();
       } else {
         if(value) {
           (element as HTMLInputElement).setAttribute('disabled', 'disabled');
@@ -1047,7 +1319,31 @@ export class SfIForm extends LitElement {
 
       if(element.nodeName.toLowerCase() == "sf-i-select") {
 
+        (element as SfISelect).selectedId = "";
+        (element as SfISelect).clearSelection();
+
+        // if((element as SfISelect).selectedId == null || (element as SfISelect).selectedId == "") {
+        //   (element as SfISelect).clearSelection();
+        // }
+
       } else if (element.nodeName.toLowerCase() == "sf-i-sub-select") {
+
+        (element as SfISubSelect).selectedId = "";
+        (element as SfISubSelect).clearSelection();
+
+        // if((element as SfISubSelect).selectedId == null || (element as SfISubSelect).selectedId == "") {
+        //   (element as SfISubSelect).clearSelection();
+        // }
+
+      } else if (element.nodeName.toLowerCase() == "sf-i-form") {
+
+        (element as SfIForm).selectedSearchId = "";
+        (element as SfIForm).clearSelection();
+
+        // if((element as SfIForm).selectedSearchId == null || (element as SfIForm).selectedSearchId == "") {
+        //   (element as SfIForm).clearSelection();
+        // }
+        
 
       } else {
 
@@ -1056,6 +1352,12 @@ export class SfIForm extends LitElement {
       }
 
     }
+
+  }
+
+  removeItemByValue = (value: string) => {
+
+    if(!this.removedValues.includes(value)) this.removedValues.push(value);
 
   }
 
@@ -1071,7 +1373,7 @@ export class SfIForm extends LitElement {
 
       } else {
 
-        (element as HTMLInputElement).style.width = '98%';
+        //(element as HTMLInputElement).style.width = '98%';
 
       }
 
@@ -1088,7 +1390,7 @@ export class SfIForm extends LitElement {
     this._sfInputSearch?.addEventListener('keyup', () => {
 
       console.log('keyup called');
-      this.searchString = this._sfInputSearch.value;
+      this.searchPhrase = this._sfInputSearch.value;
       if(this._sfInputSearch.value.length > 2) {
         this.fetchSearch();
       }
@@ -1109,50 +1411,36 @@ export class SfIForm extends LitElement {
 
   }
 
-  // initListeners = () => {
-
-  //   this._sfButtonSubmit?.addEventListener('click', () => {
-  //     this.submit();
-  //   });
-
-  //   this._sfButtonDelete?.addEventListener('click', () => {
-  //     this.submit();
-  //   });
-
-  //   for(var i = 0; i < this.getInputs().length; i++) {
-
-  //     const element = this._sfSlottedForm[0].querySelector('#' + this.getInputs()[i]);
-
-  //     if(element.nodeName.toLowerCase() == "sf-i-select") {
-
-  //       element.addEventListener('valueChanged', () => {
-  //         this.evalSubmit();
-  //       });
-
-  //     } else if (element.nodeName.toLowerCase() == "sf-i-sub-select") {
-
-  //       element.addEventListener('valueChanged', () => {
-  //         this.evalSubmit();
-  //       });
-
-  //     } else {
-
-  //       element.addEventListener('keyup', () => {
-  //         this.evalSubmit();
-  //       });
-
-  //     }
-
-  //   }
-
-  // }
-
   initListenersTrail = () => {
 
     this._SfButtonBack.addEventListener('click', () => {
       this.mode = "view";
       this.loadMode();
     });
+
+  }
+
+  clearUnitFilters = () => {
+
+    for(var i = 0; i < this.getInputs().length; i++) {
+
+      const element = this._sfSlottedForm[0].querySelector('#' + this.getInputs()[i]);
+
+      if(element.nodeName.toLowerCase() == "sf-i-select") {
+
+        (element as SfISelect).removedValues = [];
+
+      } else if (element.nodeName.toLowerCase() == "sf-i-sub-select") {
+
+        (element as SfISubSelect).removedValues = [];
+        
+      } else if (element.nodeName.toLowerCase() == "sf-i-form") {
+
+        (element as SfIForm).removedValues = [];
+        
+      }
+
+    }
 
   }
 
@@ -1179,6 +1467,12 @@ export class SfIForm extends LitElement {
         });
 
       } else if (element.nodeName.toLowerCase() == "sf-i-sub-select") {
+
+        element.addEventListener('valueChanged', () => {
+          this.evalSubmit();
+        });
+
+      } else if (element.nodeName.toLowerCase() == "sf-i-form") {
 
         element.addEventListener('valueChanged', () => {
           this.evalSubmit();
@@ -1238,6 +1532,12 @@ export class SfIForm extends LitElement {
           this.evalSubmit();
         });
 
+      } else if (element.nodeName.toLowerCase() == "sf-i-form") {
+
+        element.addEventListener('valueChanged', () => {
+          this.evalSubmit();
+        });
+
       } else {
 
         element.addEventListener('keyup', () => {
@@ -1249,25 +1549,34 @@ export class SfIForm extends LitElement {
     }
   }
 
-  populateSelectedValues = () => {
+  populateSelectedViewToDetailValues = () => {
 
-    console.log('populating selected', this.getSelectedValues());
+    console.log('populating selected', this.getSelectedViewToDetailValues());
 
     for(var i = 0; i < this.getInputs().length; i++) {
 
       const element = this._sfSlottedForm[0].querySelector('#' + this.getInputs()[i]);
 
+      console.log(element, element.nodeName.toLowerCase());
+
       if(element.nodeName.toLowerCase() == "sf-i-select") {
 
-        (element as SfISelect).selectedId = this.getSelectedValues()[i];
+        (element as SfISelect).selectedId = this.getSelectedViewToDetailValues()[i];
+        (element as SfISelect).loadMode();
 
       } else if (element.nodeName.toLowerCase() == "sf-i-sub-select") {
 
-        (element as SfISubSelect).selectedId = this.getSelectedValues()[i];
+        (element as SfISubSelect).selectedId = this.getSelectedViewToDetailValues()[i];
+        (element as SfISubSelect).loadMode();
+
+      } else if (element.nodeName.toLowerCase() == "sf-i-form") {
+
+        (element as SfIForm).selectedSearchId = this.getSelectedViewToDetailValues()[i];
+        (element as SfISubSelect).loadMode();
 
       } else {
 
-        (element as HTMLInputElement).value = this.getSelectedValues()[i];
+        (element as HTMLInputElement).value = this.getSelectedViewToDetailValues()[i];
 
       }
 
@@ -1288,9 +1597,155 @@ export class SfIForm extends LitElement {
 
   }
 
+  processUnitFiltersNew = () => {
+
+    console.log('filters', this.getUnitFiltersNew().length, "select");
+
+    for(var i = 0; i < this.getUnitFiltersNew().length; i++) {
+
+      if(this.getUnitFiltersNew()[i].op == "select") {
+
+        const inputElement = this._SfFormC[0].querySelector('#' + this.getUnitFiltersNew()[i].input);
+        const value = this.getUnitFiltersNew()[i].value;
+
+        console.log('filters', inputElement, value, "select");
+
+        if((inputElement as HTMLElement).tagName.toLowerCase() == "sf-i-select") {
+
+          console.log('filters-select', "sf-i-select", value);
+          (inputElement as SfISelect).selectedId = value;
+          (inputElement as SfISelect).loadMode();
+
+        } else if((inputElement as HTMLElement).tagName.toLowerCase() == "sf-i-sub-select") {
+
+          console.log('filters-select', "sf-i-sub-select", value);
+          (inputElement as SfISubSelect).selectedId = value;
+          (inputElement as SfISubSelect).loadMode();
+
+        } else if((inputElement as HTMLElement).tagName.toLowerCase() == "sf-i-form") {
+
+          console.log('filters-select', "sf-i-form", value);
+          (inputElement as SfIForm).selectedSearchId = value;
+          (inputElement as SfIForm).loadMode();
+
+        }
+
+      }
+
+      if(this.getUnitFiltersNew()[i].op == "remove") {
+
+        const inputElement = this._SfFormC[0].querySelector('#' + this.getUnitFiltersNew()[i].input);
+        const value = this.getUnitFiltersNew()[i].value;
+
+        console.log('filters', inputElement, value, "remove");
+
+        if((inputElement as HTMLElement).tagName.toLowerCase() == "sf-i-select") {
+
+          console.log('filters-remove', "sf-i-select", value);
+          (inputElement as SfISelect).removeItemByValue(value);
+          (inputElement as SfISelect).loadMode();
+
+        } else if((inputElement as HTMLElement).tagName.toLowerCase() == "sf-i-sub-select") {
+
+          console.log('filters-remove', "sf-i-sub-select", value);
+          (inputElement as SfISubSelect).removeItemByValue(value);
+          (inputElement as SfISubSelect).loadMode();
+
+        } else if((inputElement as HTMLElement).tagName.toLowerCase() == "sf-i-form") {
+
+          console.log('filters-remove', "sf-i-form", value);
+          (inputElement as SfIForm).removeItemByValue(value);
+          (inputElement as SfIForm).loadMode();
+
+        }
+
+      }
+
+    }
+
+  }
+
+  processUnitFiltersDetail = () => {
+
+    console.log('filters', this.getUnitFiltersDetail().length, "select");
+
+    for(var i = 0; i < this.getUnitFiltersDetail().length; i++) {
+
+      if(this.getUnitFiltersDetail()[i].op == "select") {
+
+        const inputElement = this._SfFormC[0].querySelector('#' + this.getUnitFiltersDetail()[i].input);
+        const value = this.getUnitFiltersDetail()[i].value;
+
+        console.log('filters', inputElement, value, "select");
+
+        if((inputElement as HTMLElement).tagName.toLowerCase() == "sf-i-select") {
+
+          console.log('filters-select', "sf-i-select", value);
+          (inputElement as SfISelect).selectedId = value;
+          (inputElement as SfISelect).loadMode();
+
+        } else if((inputElement as HTMLElement).tagName.toLowerCase() == "sf-i-sub-select") {
+
+          console.log('filters-select', "sf-i-sub-select", value);
+          (inputElement as SfISubSelect).selectedId = value;
+          (inputElement as SfISubSelect).loadMode();
+
+        } else if((inputElement as HTMLElement).tagName.toLowerCase() == "sf-i-form") {
+
+          console.log('filters-select', "sf-i-form", value);
+          (inputElement as SfIForm).selectedSearchId = value;
+          (inputElement as SfIForm).loadMode();
+
+        }
+
+      }
+
+      if(this.getUnitFiltersDetail()[i].op == "remove") {
+
+        const inputElement = this._SfFormC[0].querySelector('#' + this.getUnitFiltersDetail()[i].input);
+        const value = this.getUnitFiltersDetail()[i].value;
+
+        console.log('filters', inputElement, value, "remove");
+
+        if((inputElement as HTMLElement).tagName.toLowerCase() == "sf-i-select") {
+
+          console.log('filters-remove', "sf-i-select", value);
+          (inputElement as SfISelect).removeItemByValue(value);
+          (inputElement as SfISelect).loadMode();
+
+        } else if((inputElement as HTMLElement).tagName.toLowerCase() == "sf-i-sub-select") {
+
+          console.log('filters-remove', "sf-i-sub-select", value);
+          (inputElement as SfISubSelect).removeItemByValue(value);
+          (inputElement as SfISubSelect).loadMode();
+
+        } else if((inputElement as HTMLElement).tagName.toLowerCase() == "sf-i-form") {
+
+          console.log('filters-remove', "sf-i-form", value);
+          (inputElement as SfIForm).removeItemByValue(value);
+          (inputElement as SfIForm).loadMode();
+
+        }
+
+      }
+
+    }
+
+  }
+
   loadMode = async () => {
 
-    if(this.mode == "select") {
+    console.log('load mode', this.mode);
+
+    // if(this.mode == "list") {
+
+    //   setTimeout(() => {
+    //     // this.initListenersTrail();
+    //     this.fetchSearchList();
+    //   }, 500)
+
+    // } else 
+    if(this.mode == "select" || this.mode == "read" || this.mode == "list") {
 
       setTimeout(() => {
         // this.initListenersTrail();
@@ -1311,13 +1766,16 @@ export class SfIForm extends LitElement {
         this.initListenersNew();
         this.processDependencies();
         this.processFormLayouting();
+        this.clearInputs();
+        this.clearUnitFilters();
+        this.processUnitFiltersNew();
       }, 500)
 
     } else if(this.mode == "view") {
 
       setTimeout(() => {
         this.initListenersView();
-        this._sfInputSearch.value = this.searchString == null ? "" : this.searchString;
+        this._sfInputSearch.value = this.searchPhrase == null ? "" : this.searchPhrase;
         var event = new Event('keyup');
         this._sfInputSearch.dispatchEvent(event);
       }, 500)
@@ -1330,24 +1788,14 @@ export class SfIForm extends LitElement {
         this.initDisableInputs(true);
         this.processDependencies();
         await this.fetchDetail();
-        this.populateSelectedValues();
+        this.populateSelectedViewToDetailValues();
         this.initListenersDetail();
         this.processFormLayouting();
+        this.clearUnitFilters();
+        this.processUnitFiltersDetail();
       }, 500)
 
     }
-      
-    // } else {
-
-    //   this.initListeners();
-    //   this.processDependencies();
-    //   if(this.mode == "edit" || this.mode == "delete") {
-    //     this.populateSelectedValues();
-    //   }
-    //   this.processDisabled();
-    //   this.clearMessages();
-
-    // }
 
   }
 
@@ -1367,12 +1815,99 @@ export class SfIForm extends LitElement {
   
   override render() {
 
+    console.log('form mode', this.mode);
+
     //let submit = (this.mode == "edit" || this.mode == "create") ? html`<button id="sf-button-submit" disabled>Submit</button>` : html``;
     //let del = this.mode == "delete" ? html`<button id="sf-button-delete">Delete</button>` : html``;
+    /*
+<!--<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <div class="SfIFormC">
+          <label>${this.label}</label>
+          <div>
+            <ul id="input-list">
+            </ul>
+            <div class="loader-element"></div>
+          </div>
+        </div>-->
+    */
 
-    if(this.mode == "select") {
+
+    if(this.mode == "list") {
+
+      if(this.flow == "read") {
+
+
+        return html`
+          
+          <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+          <div class="SfIFormC">
+            <label>${this.label}</label>
+            <div>
+              <select id="input-select" @change="${this.onChangeSelect}" multiple disabled>
+              </select>
+              <div class="loader-element"></div>
+            </div>
+          </div>
+
+          `;
+
+      } else {
+
+
+        return html`
+            
+          <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+          <div class="SfIFormC">
+            <label>${this.label}</label>
+            <div>
+              <select id="input-select" @change="${this.onChangeSelect}" multiple>
+              </select>
+              <div class="loader-element"></div>
+            </div>
+          </div>
+
+        `;
+
+      }
+
+
+    } else if(this.mode == "read") {
+
 
       return html`
+        
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <div class="SfIFormC">
+          <label>${this.label}</label>
+          <div>
+            <select id="input-select" @change="${this.onChangeSelect}" disabled>
+            </select>
+            <div class="loader-element"></div>
+          </div>
+        </div>
+      
+      `;
+
+    } else if(this.mode == "select") {
+
+      if(this.flow == "read") {
+
+        return html`
+        
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <div class="SfIFormC">
+          <label>${this.label}</label>
+          <div>
+            <select id="input-select" @change="${this.onChangeSelect}" disabled>
+            </select>
+            <div class="loader-element"></div>
+          </div>
+        </div>
+      
+      `;
+
+      } else {
+        return html`
         
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <div class="SfIFormC">
@@ -1385,6 +1920,10 @@ export class SfIForm extends LitElement {
         </div>
       
       `;
+
+      }
+
+      
 
     } else if(this.mode == "trail") {
 
@@ -1399,9 +1938,13 @@ export class SfIForm extends LitElement {
             <div part="badge" class="badge">Log Trail</div>
           </div>
           <br />
-          <div class="d-flex justify-between">
+          <div class="d-flex">
             <div class="lb"></div>
-            <div id="button-back" class="link">← Back</div>
+            <div class="d-flex flex-grow justify-between">
+              <div id="button-back" class="link">← Back</div>
+              <div class="d-flex">
+              </div>
+            </div>
             <div class="rb"></div>
           </div>
           <br />
@@ -1431,15 +1974,16 @@ export class SfIForm extends LitElement {
             <div part="badge" class="badge">Create New</div>
           </div>
           <br />
-          <div class="d-flex justify-between">
+          <div class="d-flex">
             <div class="lb"></div>
-            <div id="button-back" class="link">← Back</div>
+            <div class="d-flex flex-grow justify-between">
+              <div id="button-back" class="link">← Back</div>
+              <div class="d-flex">
+              </div>
+            </div>
             <div class="rb"></div>
           </div>
           <br /><br />
-          <div class="d-flex justify-center">
-            <div class="loader-element"></div>
-          </div>
           <div class="d-flex justify-center">
             <div class="lb"></div>
             <div class="flex-grow">
@@ -1461,6 +2005,9 @@ export class SfIForm extends LitElement {
           </div>
           <br />
           <br />
+          <div class="d-flex justify-center">
+            <div class="loader-element"></div>
+          </div>
           <div class="d-flex justify-center">
             <div class="lb"></div>
             <div class="flex-grow">
@@ -1503,9 +2050,7 @@ export class SfIForm extends LitElement {
           <div class="d-flex justify-center">
             <div class="lb"></div>
             <div class="d-flex flex-col">
-              
               <div class="d-flex justify-center gone">
-                
               </div>
               <div class="div-row-error div-row-submit gone">
                 <div part="errormsg" class="div-row-error-message"></div>
@@ -1518,7 +2063,7 @@ export class SfIForm extends LitElement {
           </div>
           <div class="d-flex">
             <div class="lb"></div>
-            <div id="search-list-container"></div>
+            <div id="search-list-container" class="flex-grow"></div>
             <div class="rb"></div>
           </div>
         </div>
@@ -1541,7 +2086,6 @@ export class SfIForm extends LitElement {
             <div class="d-flex flex-grow justify-between">
               <div id="button-back" class="link">← Back</div>
               <div class="d-flex">
-                <button id="button-trail" class="button-icon"><span class="material-icons">receipt_long</span></button>
                 <button id="button-edit" class="button-icon"><span class="material-icons">edit</span></button>
                 <button id="button-edit-cancel" class="button-icon"><span class="material-icons">edit_off</span></button>
                 <button id="button-delete" class="button-icon"><span class="material-icons">delete</span></button>
@@ -1552,9 +2096,6 @@ export class SfIForm extends LitElement {
             <div class="rb"></div>
           </div>
           <br />
-          <div class="d-flex justify-center">
-            <div class="loader-element"></div>
-          </div>
           <div class="d-flex justify-center">
             <div class="lb"></div>
             <div class="flex-grow">
@@ -1576,6 +2117,9 @@ export class SfIForm extends LitElement {
           </div>
           <br />
           <br />
+          <div class="d-flex justify-center">
+            <div class="loader-element"></div>
+          </div>
           <div class="d-flex justify-center">
             <div class="lb"></div>
             <div class="flex-grow">
