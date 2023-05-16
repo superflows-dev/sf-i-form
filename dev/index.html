@@ -14,8 +14,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200;300;400;600&display=swap" rel="stylesheet">
     <script type="module">
-        import {SfISelect} from 'https://unpkg.com/sf-i-select@1.0.46/sf-i-select.js?module';
-        import {SfISubSelect} from 'https://unpkg.com/sf-i-sub-select@1.0.66/sf-i-sub-select.js?module';
+        import {SfISelect} from 'https://unpkg.com/sf-i-select@1.0.56/sf-i-select.js?module';
+        import {SfISubSelect} from 'https://unpkg.com/sf-i-sub-select@1.0.80/sf-i-sub-select.js?module';
+        import {SfIEvents} from 'https://unpkg.com/sf-i-events@1.0.22/sf-i-events.js?module';
     </script>
     <style>
       
@@ -77,11 +78,449 @@
         align-items: flex-end;
       }
 
+      label {
+        color: #666;
+      }
+
+      input {
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        background: #efefef;
+        box-shadow: inset 2px 2px 6px rgba(5, 5, 5, 0.2);
+        border-top: solid 1px rgba(255, 255, 255, 0.8);
+        border-left: solid 1px rgba(255, 255, 255, 0.8);
+        border-bottom: solid 1px rgba(255, 255, 255, 0.8);
+        border-right: solid 1px rgba(255, 255, 255, 0.8);
+        transition: 0.3s;
+      }
+     
+      input:focus {
+        outline-color: #e8e8e8;
+        background: #e8e8e8;
+        box-shadow: inset 20px 20px 60px #c5c5c5,
+          inset -20px -20px 60px #ffffff;
+        transition: 0.3s;
+      }
+
+      sf-i-form::part(button-icon) {
+
+        border-width: 0px;      
+        border-radius: 5px;
+        color: #666;
+        background: #efefef;
+        box-shadow: 1px 1px 10px 0 rgba(0, 0, 0, 0.25), -1px -1px 10px 0 rgba(255, 255, 255, 0.6);
+        border-top: solid 1px rgba(255, 255, 255, 0.3);
+        border-left: solid 1px rgba(255, 255, 255, 0.3);
+        border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+        border-right: solid 1px rgba(0, 0, 0, 0.1);
+        
+      }
+
+      sf-i-form::part(button-icon-small) {
+
+        border-width: 0px;      
+        border-radius: 5px;
+        color: #666;
+        background: #efefef;
+        box-shadow: 1px 1px 10px 0 rgba(0, 0, 0, 0.25), -1px -1px 10px 0 rgba(255, 255, 255, 0.6);
+        border-top: solid 1px rgba(255, 255, 255, 0.3);
+        border-left: solid 1px rgba(255, 255, 255, 0.3);
+        border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+        border-right: solid 1px rgba(0, 0, 0, 0.1);
+
+      }
+
+      sf-i-form::part(badge) {
+
+        color: #666;
+        border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+        border-right: solid 1px rgba(0, 0, 0, 0.1);
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        border-radius: 10px;
+        margin-top: -8px;
+
+      }
+
+      sf-i-form::part(title) {
+
+        font-weight: 400;
+
+      }
+
+      sf-i-select::part(input-label),
+      sf-i-sub-select::part(input-label),
+      sf-i-form::part(input-label) {
+        color: #666;
+      }
+
+      sf-i-select::part(input-select),
+      sf-i-sub-select::part(input-select),
+      sf-i-form::part(input-select) {
+
+        border-width: 0px;      
+        border-radius: 5px;
+        color: #666;
+        background: #efefef;
+        box-shadow: 1px 1px 10px 0 rgba(0, 0, 0, 0.25), -1px -1px 10px 0 rgba(255, 255, 255, 0.6);
+        border-top: solid 1px rgba(255, 255, 255, 0.3);
+        border-left: solid 1px rgba(255, 255, 255, 0.3);
+        border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+        border-right: solid 1px rgba(0, 0, 0, 0.1);
+        padding: 10px;
+
+      }
+
+      sf-i-select::part(input-select-multi),
+      sf-i-sub-select::part(input-select-multi) {
+        font-weight: 400;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        background: #efefef;
+        box-shadow: inset 2px 2px 6px rgba(5, 5, 5, 0.2);
+        border-top: solid 1px rgba(255, 255, 255, 0.8);
+        border-left: solid 1px rgba(255, 255, 255, 0.8);
+        border-bottom: solid 1px rgba(255, 255, 255, 0.8);
+        border-right: solid 1px rgba(255, 255, 255, 0.8);
+        transition: 0.3s;
+      }
+
+      sf-i-form::part(input) {
+        font-weight: 400;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        background: #efefef;
+        box-shadow: inset 2px 2px 6px rgba(5, 5, 5, 0.2);
+        border-top: solid 1px rgba(255, 255, 255, 0.8);
+        border-left: solid 1px rgba(255, 255, 255, 0.8);
+        border-bottom: solid 1px rgba(255, 255, 255, 0.8);
+        border-right: solid 1px rgba(255, 255, 255, 0.8);
+        transition: 0.3s;
+      }
+     
+      sf-i-form::part(input:focus) {
+        outline-color: #e8e8e8;
+        background: #e8e8e8;
+        box-shadow: inset 20px 20px 60px #c5c5c5,
+          inset -20px -20px 60px #ffffff;
+        transition: 0.3s;
+      }
+
+      sf-i-form::part(results-title) {
+        color: #444;
+        font-weight: 400;
+      }
+      
+      sf-i-form::part(td-head) {
+        color: #888;
+        font-weight: 400;
+        padding: 5px;
+        vertical-align: middle;
+      }
+
+      sf-i-form::part(td-body) {
+        color: #555;
+        font-weight: 400;
+        padding: 5px;
+        vertical-align: middle;
+      }
+
+      sf-i-form::part(td-action) {
+        color: #888;
+        font-weight: 400;
+        padding: 5px;
+        background-color: #efefef;
+        vertical-align: middle;
+      }
+
+      sf-i-form::part(button) {
+        color: #666;
+        background: #efefef;
+        box-shadow: 1px 1px 10px 0 rgba(0, 0, 0, 0.25), -1px -1px 10px 0 rgba(255, 255, 255, 0.6);
+        border-top: solid 1px rgba(255, 255, 255, 0.3);
+        border-left: solid 1px rgba(255, 255, 255, 0.3);
+        border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+        border-right: solid 1px rgba(0, 0, 0, 0.1);
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        border-radius: 5px;
+      }
+
+      
+
+      sf-i-form::part(button-lg) {
+        color: #666;
+        background: #efefef;
+        box-shadow: 1px 1px 10px 0 rgba(0, 0, 0, 0.25), -1px -1px 10px 0 rgba(255, 255, 255, 0.6);
+        border-top: solid 1px rgba(255, 255, 255, 0.3);
+        border-left: solid 1px rgba(255, 255, 255, 0.3);
+        border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+        border-right: solid 1px rgba(0, 0, 0, 0.1);
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        border-radius: 5px;
+        font-size: 110%;
+      }
+
+      sf-i-form::part(button-lg):not(active){
+        color: #666;
+        background: #bbbbbb;
+        box-shadow: 1px 1px 10px 0 rgba(0, 0, 0, 0.25), -1px -1px 10px 0 rgba(255, 255, 255, 0.6);
+        border-top: solid 1px rgba(255, 255, 255, 0.3);
+        border-left: solid 1px rgba(255, 255, 255, 0.3);
+        border-bottom: solid 1px rgba(0, 0, 0, 0.1);
+        border-right: solid 1px rgba(0, 0, 0, 0.1);
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 15px;
+        padding-bottom: 15px;
+        border-radius: 5px;
+        font-size: 95%;
+      }
+
+
     </style>
   </head>
   <body>
-    
+<!-- apiIdCalendarDetail="r42gyc2xx1" -->
+
     <sf-i-form 
+    id="sf-i-statutes"
+    name="Statutes"
+    label="Select Statute *"
+    apiId="4wb2x6fkga"
+    mode="multiselect-dropdown"
+    searchPhrase="foo"
+    selectProjection="name"
+    preselectedValues="[&quot;abc&quot;,&quot;def&quot;,&quot;def&quot;]"
+    mandatory
+    >
+    </sf-i-form>
+
+    <!-- <sf-i-form 
+      name="Statutes"
+      apiId="4wb2x6fkga"
+      dependencies="[{&quot;parent&quot;: &quot;sf-i-countries&quot;, &quot;child&quot;: &quot;sf-i-states&quot;},{&quot;parent&quot;: &quot;sf-i-categories&quot;, &quot;child&quot;: &quot;sf-i-subcategories&quot;}]"
+      inputIds="[&quot;sf-i-jurisdictions&quot;, &quot;sf-i-countries&quot;, &quot;sf-i-states&quot;, &quot;name&quot;, &quot;sf-i-categories&quot;, &quot;sf-i-subcategories&quot;, &quot;sf-i-updatetypes&quot;]"
+      fields="[&quot;jurisdiction&quot;,&quot;country&quot;,&quot;state&quot;,&quot;name&quot;,&quot;category&quot;,&quot;subcategory&quot;, &quot;updatetype&quot;]"
+      unitFiltersDetail="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;},{&quot;op&quot;: &quot;hide&quot;, &quot;input&quot;: &quot;sf-i-jurisdictions&quot;, &quot;value&quot;: &quot;7898fc45-88d3-4d42-9ee4-18e70e465dfb&quot;, &quot;target&quot;: &quot;sf-i-states&quot;}]"
+      unitFiltersNew="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;20851e13-f0f7-4f8d-9bb8-ab96b1df6160&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;},{&quot;op&quot;: &quot;hide&quot;, &quot;input&quot;: &quot;sf-i-jurisdictions&quot;, &quot;value&quot;: &quot;7898fc45-88d3-4d42-9ee4-18e70e465dfb&quot;, &quot;target&quot;: &quot;sf-i-states&quot;}]"
+      mode="view"
+      >
+      <div slot="form">
+        <div class="d-flex justify-center align-end">
+          <div class="w-30">
+            <sf-i-select id="sf-i-updatetypes" apiId="oqze24s784" name="UpdateTypes" label="Select Update Type *" mandatory>
+            </sf-i-select>
+          </div>
+          <div class="w-5"></div>
+          <div class="w-30">
+          </div>
+          <div class="w-5"></div>
+          <div class="w-30"></div>
+        </div>
+        <br />
+        <div class="d-flex justify-center align-end">
+          <div class="w-30">
+            <sf-i-select id="sf-i-countries" apiId="zu3kh9cq2c" name="Countries" label="Select Country" mandatory>
+            </sf-i-select>
+          </div>
+          <div class="w-5"></div>
+          <div class="w-30">
+            <sf-i-select id="sf-i-jurisdictions" apiId="5s7ih5uw4h" name="Jurisdictions" label="Select Jurisdiction" mandatory>
+            </sf-i-select>
+          </div>
+          <div class="w-5"></div>
+          <div class="w-30">
+            <sf-i-sub-select id="sf-i-states" apiId="clnu4kk1ah" name="States" label="Select State" mandatory>
+            </sf-i-sub-select>
+          </div>
+        </div>
+        <br />
+        <div class="d-flex justify-center align-end">
+          <div class="w-100-m-0">
+            <label>Name</label><br />
+            <input id="name" type="text" class="w-100-m-0" mandatory/>
+          </div>
+        </div>
+        <br />
+        <div class="d-flex justify-center align-end">
+          <div class="w-47-5">
+            <sf-i-select id="sf-i-categories" apiId="8an2d4j1gc" name="Categories" label="Select Category" mandatory>
+            </sf-i-select>
+          </div>
+          <div class="w-5"></div>
+          <div class="w-47-5">
+            <sf-i-sub-select id="sf-i-subcategories" apiId="mdkc0e2bo5" name="SubCategories" label="Select SubCategory" mandatory>
+            </sf-i-sub-select>
+          </div>
+        </div>
+        
+      </div>
+
+    </sf-i-form> -->
+
+
+    <!-- <sf-i-form 
+      name="Project Tagging"
+      apiId="4wb2x6fkga"
+      selectedId="93891bbd-8410-4fd8-9b15-5403acb8ddb1"
+      projectField="name"
+      mode="text"></sf-i-form> -->
+
+    <!-- <sf-i-form 
+      name="Project Tagging"
+      apiId="tcic9iqenc"
+      apiIdCalendarDetail="r42gyc2xx1"
+      inputIds="[&quot;sf-i-updatetypes&quot;, &quot;sf-i-projects&quot;, &quot;sf-i-search&quot;, &quot;sf-i-compliances&quot;]"
+      fields="[&quot;updatetype&quot;,&quot;project&quot;,&quot;search&quot;,&quot;compliance&quot;]"
+      dependencies="[{&quot;type&quot;: &quot;searchable&quot;, &quot;parents&quot;: [&quot;sf-i-search&quot;], &quot;child&quot;: &quot;sf-i-compliances&quot;}]"
+      unitFiltersDetail="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;}]"
+      unitFiltersNew="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;20851e13-f0f7-4f8d-9bb8-ab96b1df6160&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;}]"
+      mode="view">
+
+      <div slot="form">
+
+        <div class="d-flex justify-center align-end">
+          <div class="w-47-5">
+            <sf-i-select id="sf-i-updatetypes" apiId="oqze24s784" name="UpdateTypes" label="Select Update Type *" mandatory>
+            </sf-i-select>
+          </div>
+          <div class="w-5"></div>
+          <div class="w-47-5">
+            <sf-i-form 
+              id="sf-i-projects"
+              name="Projects"
+              label="Select Project *"
+              apiId="est9egdho9"
+              mode="select"
+              selectProjection="name"
+              searchPhrase=''
+              mandatory
+              >
+            </sf-i-form>
+          </div>
+        </div>
+        <br /><br />
+
+        <div class="d-flex justify-center align-end">
+          <div class="w-100-m-0">
+            <label>Search *</label><br />
+            <input id="sf-i-search" type="text" class="w-100-m-0" mandatory/>
+          </div>
+        </div>
+        <br /><br />
+
+        <div class="d-flex justify-center align-end">
+          <div class="w-100-m-0">
+            
+            <sf-i-form 
+              id="sf-i-compliances"
+              name="Compliances"
+              label="Select Compliances *"
+              apiId="r42gyc2xx1"
+              mode="list"
+              selectProjection="statute"
+              mandatory
+              >
+            </sf-i-form>
+          </div>
+        </div>
+        <br /><br />
+      </div>
+
+      <div slot="calendar">
+
+        <sf-i-events 
+          id="sf-i-events"
+          name="Events"
+          apiMethodList="detail"
+          apiResponseFieldList="compliance"
+          apiIdDetail="r42gyc2xx1"
+          apiMethodDetail="detail"
+          apiBodyDetail="{&quot;id&quot;: &quot;ID-DETAIL&quot;}"
+          calendarStartDD="01"
+          calendarStartMM="04"
+          calendarStartYYYY="2023"
+          >
+
+        </sf-i-events>
+
+      </div>
+
+    </sf-i-form> -->
+
+    <!-- <sf-i-form 
+      name="Vendor Tagging"
+      apiId="cwr06y1353"
+      inputIds="[&quot;sf-i-updatetypes&quot;, &quot;sf-i-vendors&quot;, &quot;sf-i-search&quot;, &quot;sf-i-compliances&quot;]"
+      fields="[&quot;updatetype&quot;,&quot;vendor&quot;,&quot;search&quot;,&quot;compliance&quot;]"
+      dependencies="[{&quot;type&quot;: &quot;searchable&quot;, &quot;parents&quot;: [&quot;sf-i-search&quot;], &quot;child&quot;: &quot;sf-i-compliances&quot;}]"
+      unitFiltersDetail="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;}]"
+      unitFiltersNew="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;20851e13-f0f7-4f8d-9bb8-ab96b1df6160&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;}]"
+      mode="view">
+
+      <div slot="form">
+
+        <div class="d-flex justify-center align-end">
+          <div class="w-47-5">
+            <sf-i-select id="sf-i-updatetypes" apiId="oqze24s784" name="UpdateTypes" label="Select Update Type *" mandatory>
+            </sf-i-select>
+          </div>
+          <div class="w-5"></div>
+          <div class="w-47-5">
+            <sf-i-form 
+              id="sf-i-vendors"
+              name="Vendors"
+              label="Select Vendor *"
+              apiId="qp0o45m0ml"
+              mode="select"
+              selectProjection="name"
+              searchPhrase=''
+              mandatory
+              >
+            </sf-i-form>
+          </div>
+        </div>
+        <br /><br />
+
+        <div class="d-flex justify-center align-end">
+          <div class="w-100-m-0">
+            <label>Search *</label><br />
+            <input id="sf-i-search" type="text" class="w-100-m-0" mandatory/>
+          </div>
+        </div>
+        <br /><br />
+
+        <div class="d-flex justify-center align-end">
+          <div class="w-100-m-0">
+            <sf-i-form 
+              id="sf-i-compliances"
+              name="Compliances"
+              label="Select Compliances *"
+              apiId="r42gyc2xx1"
+              mode="list"
+              selectProjection="statute"
+              mandatory
+              >
+            </sf-i-form>
+          </div>
+        </div>
+        <br /><br />
+      </div>
+
+    </sf-i-form>
+     -->
+    <!-- <sf-i-form 
       name="Compliances"
       apiId="qwnfxbyrr1"
       dependencies="[{&quot;type&quot;: &quot;foreignkey&quot;, &quot;parent&quot;: &quot;sf-i-countries&quot;, &quot;child&quot;: &quot;sf-i-states&quot;},{&quot;type&quot;: &quot;foreignkey&quot;, &quot;parent&quot;: &quot;sf-i-categories&quot;, &quot;child&quot;: &quot;sf-i-subcategories&quot;},{&quot;type&quot;: &quot;foreignkey&quot;, &quot;parent&quot;: &quot;sf-i-frequencies&quot;, &quot;child&quot;: &quot;sf-i-subfrequencies&quot;},{&quot;type&quot;: &quot;searchable&quot;, &quot;parents&quot;: [&quot;sf-i-countries&quot;, &quot;sf-i-states&quot;, &quot;sf-i-categories&quot;, &quot;sf-i-subcategories&quot;], &quot;child&quot;: &quot;sf-i-statutes&quot;}]"
@@ -139,10 +578,11 @@
               id="sf-i-statutes"
               name="Statutes"
               label="Select Statute *"
-              apiId="l8o208whql"
+              apiId="4wb2x6fkga"
               mode="select"
               searchString="foo"
               selectProjection="name"
+              ignoreProjections="[&quot;country&quot;]"
               mandatory
               >
             </sf-i-form>
@@ -242,7 +682,7 @@
         </div>
       </div>
 
-    </sf-i-form>
+    </sf-i-form> -->
     <script>
       
     </script>
