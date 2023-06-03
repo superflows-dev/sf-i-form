@@ -79,6 +79,9 @@ export class SfIForm extends LitElement {
   selectedViewToDetailValues: string = "[]";
 
   @property()
+  useInApi: string = "[]";
+
+  @property()
   unitFiltersNew: string = "[]";
 
   @property()
@@ -284,7 +287,7 @@ export class SfIForm extends LitElement {
       cursor: pointer;
     }
 
-    input:not([type='radio']) {
+    input:not([type='radio']):not([type='checkbox']) {
 
       font-weight: 400;
       border: none;
@@ -664,6 +667,9 @@ export class SfIForm extends LitElement {
 
   `;
 
+  @query('#button-refresh')
+  _sfButtonRefresh: any;
+  
   @query('#button-submit')
   _sfButtonSubmit: any;
 
@@ -763,6 +769,34 @@ export class SfIForm extends LitElement {
   @queryAssignedElements({slot: 'calendar'})
   _SfCalendarC: any;
 
+  getInputFromField = (field: string) => {
+
+    for(var i = 0; i < this.getFields().length; i++) {
+
+      if(field == this.getFields()[i]) {
+        return this.getInputs()[i];
+      }
+
+    }
+
+  }
+
+  getFieldFromInput = (input: string) => {
+
+    for(var i = 0; i < this.getInputs().length; i++) {
+
+      if(input == this.getInputs()[i]) {
+        return this.getFields()[i];
+      }
+
+    }
+
+  }
+
+  getUseInApi = () => {
+    return JSON.parse(this.useInApi);
+  }
+
   getUnitFiltersNew = () => {
     return JSON.parse(this.unitFiltersNew);
   }
@@ -830,15 +864,23 @@ export class SfIForm extends LitElement {
 
   getInputValue = (id: string) => {
     console.log('id', this._SfFormC, (this._SfFormC[0].querySelector('#' + id) as HTMLElement).tagName);
-
+    console.log('field getuseapi', this.getUseInApi());
     var value = null;
 
     if((this._SfFormC[0].querySelector('#' + id) as HTMLElement).tagName.toLowerCase() == "sf-i-select") {
       if((this._SfFormC[0].querySelector('#' + id) as HTMLElement).style.display == "none") {
-        value = {
-          type: "sf-i-select",
-          value: [],
-          text: []  
+        if(this.getUseInApi().includes(this.getFieldFromInput(id))) {
+          value = {
+            type: "sf-i-select",
+            value: (this._SfFormC[0].querySelector('#' + id) as SfISelect).selectedValues(),
+            text: (this._SfFormC[0].querySelector('#' + id) as SfISelect).selectedTexts()  
+          }
+        } else {
+          value = {
+            type: "sf-i-select",
+            value: [],
+            text: []  
+          }
         }
       } else {
         value = {
@@ -849,10 +891,18 @@ export class SfIForm extends LitElement {
       }
     } else if ((this._SfFormC[0].querySelector('#' + id) as HTMLElement).tagName.toLowerCase() == "sf-i-sub-select") {
       if((this._SfFormC[0].querySelector('#' + id) as HTMLElement).style.display == "none") {
-        value = {
-          type: "sf-i-sub-select",
-          value: [],
-          text: []  
+        if(this.getUseInApi().includes(this.getFieldFromInput(id))) {
+          value = {
+            type: "sf-i-sub-select",
+            value: (this._SfFormC[0].querySelector('#' + id) as SfISubSelect).selectedValues(),
+            text: (this._SfFormC[0].querySelector('#' + id) as SfISubSelect).selectedTexts()  
+          }
+        } else {
+          value = {
+            type: "sf-i-sub-select",
+            value: [],
+            text: []  
+          }
         }
       } else {
         value = {
@@ -864,10 +914,18 @@ export class SfIForm extends LitElement {
       
     } else if ((this._SfFormC[0].querySelector('#' + id) as HTMLElement).tagName.toLowerCase() == "sf-i-form") {
       if((this._SfFormC[0].querySelector('#' + id) as HTMLElement).style.display == "none") {
-        value = {
-          type: "sf-i-form",
-          value: [],
-          text: []  
+        if(this.getUseInApi().includes(this.getFieldFromInput(id))) {
+          value = {
+            type: "sf-i-form",
+            value: (this._SfFormC[0].querySelector('#' + id) as SfIForm).selectedValues(),
+            text: (this._SfFormC[0].querySelector('#' + id) as SfIForm).selectedTexts()  
+          }
+        } else {
+          value = {
+            type: "sf-i-form",
+            value: [],
+            text: []  
+          }
         }
       } else {
         value = {
@@ -879,10 +937,18 @@ export class SfIForm extends LitElement {
       
     } else {
       if((this._SfFormC[0].querySelector('#' + id) as HTMLElement).style.display == "none") {
-        value = (this._SfFormC[0].querySelector('#' + id)).value;
-        value = {
-          type: "input",
-          value: ""
+        if(this.getUseInApi().includes(this.getFieldFromInput(id))) {
+          value = (this._SfFormC[0].querySelector('#' + id)).value;
+          value = {
+            type: "input",
+            value: (this._SfFormC[0].querySelector('#' + id)).value
+          }
+        } else {
+          value = (this._SfFormC[0].querySelector('#' + id)).value;
+          value = {
+            type: "input",
+            value: ""
+          }
         }
       } else {
         value = (this._SfFormC[0].querySelector('#' + id)).value;
@@ -1017,11 +1083,13 @@ export class SfIForm extends LitElement {
       html += '<thead>';
       html += '<th part="td-action" class="td-head left-sticky">'
       html += 'Action';
-      html += '</td>'
+      html += '</th>'
       for(var i = 0; i < cols.length; i++) {
-        html += '<th part="td-head" class="td-head">'
-        html += cols[i]
-        html += '</th>'
+        if(!this.getIgnoreProjections().includes(cols[i])) {
+          html += '<th part="td-head" class="td-head">'
+          html += cols[i]
+          html += '</th>'
+        }
       }
       html += '</thead>'
 
@@ -1041,29 +1109,34 @@ export class SfIForm extends LitElement {
 
         html += '<tr>';
         html += '<td part="td-action" class="left-sticky">';
-        html += '<div id="search-'+i+'"><button part="button">View</button></div>';
+        html += '<div id="search-'+i+'"><button part="button" class="button-search-view">View</button></div>';
         html += '</td>';
-        for(var j = 0; j < data.length; j++) {
+        for(var j = 0; j < cols.length; j++) {
 
-          // console.log('data', data[j]);
+          console.log('getignoreprojects', this.getIgnoreProjections());
 
+          if(!this.getIgnoreProjections().includes(cols[j])) {
 
-          html += '<td part="td-body" class="td-body '+classBg+'">';
-          if(Array.isArray(data[j])) {
+            html += '<td part="td-body" class="td-body '+classBg+'">';
+            if(Array.isArray(data[j])) {
 
-            for(var k = 0; k < data[j].length; k++) {
-              html += data[j][k];
-              if(k < (data[j].length - 1)) {
-                html += "; ";
+              for(var k = 0; k < data[j].length; k++) {
+                html +=  ('<sf-i-elastic-text text="'+data[j][k]+'" minLength="20"></sf-i-elastic-text>');
+                if(k < (data[j].length - 1)) {
+                  html += "; ";
+                }
               }
-            }
 
-          } else {
-            html += data[j]
+            } else {
+              html += ('<sf-i-elastic-text text="'+data[j]+'" minLength="20"></sf-i-elastic-text>')
+            }
+            html += '</td>';
           }
-          html += '</td>';
+
         }
+
         html += '</tr>';
+
 
       }
       html += '</table>';
@@ -1098,37 +1171,6 @@ export class SfIForm extends LitElement {
 
   }
 
-  // renderSelect = (values: any) => {
-
-  //   var html = '';
-
-  //   html += '<option value="noselect" '+ ((this.selectedSearchId == null || this.selectedSearchId.length === 0) ? 'selected' : '') +' hidden disabled>Select</option>'
-
-  //   for(var i = 0; i < values.length; i++) {
-
-  //     const fields = values[i].fields;
-  //     const id =  values[i].id;
-  //     const data = JSON.parse(fields.data);
-  //     const cols = JSON.parse(fields.cols);
-
-  //     if(this.removedValues.includes(id)) continue;
-
-  //     var projection = "";
-
-  //     for(var j = 0; j < cols.length; j++) {
-  //       if(cols[j] == this.selectProjection) {
-  //         projection = data[j];
-  //       }
-  //     }
-
-  //     html += '<option value="'+id+'" '+ (this.selectedSearchId.includes(id) ? 'selected' : '') +'>'+projection+'</option>';
-
-  //   }
-
-  //   this._sfInputSelect.innerHTML = html;
-
-  // }
-
   renderListRows = (values: any, multiSelect: boolean) => {
 
     console.log('renderlistrows', values);
@@ -1141,6 +1183,7 @@ export class SfIForm extends LitElement {
       let data = JSON.parse(values[i].fields.data);
       let cols = JSON.parse(values[i].fields.cols);
 
+
       var classBg = "";
 
       if(i%2 === 0) {
@@ -1150,7 +1193,7 @@ export class SfIForm extends LitElement {
       }
 
       var appendStr = "";
-      for(var j = 0; j < data.length; j++) {
+      for(var j = 0; j < cols.length; j++) {
         // console.log('data[j]', data[j]);
         if(!this.getIgnoreProjections().includes(cols[j])) {
 
@@ -1195,7 +1238,7 @@ export class SfIForm extends LitElement {
       }
       
       html += '</td>';
-      for(j = 0; j < data.length; j++) {
+      for(j = 0; j < cols.length; j++) {
 
        // console.log('data', data[j]);
 
@@ -1258,7 +1301,7 @@ export class SfIForm extends LitElement {
       html += '</table>';
 
       if(values.length === this.blockSize) {
-        html += '<div class="d-flex justify-center align-center mt-10 left-sticky">';
+        html += '<div id="down-indicator" class="d-flex justify-center align-center mt-10 left-sticky">';
         html += '<span part="td-head" id="page-num">&nbsp;&nbsp;'+(this.prevCursor.length+1) + "/" + (Math.ceil(parseInt(found)/10))+'&nbsp;&nbsp;</span>'
         html += '<button id="button-next-cursor" part="button-icon-small" class="material-icons">expand_more</button>&nbsp;&nbsp;';
         html += '</div>';
@@ -1282,8 +1325,12 @@ export class SfIForm extends LitElement {
 
     } else if(values.length > 0 && this.nextCursor.length > 0) {
 
-      this._SfSearchSelectContainer.querySelector('#select-list-table').innerHTML += this.renderListRows(values, multiSelect);
+      this._SfSearchSelectContainer.querySelector('#select-list-table').insertAdjacentHTML('beforeend', this.renderListRows(values, multiSelect))
       this._SfSearchSelectContainer.querySelector('#page-num').innerHTML = '&nbsp;&nbsp;'+(this.prevCursor.length+1) + "/" + (Math.ceil(parseInt(found)/10))+'&nbsp;&nbsp;';
+
+      if(values.length < this.blockSize) { 
+        ((this._SfSearchSelectContainer as HTMLDivElement).querySelector('#down-indicator') as HTMLDivElement).style.display = 'none';
+      }
 
       var old_element = (this._SfSearchSelectContainer as HTMLDivElement).querySelector('#button-next-cursor');
       var new_element = old_element!.cloneNode(true);
@@ -1738,6 +1785,7 @@ export class SfIForm extends LitElement {
     for(var i = 0; i < this.getFields().length; i++) {
 
       const field = this.getFields()[i] as string;
+      console.log('field', field);
       values[field] = this.getInputValue(this.getInputs()[i])
 
     }
@@ -1753,10 +1801,18 @@ export class SfIForm extends LitElement {
     this._SfLoader.innerHTML = '';
     if(xhr.status == 200) {
       this.setSuccess('Operation Successful!');
+      if(this.mode == "detail") {
+        setTimeout(() => {
+          this._SfButtonBack.click();
+        }, 2000);
+      } else {
+        this.dispatchMyEvent("valueChanged", {});
+        this.dispatchMyEvent("valueUpdated", {});
+        this.loadMode();
+      }
       setTimeout(() => {
-        this._SfButtonBack.click();
-      }, 2000);
-      
+        this.clearMessages();
+      }, 3000);
     } else {
       const jsonRespose = JSON.parse(xhr.responseText);
       this.setError(jsonRespose.error);
@@ -1779,48 +1835,89 @@ export class SfIForm extends LitElement {
 
         if(element.nodeName.toLowerCase() == "sf-i-select") {
           const elementSfISelect = element as SfISelect;
+          const parentElement = (elementSfISelect.parentElement as HTMLDivElement);
+          const icon = parentElement.querySelector('.error-icon') as HTMLElement;
+          if(icon != null) {
+            parentElement.removeChild(icon);
+          }
           if(element.hasAttribute('mandatory') && (elementSfISelect.selectedValues().length === 0 || elementSfISelect.selectedIndex() === 0)) {
-            console.log('evaluate false return', element, elementSfISelect.selectedValues().length, elementSfISelect.selectedIndex())
+            const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
+            parentElement.insertAdjacentHTML('beforeend', errorHtml);
             evaluate = false;
             break;
+          } else {
+            const errorHtml = '<div class="error-icon d-flex justify-end color-success"><div class="material-icons">done</div></div>';
+            parentElement.insertAdjacentHTML('beforeend', errorHtml);
           }
         } else if(element.nodeName.toLowerCase() == "sf-i-sub-select") {
           const elementSfISubSelect = element as SfISubSelect;
+          const parentElement = (elementSfISubSelect.parentElement as HTMLDivElement);
+          const icon = parentElement.querySelector('.error-icon') as HTMLElement;
+          if(icon != null) {
+            parentElement.removeChild(icon);
+          }
           if(element.hasAttribute('mandatory') && (elementSfISubSelect.selectedValues().length === 0 || elementSfISubSelect.selectedIndex() === 0)) {
-            console.log('evaluate false return', element, elementSfISubSelect.selectedValues().length, elementSfISubSelect.selectedIndex())
+            const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
+            parentElement.insertAdjacentHTML('beforeend', errorHtml);
             evaluate = false;
             break;
-          } 
+          } else {
+            const errorHtml = '<div class="error-icon d-flex justify-end color-success"><div class="material-icons">done</div></div>';
+            parentElement.insertAdjacentHTML('beforeend', errorHtml);
+          }
         } else if(element.nodeName.toLowerCase() == "sf-i-form") {
           const elementSfIForm = element as SfIForm;
-  
+          const parentElement = ((elementSfIForm as SfIForm).parentElement as HTMLDivElement);
+          const icon = parentElement.querySelector('.error-icon') as HTMLElement;
+          if(icon != null) {
+            parentElement.removeChild(icon);
+          }
           if(elementSfIForm.mode == "list") {
   
             console.log('form selected values', elementSfIForm.selectedValues());
             console.log('form selected texts', elementSfIForm.selectedTexts());
   
             if(element.hasAttribute('mandatory') && elementSfIForm.selectedValues().length === 0) {
+              const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
+            parentElement.insertAdjacentHTML('beforeend', errorHtml);
               console.log('evaluate false return', element)
               evaluate = false;
               break;
+            } else {
+              const errorHtml = '<div class="error-icon d-flex justify-end color-success"><div class="material-icons">done</div></div>';
+            parentElement.insertAdjacentHTML('beforeend', errorHtml);
             }
     
           } else {
   
             if(element.hasAttribute('mandatory') && elementSfIForm.selectedValues().length === 0) {
+              const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
+            parentElement.insertAdjacentHTML('beforeend', errorHtml);
               console.log('evaluate false return', element)
               evaluate = false;
               break;
+            } else {
+              const errorHtml = '<div class="error-icon d-flex justify-end color-success"><div class="material-icons">done</div></div>';
+              parentElement.insertAdjacentHTML('beforeend', errorHtml);
             }
     
           }
           
         } else {
-  
+          const parentElement = (element.parentElement as HTMLDivElement);
+          const icon = parentElement.querySelector('.error-icon') as HTMLElement;
+          if(icon != null) {
+            parentElement.removeChild(icon);
+          }
           if(element.hasAttribute('mandatory') && (element as HTMLInputElement).value.length === 0) {
+            const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
+            parentElement.insertAdjacentHTML('beforeend', errorHtml);
             console.log('evaluate false return', element)
             evaluate = false;
             break;
+          } else {
+            const errorHtml = '<div class="error-icon d-flex justify-end color-success"><div class="material-icons">check_circle</div></div>';
+            parentElement.insertAdjacentHTML('beforeend', errorHtml);
           }
 
         }
@@ -1897,7 +1994,9 @@ export class SfIForm extends LitElement {
       (this._SfButtonDeleteConfirm as HTMLButtonElement).style.display = 'none';
       (this._SfButtonDeleteCancel as HTMLButtonElement).style.display = 'none';
       (this._SfButtonEdit as HTMLButtonElement).style.display = 'block';
-      (this._SfButtonDelete as HTMLButtonElement).style.display = 'block';
+      if(this.mode != "consumer") {
+        (this._SfButtonDelete as HTMLButtonElement).style.display = 'block';
+      }
       (this._sfButtonSubmit as HTMLButtonElement).style.display = 'none';
     } else {
       // (this._sfButtonTrail as HTMLButtonElement).style.display = 'none';
@@ -1916,6 +2015,14 @@ export class SfIForm extends LitElement {
 
     this.processFiltersByEvent();
 
+  }
+
+  hideDelete = () => {
+    (this._SfButtonDelete as HTMLButtonElement).style.display = 'none';
+  }
+
+  hideBack = () => {
+    (this._SfButtonBack as HTMLButtonElement).style.visibility = 'hidden';
   }
 
   formatShortlistedSearchPhrase = () => {
@@ -2072,9 +2179,10 @@ export class SfIForm extends LitElement {
     for(var i = 0; i < this.getInputs().length; i++) {
 
       const element = this._sfSlottedForm[0].querySelector('#' + this.getInputs()[i]);
-
+      console.log('disabling', element);
       if(element.nodeName.toLowerCase() == "sf-i-select") {
         (element as SfISelect).flow = value ? "read" : "";
+        console.log('disabling1', element);
         (element as SfISelect).initState();
       } else if (element.nodeName.toLowerCase() == "sf-i-sub-select") {
         (element as SfISubSelect).flow = value ? "read" : "";
@@ -2169,6 +2277,154 @@ export class SfIForm extends LitElement {
 
   }
 
+  fWait = (ms: number) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        console.log("Done waiting");
+        resolve(ms)
+      }, ms )
+    })
+  }  
+
+  checkButtonState = true;
+
+  // triggerCheckButtonStates = async () => {
+
+  //   const func = () => {
+  //     console.log('i = func called');
+  //     this.checkButtonStates();
+  //   }
+
+  //   let myPromise = new Promise((resolve) => {
+
+  //     func();
+  //     console.log('i = 20 checkbuttonstate', this.checkButtonState);
+  //     if(this.checkButtonState) {
+  //       console.log('i = settimeout', this.checkButtonState);
+  //       setTimeout(() => {
+  //         func();
+  //       }, 2000);
+  //     } else {
+  //       console.log('i = resolving promise', this.checkButtonState);
+  //       resolve('')
+  //     }
+  //   });
+    
+  //   return myPromise;
+  // }
+
+  checkButtonStates = () => {
+
+    this.checkButtonState = false;
+
+    if((this._SfFormC[0] as HTMLDivElement) == null) {
+      this.checkButtonState = true;
+      console.log('i = func checkbuttonstate returning null', this.checkButtonState);
+      return;
+    }
+
+    console.log('i = func checkbuttonstate no null 1', this.checkButtonState);
+    const selects = (this._SfFormC[0] as HTMLDivElement).querySelectorAll('sf-i-select') as NodeListOf<SfISelect>;
+    for(var i = 0; i < selects.length; i++) {
+      const outerHtml = selects[i].nextElementSibling?.outerHTML;
+      if(outerHtml != null) {
+        if(outerHtml!.indexOf('color-success') >= 0) {
+        } else {
+          this.checkButtonState = true;
+          break;
+        }
+      } else {
+        this.checkButtonState = true;
+      }
+    }
+
+    if(!this.checkButtonState) {
+      const subSelects = (this._SfFormC[0] as HTMLDivElement).querySelectorAll('sf-i-sub-select') as NodeListOf<SfISubSelect>;
+      for(var i = 0; i < subSelects.length; i++) {
+        const outerHtml = subSelects[i].nextElementSibling?.outerHTML;
+        if(outerHtml != null) {
+          if(outerHtml!.indexOf('color-success') >= 0) {
+          } else {
+            this.checkButtonState = true;
+            break;
+          }
+        } else {
+          this.checkButtonState = true;
+        }
+      }
+    }
+
+    if(!this.checkButtonState) {
+      const subForms = (this._SfFormC[0] as HTMLDivElement).querySelectorAll('sf-i-form') as NodeListOf<SfIForm>;
+      for(var i = 0; i < subForms.length; i++) {
+        const outerHtml = subForms[i].nextElementSibling?.outerHTML;
+        if(outerHtml != null) {
+          if(outerHtml!.indexOf('color-success') >= 0) {
+          } else {
+            this.checkButtonState = true;
+            break;
+          }
+        } else {
+          this.checkButtonState = true;
+        }
+      }
+    }
+
+    if(!this.checkButtonState) {
+      const subInputs = (this._SfFormC[0] as HTMLDivElement).querySelectorAll('input') as NodeListOf<HTMLInputElement>;
+      for(var i = 0; i < subInputs.length; i++) {
+        const outerHtml = subInputs[i].nextElementSibling?.outerHTML;
+        if(outerHtml != null) {
+          if(outerHtml!.indexOf('color-success') >= 0) {
+          } else {
+            this.checkButtonState = true;
+            break;
+          }
+        } else {
+          this.checkButtonState = true;
+        }
+        
+      }
+    }
+
+    console.log('i = func checkbuttonstate no null 2', this.checkButtonState);
+
+  }
+
+  loopThroughSearchResults = async () => {
+
+    var buttons = (this._SfSearchListContainer as HTMLDivElement).querySelectorAll('.button-search-view') as NodeListOf<HTMLButtonElement>;
+
+    for(var i = 0; i < buttons.length; i++) {
+      console.log('processing i =', i);
+      buttons[i].click();
+      console.log('processing before wait', i);
+      await this.fWait(5000);
+      console.log('processing after wait', i);
+      this.checkButtonStates();
+      console.log('processing after checkbuttonstates', i, this.checkButtonState);
+      if(this.checkButtonState) {
+        i--;
+      } else {
+        (this._SfButtonEdit as HTMLButtonElement).click();
+        await this.fWait(5000);
+        var allClear = false;
+        while(!allClear) {
+          this.checkButtonStates();
+          await this.fWait(5000);
+          if(!this.checkButtonState) {
+            allClear = true;
+          }
+        }
+        (this._sfButtonSubmit as HTMLButtonElement).click();
+        await this.fWait(5000);
+        await this.fetchSearch();
+        buttons = (this._SfSearchListContainer as HTMLDivElement).querySelectorAll('.button-search-view') as NodeListOf<HTMLButtonElement>;
+      }
+    }
+
+  }
+
   initListenersView = () => {
 
     console.log('init listeners view');
@@ -2202,6 +2458,10 @@ export class SfIForm extends LitElement {
       this.fetchSearch();
     });
 
+    this._sfButtonRefresh.addEventListener('click', async () => {
+      await this.fetchSearch();
+      this.loopThroughSearchResults();
+    });
 
   }
 
@@ -2246,7 +2506,7 @@ export class SfIForm extends LitElement {
       filters = this.getUnitFiltersNew();
     }
 
-    if(this.mode == "detail") {
+    if(this.mode == "detail" || this.mode == "consumer") {
       filters = this.getUnitFiltersDetail();
     }
 
@@ -2258,66 +2518,77 @@ export class SfIForm extends LitElement {
         const targetElement = this._SfFormC[0].querySelector('#' + filters[i].target);
         const value = filters[i].value;
 
-        if((inputElement as HTMLInputElement).nodeName.toLowerCase() == "sf-i-select") {
+        if(filters[i].input != null) {
 
-          console.log('op', inputElement, targetElement, (inputElement as SfISelect).selectedValues()[0], value);
+          if((inputElement as HTMLInputElement).nodeName.toLowerCase() == "sf-i-select") {
 
-          if((inputElement as SfISelect).selectedValues()[0] == value) {
+            console.log('op', inputElement, targetElement, (inputElement as SfISelect).selectedValues()[0], value);
 
-            (targetElement as HTMLElement).style.display = 'none';
+            if((inputElement as SfISelect).selectedValues()[0] == value) {
+
+              (targetElement as HTMLElement).style.display = 'none';
+      
+            } else {
+
+              (targetElement as HTMLElement).style.display = 'block';
+
+            }
+
+          } else if ((inputElement as HTMLInputElement).nodeName.toLowerCase() == "sf-i-sub-select") {
+
+            console.log('op', inputElement, targetElement, (inputElement as SfISubSelect).selectedValues()[0], value);
+
+            if((inputElement as SfISubSelect).selectedValues()[0] == value) {
+
+              console.log('setting null 2');
     
+              (targetElement as HTMLElement).style.display = 'none';
+      
+            } else {
+
+              (targetElement as HTMLElement).style.display = 'block';
+
+            }
+
+          } else if ((inputElement as HTMLInputElement).nodeName.toLowerCase() == "sf-i-form") {
+
+            console.log('op', inputElement, targetElement, (inputElement as SfIForm).selectedValues()[0], value);
+
+            if((inputElement as SfIForm).selectedValues()[0] == value) {
+
+              console.log('setting null 3');
+    
+              (targetElement as HTMLElement).style.display = 'none';
+      
+            } else {
+
+              (targetElement as HTMLElement).style.display = 'block';
+
+            }
+
           } else {
 
-            (targetElement as HTMLElement).style.display = 'block';
+            if((inputElement as HTMLInputElement).value == value) {
+    
+              (targetElement as HTMLElement).style.display = 'none';
+      
+            } else {
 
-          }
+              (targetElement as HTMLElement).style.display = 'block';
 
-        } else if ((inputElement as HTMLInputElement).nodeName.toLowerCase() == "sf-i-sub-select") {
+            }
 
-          console.log('op', inputElement, targetElement, (inputElement as SfISubSelect).selectedValues()[0], value);
-
-          if((inputElement as SfISubSelect).selectedValues()[0] == value) {
-
-            console.log('setting null 2');
+          }        
   
-            (targetElement as HTMLElement).style.display = 'none';
-    
-          } else {
-
-            (targetElement as HTMLElement).style.display = 'block';
-
-          }
-
-        } else if ((inputElement as HTMLInputElement).nodeName.toLowerCase() == "sf-i-form") {
-
-          console.log('op', inputElement, targetElement, (inputElement as SfIForm).selectedValues()[0], value);
-
-          if((inputElement as SfIForm).selectedValues()[0] == value) {
-
-            console.log('setting null 3');
-  
-            (targetElement as HTMLElement).style.display = 'none';
-    
-          } else {
-
-            (targetElement as HTMLElement).style.display = 'block';
-
-          }
 
         } else {
 
-          if((inputElement as HTMLInputElement).value == value) {
-  
-            (targetElement as HTMLElement).style.display = 'none';
-    
-          } else {
+          (targetElement as HTMLElement).style.display = 'none';
 
-            (targetElement as HTMLElement).style.display = 'block';
+        }
 
-          }
+        console.log('processing filters element', inputElement);
 
-        }        
-  
       }
 
     }
@@ -2755,6 +3026,8 @@ export class SfIForm extends LitElement {
 
       setTimeout(() => {
         // this.initListenersTrail();
+        this.prevCursor = [];
+        this.nextCursor = [];
         this.fetchSearchSelect();
       }, 500)
 
@@ -2788,7 +3061,7 @@ export class SfIForm extends LitElement {
       }, 500)
       
 
-    } else if (this.mode == "detail") {
+    } else if (this.mode == "detail" || (this.mode == "consumer" && this.selectedId.length != null && this.selectedId.length > 0)) {
 
         console.log('load mode detail');
 
@@ -2815,7 +3088,13 @@ export class SfIForm extends LitElement {
           this.processFormLayouting();
           this.clearUnitFilters();
           this.processUnitFiltersDetail();
-        }, 500)
+
+          if(this.mode == "consumer") {
+            this.hideDelete();
+            this.hideBack();
+          }
+
+        }, this.mode == "detail" ? 500 : 3000)
       
     }
 
@@ -3052,13 +3331,12 @@ export class SfIForm extends LitElement {
             <div class="rb"></div>
           </div>
           <br />
-          <br />
           <div class="d-flex justify-center">
             <div class="loader-element"></div>
           </div>
           <div class="d-flex justify-center">
             <div class="lb"></div>
-            <div class="flex-grow">
+            <div class="d-flex justify-center flex-grow">
               <button part="button-lg" id="button-submit" disabled>Submit</button>
             </div>
             <div class="rb"></div>
@@ -3091,7 +3369,8 @@ export class SfIForm extends LitElement {
                 </div>
                 <div class="loader-element"></div>
               </div>
-              <div>
+              <div class="d-flex">
+                <button id="button-refresh" part="button-icon" class="material-icons button-icon">autorenew</button>
                 <button id="button-trail" part="button-icon" class="material-icons button-icon">receipt_long</button>
                 <button id="button-new" part="button-icon" class="material-icons button-icon">add</button>
               </div>
@@ -3128,7 +3407,7 @@ export class SfIForm extends LitElement {
         </div>
       `;
       
-    } else if(this.mode == "detail") {
+    } else if(this.mode == "detail" || this.mode == "consumer") {
 
       return html`
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -3185,13 +3464,12 @@ export class SfIForm extends LitElement {
             <div class="rb"></div>
           </div>
           <br />
-          <br />
           <div class="d-flex justify-center">
             <div class="loader-element"></div>
           </div>
           <div class="d-flex justify-center">
             <div class="lb"></div>
-            <div class="flex-grow">
+            <div class="d-flex justify-center flex-grow">
               <button part="button-lg" id="button-submit" disabled>Submit</button>
             </div>
             <div class="rb"></div>

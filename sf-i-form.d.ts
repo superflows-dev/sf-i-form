@@ -28,6 +28,7 @@ export declare class SfIForm extends LitElement {
     inputIds: string;
     fields: string;
     selectedViewToDetailValues: string;
+    useInApi: string;
     unitFiltersNew: string;
     unitFiltersDetail: string;
     _sfSlottedForm: any;
@@ -49,6 +50,7 @@ export declare class SfIForm extends LitElement {
     selectedValues: () => any[];
     selectedTexts: () => any[];
     static styles: import("lit").CSSResult;
+    _sfButtonRefresh: any;
     _sfButtonSubmit: any;
     _sfButtonAll: any;
     _sfButtonTrail: any;
@@ -82,6 +84,9 @@ export declare class SfIForm extends LitElement {
     _SfIEvents: any;
     _SfFormC: any;
     _SfCalendarC: any;
+    getInputFromField: (field: string) => any;
+    getFieldFromInput: (input: string) => any;
+    getUseInApi: () => any;
     getUnitFiltersNew: () => any;
     getUnitFiltersDetail: () => any;
     getSelectedViewToDetailValues: () => any;
@@ -128,6 +133,8 @@ export declare class SfIForm extends LitElement {
     disableConfirm: (value: boolean) => void;
     disableCalendar: (value: boolean) => void;
     disableEdit: (value: boolean) => void;
+    hideDelete: () => void;
+    hideBack: () => void;
     formatShortlistedSearchPhrase: () => void;
     updateShortlistedSearchPhrase: (parents: any, childElement: any) => void;
     processDependencies: () => void;
@@ -136,6 +143,10 @@ export declare class SfIForm extends LitElement {
     clearInputs: () => void;
     removeItemByValue: (value: string) => void;
     processFormLayouting: () => void;
+    fWait: (ms: number) => Promise<unknown>;
+    checkButtonState: boolean;
+    checkButtonStates: () => void;
+    loopThroughSearchResults: () => Promise<void>;
     initListenersView: () => void;
     initListenersTrail: () => void;
     clearUnitFilters: () => void;
