@@ -64,6 +64,8 @@ export declare class SfIForm extends LitElement {
     _SfRowErrorMessage: any;
     _SfRowSuccess: any;
     _SfRowSuccessMessage: any;
+    _SfRowNotif: any;
+    _SfRowNotifMessage: any;
     _SfLoader: any;
     _SfFormContainer: any;
     _SfCalendarContainer: any;
@@ -110,6 +112,7 @@ export declare class SfIForm extends LitElement {
     clearMessages: () => void;
     setError: (msg: string) => void;
     setSuccess: (msg: string) => void;
+    setNotif: (msg: string) => void;
     setListSelection: (value: string, text: string) => void;
     clickTableNextList: (cursor: any) => void;
     clickTableNext: (cursor: any) => void;
