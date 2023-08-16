@@ -322,7 +322,20 @@
   <body>
 <!-- apiIdCalendarDetail="r42gyc2xx1" -->
 
-    <sf-i-form 
+      <sf-i-form 
+        id="sf-i-project"
+        name="Projects"
+        label="Select Project *"
+        apiId="est9egdho9"
+        mode="select"
+        selectProjection="project"
+        ignoreProjections="[&quot;compliance&quot;,&quot;search&quot;,&quot;updatetype&quot;,&quot;shortid&quot;]"
+        searchPhrase=""
+        mandatory
+        >
+        </sf-i-form>
+
+    <!-- <sf-i-form 
       name="Compliances"
       apiId="r42gyc2xx1"
       dependencies="[{&quot;type&quot;: &quot;foreignkey&quot;, &quot;parent&quot;: &quot;sf-i-countries&quot;, &quot;child&quot;: &quot;sf-i-states&quot;},{&quot;type&quot;: &quot;foreignkey&quot;, &quot;parent&quot;: &quot;sf-i-categories&quot;, &quot;child&quot;: &quot;sf-i-subcategories&quot;},{&quot;type&quot;: &quot;foreignkey&quot;, &quot;parent&quot;: &quot;sf-i-frequencies&quot;, &quot;child&quot;: &quot;sf-i-subfrequencies&quot;},{&quot;type&quot;: &quot;searchable&quot;, &quot;parents&quot;: [&quot;sf-i-countries&quot;, &quot;sf-i-states&quot;, &quot;sf-i-categories&quot;, &quot;sf-i-subcategories&quot;], &quot;child&quot;: &quot;sf-i-statutes&quot;}]"
@@ -484,7 +497,7 @@
         <br /><br />
       </div>
 
-      </sf-i-form>
+      </sf-i-form> -->
 
 
     <!-- <sf-i-form id="sf-i-user" name="Users" label="Select User" apiid="rnmvvr922j" mode="multiselect-dropdown" searchphrase="ABC Group of Hotels  " selectprojection="name" mandatory=""></sf-i-form> -->

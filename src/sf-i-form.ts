@@ -2121,7 +2121,7 @@ export class SfIForm extends LitElement {
         }
         childElement.shortlistedSearchPhrases[parentElement.id] = selText
 
-      } else if(parentElement.nodeName.toLowerCase() == "input") {
+      } else if(parentElement.nodeName.toLowerCase() == "input" || parentElement.nodeName.toLowerCase() == "textarea") {
 
         var selText = '';
         selText += (parentElement as HTMLInputElement).value + "&"
@@ -3588,7 +3588,7 @@ export class SfIForm extends LitElement {
           </div>
           <br />
           <div class="d-flex">
-            <div class="lb"></div>
+            <div class="lb" part="lb"></div>
             <div class="d-flex align-end justify-between flex-grow">
               <div class="d-flex flex-col">
                 <label>Search</label>
@@ -3604,10 +3604,10 @@ export class SfIForm extends LitElement {
                 <button id="button-new" part="button-icon" class="material-icons button-icon">add</button>
               </div>
             </div>
-            <div class="rb"></div>
+            <div class="rb" part="rb"></div>
           </div>
           <div class="d-flex justify-center">
-            <div class="lb"></div>
+            <div class="lb" part="lb"></div>
             <div class="d-flex flex-col">
               <div class="d-flex justify-center gone">
               </div>
@@ -3621,12 +3621,12 @@ export class SfIForm extends LitElement {
                 <div part="notifmsg" class="div-row-notif-message"></div>
               </div>
             </div>
-            <div class="rb"></div>
+            <div class="rb" part="rb"></div>
           </div>
           <div class="d-flex">
-            <div class="lb"></div>
+            <div class="lb" part="lb"></div>
             <div id="search-list-container" class="flex-grow"></div>
-            <div class="rb"></div>
+            <div class="rb" part="rb"></div>
           </div>
         </div>
       `;
@@ -3652,7 +3652,7 @@ export class SfIForm extends LitElement {
           </div>
           <br />
           <div class="d-flex">
-            <div class="lb"></div>
+            <div class="lb" part="lb"></div>
             <div class="d-flex flex-grow justify-between">
               <button id="button-back" part="button-icon" class="button-icon"><span class="material-icons">keyboard_backspace</span></button>
               <div class="d-flex">
@@ -3665,26 +3665,26 @@ export class SfIForm extends LitElement {
                 <button id="button-delete-confirm" part="button-icon" class="button-icon"><span class="material-icons">delete</span><span class="material-icons">done</span></button>
               </div>
             </div>
-            <div class="rb"></div>
+            <div class="rb" part="rb"></div>
           </div>
           <br />
           <div class="d-flex justify-center">
-            <div class="lb"></div>
+            <div class="lb" part="lb"></div>
             <div class="flex-grow" id="form-container">
               <slot name="form"></slot>
             </div>
-            <div class="rb"></div>
+            <div class="rb" part="rb"></div>
           </div>
           <div class="d-flex justify-center">
-            <div class="lb"></div>
+            <div class="lb" part="lb"></div>
             <div class="flex-grow flexpcol hide" part="calendar-container" id="calendar-container">
               <div><h3 part="results-title"  class="text-center">Compliance Calendar</h3></div>
               <slot name="calendar"></slot>
             </div>
-            <div class="rb"></div>
+            <div class="rb" part="rb"></div>
           </div>
           <div class="d-flex justify-between">
-            <div class="lb"></div>
+            <div class="lb" part="lb"></div>
             <div>
               <div class="div-row-error div-row-submit gone">
                 <div part="errormsg" class="div-row-error-message"></div>
@@ -3696,18 +3696,18 @@ export class SfIForm extends LitElement {
                 <div part="notifmsg" class="div-row-notif-message"></div>
               </div>
             </div>
-            <div class="rb"></div>
+            <div class="rb" part="rb"></div>
           </div>
           <br />
           <div class="d-flex justify-center">
             <div class="loader-element"></div>
           </div>
           <div class="d-flex justify-center">
-            <div class="lb"></div>
+            <div class="lb" part="lb"></div>
             <div class="d-flex justify-start flex-grow">
               <button part="button-lg" id="button-submit" disabled>Submit</button>
             </div>
-            <div class="rb"></div>
+            <div class="rb" part="rb"></div>
           </div>
           
         </div>
