@@ -320,6 +320,10 @@ export class SfIForm extends LitElement {
       list-style-type:none;
     }
 
+    .flex-wrap {
+      flex-wrap: wrap;
+    }
+
     .mb-10 {
       margin-bottom: 10px;
     }
@@ -3355,7 +3359,7 @@ export class SfIForm extends LitElement {
         <div class="SfIFormC">
           <label part="input-label">${this.label}</label>
           <div>
-            <div class="d-flex justify-center align-start">
+            <div class="d-flex justify-center align-start flex-wrap">
               <div class="d-flex" id="search-multiselect-selected"></div>
               <div part="button-icon-small" class="d-flex hide material-icons color-gray pointer" id="search-multiselect-delete">delete</div>
               <div class="d-flex flex-col">
