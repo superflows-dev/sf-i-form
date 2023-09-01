@@ -2575,7 +2575,6 @@ SfIForm.styles = css `
       border: solid 1px #dddddd;
       white-space: nowrap;
       overflow: hidden !important;
-      text-overflow: ellipsis;
       width: 50px;
     }
 
