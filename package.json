@@ -1,7 +1,7 @@
 {
   "name": "sf-i-form",
   "private": false,
-  "version": "1.0.108",
+  "version": "1.0.109",
   "description": "Superflows Navigation Component",
   "main": "sf-i-form.js",
   "module": "sf-i-form.js",

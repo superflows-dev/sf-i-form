@@ -17,6 +17,7 @@ import { LitElement, PropertyValueMap } from 'lit';
  */
 export declare class SfIForm extends LitElement {
     blockSize: number;
+    VALIDATION_TEXT_BASIC: string;
     mode: string;
     flow: string;
     showCalendar: boolean;
@@ -27,6 +28,7 @@ export declare class SfIForm extends LitElement {
     dependencies: string;
     inputIds: string;
     fields: string;
+    validations: string;
     selectedViewToDetailValues: string;
     useInApi: string;
     unitFiltersNew: string;
@@ -93,6 +95,7 @@ export declare class SfIForm extends LitElement {
     getUnitFiltersDetail: () => any;
     getSelectedViewToDetailValues: () => any;
     getFields: () => any;
+    getValidations: () => any;
     getDependencies: () => any;
     getInputs: () => any;
     dispatchMyEvent: (ev: string, args?: any) => void;
@@ -132,6 +135,7 @@ export declare class SfIForm extends LitElement {
     submitDelete: () => Promise<void>;
     submitNew: () => Promise<void>;
     submitEdit: () => Promise<void>;
+    getValidationOfElement: (id: string) => any;
     evalSubmit: () => void;
     disableConfirm: (value: boolean) => void;
     disableCalendar: (value: boolean) => void;

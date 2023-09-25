@@ -37,6 +37,7 @@ DB: partitionKey, rangeKey, values
 export class SfIForm extends LitElement {
   
   blockSize = 10;
+  VALIDATION_TEXT_BASIC = "text-basic"
 
   @property()
   mode!: string;
@@ -74,6 +75,9 @@ export class SfIForm extends LitElement {
 
   @property()
   fields: string = "[]";
+
+  @property()
+  validations: string = "[]";
 
   @property()
   selectedViewToDetailValues: string = "[]";
@@ -846,6 +850,10 @@ export class SfIForm extends LitElement {
 
   getFields = () => {
     return JSON.parse(this.fields);
+  }
+
+  getValidations = () => {
+    return JSON.parse(this.validations);
   }
 
   getDependencies = () => {
@@ -1892,6 +1900,23 @@ export class SfIForm extends LitElement {
 
   }
 
+  getValidationOfElement = (id: string) => {
+
+    let ret = "";
+
+    for(var i = 0; i < Object.keys(this.getValidations()).length; i++) {
+
+      const key = Object.keys(this.getValidations())[i];
+      console.log('key', key);
+      if(key == id) {
+        return this.getValidations()[id]
+      }
+    }
+
+    return ret;
+
+  }
+
   evalSubmit = () => {
 
     var evaluate = true;
@@ -1913,7 +1938,7 @@ export class SfIForm extends LitElement {
             parentElement.removeChild(icon);
           }
           if(element.hasAttribute('mandatory') && (elementSfISelect.selectedValues().length === 0 || elementSfISelect.selectedIndex() === 0)) {
-            const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
+            const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
             parentElement.insertAdjacentHTML('beforeend', errorHtml);
             evaluate = false;
             break;
@@ -1929,7 +1954,7 @@ export class SfIForm extends LitElement {
             parentElement.removeChild(icon);
           }
           if(element.hasAttribute('mandatory') && (elementSfISubSelect.selectedValues().length === 0 || elementSfISubSelect.selectedIndex() === 0)) {
-            const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
+            const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
             parentElement.insertAdjacentHTML('beforeend', errorHtml);
             evaluate = false;
             break;
@@ -1950,7 +1975,7 @@ export class SfIForm extends LitElement {
             console.log('form selected texts', elementSfIForm.selectedTexts());
   
             if(element.hasAttribute('mandatory') && elementSfIForm.selectedValues().length === 0) {
-              const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
+              const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
             parentElement.insertAdjacentHTML('beforeend', errorHtml);
               console.log('evaluate false return', element)
               evaluate = false;
@@ -1963,7 +1988,7 @@ export class SfIForm extends LitElement {
           } else {
   
             if(element.hasAttribute('mandatory') && elementSfIForm.selectedValues().length === 0) {
-              const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
+              const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
             parentElement.insertAdjacentHTML('beforeend', errorHtml);
               console.log('evaluate false return', element)
               evaluate = false;
@@ -1981,16 +2006,49 @@ export class SfIForm extends LitElement {
           if(icon != null) {
             parentElement.removeChild(icon);
           }
-          if(element.hasAttribute('mandatory') && (element as HTMLInputElement).value.length === 0) {
-            const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
-            parentElement.insertAdjacentHTML('beforeend', errorHtml);
-            console.log('evaluate false return', element)
-            evaluate = false;
-            break;
-          } else {
-            const errorHtml = '<div class="error-icon d-flex justify-end color-success"><div class="material-icons">check_circle</div></div>';
-            parentElement.insertAdjacentHTML('beforeend', errorHtml);
+
+          let errInValidation = false;
+          if(this.getValidationOfElement(id) == this.VALIDATION_TEXT_BASIC) {
+
+            let value = (element as HTMLInputElement).value;
+
+            if((element as HTMLInputElement).value.length > 0) {
+
+              if(value.indexOf('[') >= 0 || value.indexOf(']') >= 0) {
+                errInValidation = true;
+              }
+              if(value.indexOf('"') >= 0) {
+                errInValidation = true;
+              }
+  
+              if(errInValidation) {
+                evaluate = false;
+                const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
+                parentElement.insertAdjacentHTML('beforeend', errorHtml);
+                console.log('evaluate false return', element)
+                evaluate = false;
+                return;
+              }
+  
+            }
+
+            
           }
+
+          if(!errInValidation) {
+            if(element.hasAttribute('mandatory') && (element as HTMLInputElement).value.length === 0) {
+              const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
+              parentElement.insertAdjacentHTML('beforeend', errorHtml);
+              console.log('evaluate false return', element)
+              evaluate = false;
+              break;
+            } else {
+              const errorHtml = '<div class="error-icon d-flex justify-end color-success"><div class="material-icons">check_circle</div></div>';
+              parentElement.insertAdjacentHTML('beforeend', errorHtml);
+            }
+          }
+
+          console.log('getvalidationofelement', id, this.getValidationOfElement(id));
 
         }
 

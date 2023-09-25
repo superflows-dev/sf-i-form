@@ -36,6 +36,7 @@ let SfIForm = class SfIForm extends LitElement {
     constructor() {
         super();
         this.blockSize = 10;
+        this.VALIDATION_TEXT_BASIC = "text-basic";
         this.flow = "";
         this.showCalendar = false;
         this.ignoreProjections = "[]";
@@ -50,6 +51,7 @@ let SfIForm = class SfIForm extends LitElement {
         this.dependencies = "[]";
         this.inputIds = "[]";
         this.fields = "[]";
+        this.validations = "[]";
         this.selectedViewToDetailValues = "[]";
         this.useInApi = "[]";
         this.unitFiltersNew = "[]";
@@ -167,6 +169,9 @@ let SfIForm = class SfIForm extends LitElement {
         };
         this.getFields = () => {
             return JSON.parse(this.fields);
+        };
+        this.getValidations = () => {
+            return JSON.parse(this.validations);
         };
         this.getDependencies = () => {
             return JSON.parse(this.dependencies);
@@ -995,6 +1000,17 @@ let SfIForm = class SfIForm extends LitElement {
                 this.setError(jsonRespose.error);
             }
         };
+        this.getValidationOfElement = (id) => {
+            let ret = "";
+            for (var i = 0; i < Object.keys(this.getValidations()).length; i++) {
+                const key = Object.keys(this.getValidations())[i];
+                console.log('key', key);
+                if (key == id) {
+                    return this.getValidations()[id];
+                }
+            }
+            return ret;
+        };
         this.evalSubmit = () => {
             var _a, _b;
             var evaluate = true;
@@ -1011,7 +1027,7 @@ let SfIForm = class SfIForm extends LitElement {
                             parentElement.removeChild(icon);
                         }
                         if (element.hasAttribute('mandatory') && (elementSfISelect.selectedValues().length === 0 || elementSfISelect.selectedIndex() === 0)) {
-                            const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
+                            const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
                             parentElement.insertAdjacentHTML('beforeend', errorHtml);
                             evaluate = false;
                             break;
@@ -1029,7 +1045,7 @@ let SfIForm = class SfIForm extends LitElement {
                             parentElement.removeChild(icon);
                         }
                         if (element.hasAttribute('mandatory') && (elementSfISubSelect.selectedValues().length === 0 || elementSfISubSelect.selectedIndex() === 0)) {
-                            const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
+                            const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
                             parentElement.insertAdjacentHTML('beforeend', errorHtml);
                             evaluate = false;
                             break;
@@ -1050,7 +1066,7 @@ let SfIForm = class SfIForm extends LitElement {
                             console.log('form selected values', elementSfIForm.selectedValues());
                             console.log('form selected texts', elementSfIForm.selectedTexts());
                             if (element.hasAttribute('mandatory') && elementSfIForm.selectedValues().length === 0) {
-                                const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
+                                const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
                                 parentElement.insertAdjacentHTML('beforeend', errorHtml);
                                 console.log('evaluate false return', element);
                                 evaluate = false;
@@ -1063,7 +1079,7 @@ let SfIForm = class SfIForm extends LitElement {
                         }
                         else {
                             if (element.hasAttribute('mandatory') && elementSfIForm.selectedValues().length === 0) {
-                                const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
+                                const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
                                 parentElement.insertAdjacentHTML('beforeend', errorHtml);
                                 console.log('evaluate false return', element);
                                 evaluate = false;
@@ -1081,17 +1097,40 @@ let SfIForm = class SfIForm extends LitElement {
                         if (icon != null) {
                             parentElement.removeChild(icon);
                         }
-                        if (element.hasAttribute('mandatory') && element.value.length === 0) {
-                            const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
-                            parentElement.insertAdjacentHTML('beforeend', errorHtml);
-                            console.log('evaluate false return', element);
-                            evaluate = false;
-                            break;
+                        let errInValidation = false;
+                        if (this.getValidationOfElement(id) == this.VALIDATION_TEXT_BASIC) {
+                            let value = element.value;
+                            if (element.value.length > 0) {
+                                if (value.indexOf('[') >= 0 || value.indexOf(']') >= 0) {
+                                    errInValidation = true;
+                                }
+                                if (value.indexOf('"') >= 0) {
+                                    errInValidation = true;
+                                }
+                                if (errInValidation) {
+                                    evaluate = false;
+                                    const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
+                                    parentElement.insertAdjacentHTML('beforeend', errorHtml);
+                                    console.log('evaluate false return', element);
+                                    evaluate = false;
+                                    return;
+                                }
+                            }
                         }
-                        else {
-                            const errorHtml = '<div class="error-icon d-flex justify-end color-success"><div class="material-icons">check_circle</div></div>';
-                            parentElement.insertAdjacentHTML('beforeend', errorHtml);
+                        if (!errInValidation) {
+                            if (element.hasAttribute('mandatory') && element.value.length === 0) {
+                                const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
+                                parentElement.insertAdjacentHTML('beforeend', errorHtml);
+                                console.log('evaluate false return', element);
+                                evaluate = false;
+                                break;
+                            }
+                            else {
+                                const errorHtml = '<div class="error-icon d-flex justify-end color-success"><div class="material-icons">check_circle</div></div>';
+                                parentElement.insertAdjacentHTML('beforeend', errorHtml);
+                            }
                         }
+                        console.log('getvalidationofelement', id, this.getValidationOfElement(id));
                     }
                 }
             }
@@ -3001,6 +3040,9 @@ __decorate([
 __decorate([
     property()
 ], SfIForm.prototype, "fields", void 0);
+__decorate([
+    property()
+], SfIForm.prototype, "validations", void 0);
 __decorate([
     property()
 ], SfIForm.prototype, "selectedViewToDetailValues", void 0);
