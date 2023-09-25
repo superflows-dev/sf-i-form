@@ -322,7 +322,20 @@
   <body>
 <!-- apiIdCalendarDetail="r42gyc2xx1" -->
 
-    <sf-i-form id="sf-i-user" name="Users" label="Select User" apiid="rnmvvr922j" mode="multiselect-dropdown" searchphrase="ABC" selectprojection="name" mandatory=""></sf-i-form>
+    <sf-i-form 
+    id="sf-i-project"
+    name="Projects"
+    label="Select Project *"
+    apiId="est9egdho9"
+    mode="select"
+    selectProjection="project"
+    ignoreProjections="[&quot;address&quot;,&quot;emails&quot;,&quot;vertical&quot;,&quot;cycledate&quot;,&quot;shortid&quot;]"
+    searchPhrase=""
+    mandatory
+    >
+    </sf-i-form>
+
+    <!-- <sf-i-form id="sf-i-user" name="Users" label="Select User" apiid="rnmvvr922j" mode="multiselect-dropdown" searchphrase="ABC" selectprojection="name" mandatory=""></sf-i-form> -->
 
       <!-- <sf-i-form 
         id="sf-i-project"

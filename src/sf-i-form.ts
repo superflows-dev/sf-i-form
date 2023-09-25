@@ -1282,7 +1282,7 @@ export class SfIForm extends LitElement {
       if(multiSelect) {
         html += '<div><input id="search-'+i+'" part="input-checkbox" type="checkbox" value="'+values[i].id+'" '+checked+' '+disabled+'/><div class="append-str gone">'+appendStr+'</div></div>';
       } else {
-        html += '<div><input id="search-'+i+'" name="select-statute" part="input-checkbox" type="radio" value="'+values[i].id+'" '+checked+' '+disabled+'/><div class="append-str gone">'+appendStr+'</div></div>';
+        html += '<div><input id="search-'+values[i].id+'" class="search-select-input" name="select-statute" part="input-checkbox" type="radio" value="'+values[i].id+'" '+checked+' '+disabled+'/><div class="append-str gone">'+appendStr+'</div></div>';
       }
       
       html += '</td>';
@@ -1319,6 +1319,8 @@ export class SfIForm extends LitElement {
   }
 
   renderList = (values: any, found: any, cursor: any, multiSelect: boolean = false) => {
+
+    console.log('renderlist', values, this.nextCursor);
 
     let html = '';
 
@@ -1357,15 +1359,28 @@ export class SfIForm extends LitElement {
 
       this._SfSearchSelectContainer.innerHTML = html;
 
-      for(var i = 0; i < values.length; i++) {
+      const inputElements = (this._SfSearchSelectContainer as HTMLDivElement).querySelectorAll('.search-select-input') as NodeListOf<HTMLInputElement>;
 
-       // console.log(this._SfSearchSelectContainer.querySelector('#search-' + i))
-        this._SfSearchSelectContainer.querySelector('#search-' + i).addEventListener('click', () => {
-        //  console.log('id', ev.currentTarget.id)
+      console.log('inputs', inputElements);
+
+      for(var i = 0; i < inputElements.length; i++) {
+
+        (inputElements[i] as HTMLInputElement).addEventListener('click', () => {
+          //console.log('event', (ev.currentTarget as HTMLInputElement).id);
           this.dispatchMyEvent("valueChanged", {newValue: {}, newText: {}});
-        });
+        })
 
       }
+
+      // for(var i = 0; i < values.length; i++) {
+
+      //  // console.log(this._SfSearchSelectContainer.querySelector('#search-' + i))
+      //   this._SfSearchSelectContainer.querySelector('#search-' + i).addEventListener('click', () => {
+      //   //  console.log('id', ev.currentTarget.id)
+      //     this.dispatchMyEvent("valueChanged", {newValue: {}, newText: {}});
+      //   });
+
+      // }
 
       (this._SfSearchSelectContainer as HTMLDivElement).querySelector('#button-next-cursor')?.addEventListener('click', () => {
         this.clickTableNextList(cursor);
@@ -1378,6 +1393,17 @@ export class SfIForm extends LitElement {
 
       if(values.length < this.blockSize) { 
         ((this._SfSearchSelectContainer as HTMLDivElement).querySelector('#down-indicator') as HTMLDivElement).style.display = 'none';
+      }
+
+      const inputElements = (this._SfSearchSelectContainer as HTMLDivElement).querySelectorAll('.search-select-input') as NodeListOf<HTMLInputElement>;
+
+      for(var i = 0; i < inputElements.length; i++) {
+
+        (inputElements[i] as HTMLInputElement).addEventListener('click', () => {
+          //console.log('event', (ev.currentTarget as HTMLInputElement).id);
+          this.dispatchMyEvent("valueChanged", {newValue: {}, newText: {}});
+        })
+
       }
 
       var old_element = (this._SfSearchSelectContainer as HTMLDivElement).querySelector('#button-next-cursor');

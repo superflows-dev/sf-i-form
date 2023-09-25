@@ -527,7 +527,7 @@ let SfIForm = class SfIForm extends LitElement {
                     html += '<div><input id="search-' + i + '" part="input-checkbox" type="checkbox" value="' + values[i].id + '" ' + checked + ' ' + disabled + '/><div class="append-str gone">' + appendStr + '</div></div>';
                 }
                 else {
-                    html += '<div><input id="search-' + i + '" name="select-statute" part="input-checkbox" type="radio" value="' + values[i].id + '" ' + checked + ' ' + disabled + '/><div class="append-str gone">' + appendStr + '</div></div>';
+                    html += '<div><input id="search-' + values[i].id + '" class="search-select-input" name="select-statute" part="input-checkbox" type="radio" value="' + values[i].id + '" ' + checked + ' ' + disabled + '/><div class="append-str gone">' + appendStr + '</div></div>';
                 }
                 html += '</td>';
                 for (j = 0; j < cols.length; j++) {
@@ -554,6 +554,7 @@ let SfIForm = class SfIForm extends LitElement {
         };
         this.renderList = (values, found, cursor, multiSelect = false) => {
             var _a, _b, _c;
+            console.log('renderlist', values, this.nextCursor);
             let html = '';
             if (values.length > 0 && this.nextCursor.length === 0) {
                 html += '<h3 part="results-title" class="left-sticky">Search Results (' + found + ')</h3>';
@@ -581,13 +582,21 @@ let SfIForm = class SfIForm extends LitElement {
                     html += '</div>';
                 }
                 this._SfSearchSelectContainer.innerHTML = html;
-                for (var i = 0; i < values.length; i++) {
-                    // console.log(this._SfSearchSelectContainer.querySelector('#search-' + i))
-                    this._SfSearchSelectContainer.querySelector('#search-' + i).addEventListener('click', () => {
-                        //  console.log('id', ev.currentTarget.id)
+                const inputElements = this._SfSearchSelectContainer.querySelectorAll('.search-select-input');
+                console.log('inputs', inputElements);
+                for (var i = 0; i < inputElements.length; i++) {
+                    inputElements[i].addEventListener('click', () => {
+                        //console.log('event', (ev.currentTarget as HTMLInputElement).id);
                         this.dispatchMyEvent("valueChanged", { newValue: {}, newText: {} });
                     });
                 }
+                // for(var i = 0; i < values.length; i++) {
+                //  // console.log(this._SfSearchSelectContainer.querySelector('#search-' + i))
+                //   this._SfSearchSelectContainer.querySelector('#search-' + i).addEventListener('click', () => {
+                //   //  console.log('id', ev.currentTarget.id)
+                //     this.dispatchMyEvent("valueChanged", {newValue: {}, newText: {}});
+                //   });
+                // }
                 (_a = this._SfSearchSelectContainer.querySelector('#button-next-cursor')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
                     this.clickTableNextList(cursor);
                 });
@@ -597,6 +606,13 @@ let SfIForm = class SfIForm extends LitElement {
                 this._SfSearchSelectContainer.querySelector('#page-num').innerHTML = '&nbsp;&nbsp;' + (this.prevCursor.length + 1) + "/" + (Math.ceil(parseInt(found) / 10)) + '&nbsp;&nbsp;';
                 if (values.length < this.blockSize) {
                     this._SfSearchSelectContainer.querySelector('#down-indicator').style.display = 'none';
+                }
+                const inputElements = this._SfSearchSelectContainer.querySelectorAll('.search-select-input');
+                for (var i = 0; i < inputElements.length; i++) {
+                    inputElements[i].addEventListener('click', () => {
+                        //console.log('event', (ev.currentTarget as HTMLInputElement).id);
+                        this.dispatchMyEvent("valueChanged", { newValue: {}, newText: {} });
+                    });
                 }
                 var old_element = this._SfSearchSelectContainer.querySelector('#button-next-cursor');
                 var new_element = old_element.cloneNode(true);
