@@ -18,11 +18,13 @@ import { LitElement, PropertyValueMap } from 'lit';
 export declare class SfIForm extends LitElement {
     blockSize: number;
     VALIDATION_TEXT_BASIC: string;
+    VALIDATION_TEXT_DATE: string;
     mode: string;
     flow: string;
     showCalendar: boolean;
     searchPhrase: string;
     selectProjection: string;
+    selectAnotherProjection: string;
     ignoreProjections: string;
     getIgnoreProjections: () => any;
     dependencies: string;

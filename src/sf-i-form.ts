@@ -38,6 +38,7 @@ export class SfIForm extends LitElement {
   
   blockSize = 10;
   VALIDATION_TEXT_BASIC = "text-basic"
+  VALIDATION_TEXT_DATE = "text-date"
 
   @property()
   mode!: string;
@@ -53,6 +54,9 @@ export class SfIForm extends LitElement {
 
   @property()
   selectProjection!: string;
+
+  @property()
+  selectAnotherProjection!: string;
 
   @property()
   ignoreProjections: string = "[]";
@@ -1631,13 +1635,25 @@ export class SfIForm extends LitElement {
       const cols = JSON.parse(values[i].fields.cols[0]) as Array<any>;
       const data = JSON.parse(values[i].fields.data[0]) as Array<any>;
 
+      let selectProjectionValue = "";
+      let selectAnotherProjectionValue = "";
+
       for(var j = 0; j < cols.length; j++) {
         if(cols[j] == this.selectProjection) {
-          const value = Array.isArray(data[j]) ? data[j][0] : data[j];
-          html += '<option value="'+value+';'+id+'">'+value+'</option>';
+          selectProjectionValue = Array.isArray(data[j]) ? data[j][0] : data[j];
+        }
+        if(this.selectAnotherProjection != null && this.selectAnotherProjection.length > 0) {
+          if(cols[j] == this.selectAnotherProjection) {
+            selectAnotherProjectionValue = Array.isArray(data[j]) ? data[j][0] : data[j];
+          }
         }
       }
 
+      if(this.selectAnotherProjection != null && selectAnotherProjectionValue.length > 0) {
+        html += '<option value="'+selectProjectionValue+';'+id+';'+selectAnotherProjectionValue+'">'+selectProjectionValue+'</option>';
+      } else {
+        html += '<option value="'+selectProjectionValue+';'+id+'">'+selectProjectionValue+'</option>';
+      }
 
     }
 
@@ -2035,6 +2051,37 @@ export class SfIForm extends LitElement {
             
           }
 
+          if(this.getValidationOfElement(id) == this.VALIDATION_TEXT_DATE) {
+
+            let value = (element as HTMLInputElement).value;
+
+            if((element as HTMLInputElement).value.length > 0) {
+
+              if(value.indexOf(' ') >= 0) {
+                errInValidation = true;
+              }
+
+              var regExpAlpha = /[a-zA-Z]/g;
+              var regExpSpecial = /[ `!@#$%^&()_+\-=\[\]{};':"|.<>?~]/;
+
+              if(regExpAlpha.test(value) || regExpSpecial.test(value)) {
+                errInValidation = true;
+              }
+  
+              if(errInValidation) {
+                evaluate = false;
+                const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
+                parentElement.insertAdjacentHTML('beforeend', errorHtml);
+                console.log('evaluate false return', element)
+                evaluate = false;
+                return;
+              }
+  
+            }
+
+            
+          }
+
           if(!errInValidation) {
             if(element.hasAttribute('mandatory') && (element as HTMLInputElement).value.length === 0) {
               const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div>';
@@ -2296,6 +2343,8 @@ export class SfIForm extends LitElement {
   initShowInputs = () => {
 
     for(var i = 0; i < this.getInputs().length; i++) {
+
+      console.log(this.getInputs()[i]);
 
       const element = this._sfSlottedForm[0].querySelector('#' + this.getInputs()[i]);
       element.style.display = 'block'; 
