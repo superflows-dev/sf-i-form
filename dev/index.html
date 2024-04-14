@@ -15,8 +15,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200;300;400;600&display=swap" rel="stylesheet">
     <script type="module">
-        import {SfISelect} from 'https://unpkg.com/sf-i-select@1.0.85/sf-i-select.js?module';
-        import {SfISubSelect} from 'https://unpkg.com/sf-i-sub-select@1.0.80/sf-i-sub-select.js?module';
+        import {SfISelect} from 'https://unpkg.com/sf-i-select@1.0.91/sf-i-select.js?module';
+        import {SfISubSelect} from 'https://unpkg.com/sf-i-sub-select@1.0.82/sf-i-sub-select.js?module';
         import {SfIEvents} from 'https://unpkg.com/sf-i-events@1.0.22/sf-i-events.js?module';
         import {SfIElasticText} from 'https://unpkg.com/sf-i-elastic-text@1.0.7/sf-i-elastic-text.js?module';
     </script>
@@ -968,7 +968,7 @@
 
     <!-- <sf-i-form id="sf-i-user" name="Users" label="Select User" apiid="rnmvvr922j" mode="multiselect-dropdown" searchphrase="Project 1 Kothrud h@abc.com Hardware 3/5/*" selectprojection="name" mandatory=""></sf-i-form> -->
 
-    <sf-i-form 
+    <!-- <sf-i-form 
     id="sf-i-compliances"
     name="Compliances"
     label="Select Compliances *"
@@ -980,8 +980,53 @@
     preselectedValues="[]"
     mandatory
     >
-    </sf-i-form>
+    </sf-i-form> -->
 
+    <sf-i-form name="Statutes" apiid="4wb2x6fkga" dependencies="[{&quot;parent&quot;: &quot;sf-i-countries&quot;, &quot;child&quot;: &quot;sf-i-states&quot;},{&quot;parent&quot;: &quot;sf-i-categories&quot;, &quot;child&quot;: &quot;sf-i-subcategories&quot;}]" inputids="[&quot;sf-i-jurisdictions&quot;, &quot;sf-i-countries&quot;, &quot;sf-i-states&quot;, &quot;name&quot;, &quot;sf-i-categories&quot;, &quot;sf-i-subcategories&quot;, &quot;sf-i-updatetypes&quot;]" fields="[&quot;jurisdiction&quot;,&quot;country&quot;,&quot;state&quot;,&quot;name&quot;,&quot;category&quot;,&quot;subcategory&quot;, &quot;updatetype&quot;]" unitfiltersdetail="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;},{&quot;op&quot;: &quot;hide&quot;, &quot;input&quot;: &quot;sf-i-jurisdictions&quot;, &quot;value&quot;: &quot;7898fc45-88d3-4d42-9ee4-18e70e465dfb&quot;, &quot;target&quot;: &quot;sf-i-states&quot;}]" unitfiltersnew="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;20851e13-f0f7-4f8d-9bb8-ab96b1df6160&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;},{&quot;op&quot;: &quot;hide&quot;, &quot;input&quot;: &quot;sf-i-jurisdictions&quot;, &quot;value&quot;: &quot;7898fc45-88d3-4d42-9ee4-18e70e465dfb&quot;, &quot;target&quot;: &quot;sf-i-states&quot;}]" ignoreprojections="[&quot;updatetype&quot;,&quot;jurisdiction&quot;,&quot;state&quot;,&quot;category&quot;,&quot;subcategory&quot;,&quot;shortid&quot;]" mode="view">
+      <div slot="form">
+        <div class="d-flex align-start">
+
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-updatetypes" apiid="oqze24s784" name="UpdateTypes" label="Select Update Type *" mandatory="" style="display: block;">
+            </sf-i-select>
+          </div>
+          <div class="w-10-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-countries" apiid="zu3kh9cq2c" name="Countries" label="Select Country" mandatory="" style="display: block;">
+            </sf-i-select>
+          </div>
+
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-jurisdictions" apiid="5s7ih5uw4h" name="Jurisdictions" label="Select Jurisdiction" mandatory="" style="display: block;">
+            </sf-i-select>
+          <div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div></div>
+          <div class="w-10-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-sub-select id="sf-i-states" apiid="clnu4kk1ah" name="States" label="Select State" mandatory="" style="display: inline;">
+            </sf-i-sub-select>
+          </div>
+
+          <div class="w-100-m-0 mb-20">
+            <label>Name</label><br>
+            <input id="name" type="text" class="w-100-m-0" mandatory="" style="display: block;">
+          </div>
+
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-categories" apiid="8an2d4j1gc" name="Categories" label="Select Category" mandatory="" style="display: block;">
+            </sf-i-select>
+          </div>
+          <div class="w-10-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-sub-select id="sf-i-subcategories" apiid="mdkc0e2bo5" name="SubCategories" label="Select SubCategory" mandatory="" style="display: block;">
+            </sf-i-sub-select>
+          </div>
+          
+        </div>
+        <br>
+        
+      </div>
+
+    </sf-i-form>
 
 
     <!-- <sf-i-form 
@@ -1362,7 +1407,38 @@
 
     </sf-i-form> -->
     <script>
+
+      function setCookie(name,value,days) {
+          var expires = "";
+          if (days) {
+              var date = new Date();
+              date.setTime(date.getTime() + (days*24*60*60*1000));
+              expires = "; expires=" + date.toUTCString();
+          }
+          document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+      }
+      function getCookie(name) {
+          var nameEQ = name + "=";
+          var ca = document.cookie.split(';');
+          for(var i=0;i < ca.length;i++) {
+              var c = ca[i];
+              while (c.charAt(0)==' ') c = c.substring(1,c.length);
+              if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+          }
+          return null;
+      }
+      function eraseCookie(name) {   
+          document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      }
       
+      // setCookie('admin', 'false', 10);
+      // setCookie('accessToken', 'lswr0qwuyso6z6c1vu', 10);
+      // setCookie('email', 'hrushi.mehendale@gmail.com', 10);
+
+      setCookie('admin', 'true', 10);
+      setCookie('accessToken', 'lryl9bjdnsb4kys1z2', 10);
+      setCookie('email', 'hrushi.mehendale@gmail.com', 10);
+
     </script>
   </body>
 </html>
