@@ -321,6 +321,61 @@
     </style>
   </head>
   <body>
+    <sf-i-form name="Projects" apiid="est9egdho9" dependencies="[]" unitfiltersdetail="[]" unitfiltersnew="[]" inputids="[&quot;sf-i-name&quot;, &quot;sf-i-emails&quot;, &quot;sf-i-cycledate&quot;, &quot;sf-i-contractdate&quot;, &quot;sf-i-quality&quot;]" fields="[&quot;name&quot;,&quot;emails&quot;,&quot;cycledate&quot;,&quot;contractdate&quot;,&quot;quality&quot;]" ignoreprojections="[&quot;emails&quot;,&quot;cycledate&quot;,&quot;address&quot;,&quot;vertical&quot;]" validations="{&quot;sf-i-name&quot;:  &quot;text-basic&quot;, &quot;sf-i-emails&quot;:  &quot;text-basic&quot;, &quot;sf-i-contractdate&quot;:  &quot;text-date&quot;, &quot;sf-i-quality&quot;:  &quot;text-basic&quot;}" mode="view">
+
+      <div slot="form">
+
+        <div class="d-flex justify-center align-start">
+          <div class="w-100-m-0">
+            <label>Name *</label><br>
+            <input id="sf-i-name" type="text" class="w-100-m-0" mandatory="">
+          </div>
+        </div>
+        <br><br>
+        <!-- <div class="d-flex justify-center align-start">
+            <div class="w-100-m-0">
+              <label>Address *</label><br />
+              <input id="sf-i-address" type="text" class="w-100-m-0" mandatory/>
+            </div>
+        </div>
+        <br /><br /> -->
+        <div class="d-flex justify-center align-start">
+            <div class="w-100-m-0">
+              <label>Emails * <small>(multiple allowed, separate by comma)</small></label><br>
+              <input id="sf-i-emails" type="text" class="w-100-m-0" mandatory="">
+            </div>
+        </div>
+        <!-- <br /><br />
+        <div class="d-flex justify-center align-start">
+            <div class="w-100-m-0">
+              <label>Business Vertical *</label><br />
+              <input id="sf-i-vertical" type="text" class="w-100-m-0" mandatory/>
+            </div>
+        </div> -->
+        <br><br>
+        <div class="d-flex justify-center align-start">
+            <div class="w-100-m-0">
+              <label>Contract End Date *</label><br>
+              <input id="sf-i-contractdate" type="text" class="w-100-m-0" mandatory="">
+            </div>
+        </div>
+        <br><br>
+        <div class="d-flex justify-center align-start">
+            <div class="w-100-m-0">
+              <label>Business Cycle Date *</label><br>
+              <input id="sf-i-cycledate" type="text" class="w-100-m-0" mandatory="">
+            </div>
+        </div>
+        <br><br>
+        <div class="d-flex justify-center align-start">
+            <div class="w-100-m-0">
+              <label>Quality *</label><br>
+              <input id="sf-i-quality" type="text" class="w-100-m-0" mandatory="">
+            </div>
+        </div>
+      </div>
+
+    </sf-i-form>
 <!-- apiIdCalendarDetail="r42gyc2xx1" -->
 <!-- 
     <sf-i-form 
@@ -982,7 +1037,7 @@
     >
     </sf-i-form> -->
 
-    <sf-i-form name="Statutes" apiid="4wb2x6fkga" dependencies="[{&quot;parent&quot;: &quot;sf-i-countries&quot;, &quot;child&quot;: &quot;sf-i-states&quot;},{&quot;parent&quot;: &quot;sf-i-categories&quot;, &quot;child&quot;: &quot;sf-i-subcategories&quot;}]" inputids="[&quot;sf-i-jurisdictions&quot;, &quot;sf-i-countries&quot;, &quot;sf-i-states&quot;, &quot;name&quot;, &quot;sf-i-categories&quot;, &quot;sf-i-subcategories&quot;, &quot;sf-i-updatetypes&quot;]" fields="[&quot;jurisdiction&quot;,&quot;country&quot;,&quot;state&quot;,&quot;name&quot;,&quot;category&quot;,&quot;subcategory&quot;, &quot;updatetype&quot;]" unitfiltersdetail="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;},{&quot;op&quot;: &quot;hide&quot;, &quot;input&quot;: &quot;sf-i-jurisdictions&quot;, &quot;value&quot;: &quot;7898fc45-88d3-4d42-9ee4-18e70e465dfb&quot;, &quot;target&quot;: &quot;sf-i-states&quot;}]" unitfiltersnew="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;20851e13-f0f7-4f8d-9bb8-ab96b1df6160&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;},{&quot;op&quot;: &quot;hide&quot;, &quot;input&quot;: &quot;sf-i-jurisdictions&quot;, &quot;value&quot;: &quot;7898fc45-88d3-4d42-9ee4-18e70e465dfb&quot;, &quot;target&quot;: &quot;sf-i-states&quot;}]" ignoreprojections="[&quot;updatetype&quot;,&quot;jurisdiction&quot;,&quot;state&quot;,&quot;category&quot;,&quot;subcategory&quot;,&quot;shortid&quot;]" mode="view">
+    <!-- <sf-i-form name="Statutes" apiid="4wb2x6fkga" dependencies="[{&quot;parent&quot;: &quot;sf-i-countries&quot;, &quot;child&quot;: &quot;sf-i-states&quot;},{&quot;parent&quot;: &quot;sf-i-categories&quot;, &quot;child&quot;: &quot;sf-i-subcategories&quot;}]" inputids="[&quot;sf-i-jurisdictions&quot;, &quot;sf-i-countries&quot;, &quot;sf-i-states&quot;, &quot;name&quot;, &quot;sf-i-categories&quot;, &quot;sf-i-subcategories&quot;, &quot;sf-i-updatetypes&quot;]" fields="[&quot;jurisdiction&quot;,&quot;country&quot;,&quot;state&quot;,&quot;name&quot;,&quot;category&quot;,&quot;subcategory&quot;, &quot;updatetype&quot;]" unitfiltersdetail="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;},{&quot;op&quot;: &quot;hide&quot;, &quot;input&quot;: &quot;sf-i-jurisdictions&quot;, &quot;value&quot;: &quot;7898fc45-88d3-4d42-9ee4-18e70e465dfb&quot;, &quot;target&quot;: &quot;sf-i-states&quot;}]" unitfiltersnew="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;20851e13-f0f7-4f8d-9bb8-ab96b1df6160&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;},{&quot;op&quot;: &quot;hide&quot;, &quot;input&quot;: &quot;sf-i-jurisdictions&quot;, &quot;value&quot;: &quot;7898fc45-88d3-4d42-9ee4-18e70e465dfb&quot;, &quot;target&quot;: &quot;sf-i-states&quot;}]" ignoreprojections="[&quot;updatetype&quot;,&quot;jurisdiction&quot;,&quot;state&quot;,&quot;category&quot;,&quot;subcategory&quot;,&quot;shortid&quot;]" mode="view">
       <div slot="form">
         <div class="d-flex align-start">
 
@@ -1026,7 +1081,7 @@
         
       </div>
 
-    </sf-i-form>
+    </sf-i-form> -->
 
 
     <!-- <sf-i-form 
@@ -1436,7 +1491,7 @@
       // setCookie('email', 'hrushi.mehendale@gmail.com', 10);
 
       setCookie('admin', 'true', 10);
-      setCookie('accessToken', 'lryl9bjdnsb4kys1z2', 10);
+      setCookie('accessToken', 'lvkjmou48ganznmolze', 10);
       setCookie('email', 'hrushi.mehendale@gmail.com', 10);
 
     </script>

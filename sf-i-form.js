@@ -401,7 +401,7 @@ let SfIForm = class SfIForm extends LitElement {
                     if (this.prevCursor.length > 0) {
                         html += '<button id="button-prev-cursor" part="button-icon-small" class="material-icons">chevron_left</button>&nbsp;';
                     }
-                    html += '<span part="td-head">&nbsp;&nbsp;' + (this.prevCursor.length + 1) + "/" + (Math.ceil(parseInt(found) / 10)) + '&nbsp;&nbsp;</span>';
+                    html += '<span part="td-head">&nbsp;&nbsp;' + (this.prevCursor.length + 1) + "/" + (Math.ceil(parseInt(found) / this.blockSize)) + '&nbsp;&nbsp;</span>';
                     html += '<button id="button-next-cursor" part="button-icon-small" class="material-icons">chevron_right</button>&nbsp;&nbsp;';
                     html += '</div>';
                 }
@@ -410,25 +410,25 @@ let SfIForm = class SfIForm extends LitElement {
                     if (this.prevCursor.length > 0) {
                         html += '<button id="button-prev-cursor" part="button-icon-small" class="material-icons">chevron_left</button>&nbsp;&nbsp;';
                     }
-                    html += '<span part="td-head">&nbsp;&nbsp;' + (this.prevCursor.length + 1) + "/" + (Math.ceil(parseInt(found) / 10)) + '&nbsp;&nbsp;</span>';
+                    html += '<span part="td-head">&nbsp;&nbsp;' + (this.prevCursor.length + 1) + "/" + (Math.ceil(parseInt(found) / this.blockSize)) + '&nbsp;&nbsp;</span>';
                     html += '</div>';
                 }
                 html += '<table>';
                 //console.log('search', values)
-                const cols = JSON.parse(values[0].fields.cols);
                 html += '<thead>';
-                html += '<th part="td-action" class="td-head left-sticky">';
-                html += 'Action';
-                html += '</th>';
-                for (var i = 0; i < cols.length; i++) {
-                    if (!this.getIgnoreProjections().includes(cols[i])) {
-                        html += '<th part="td-head" class="td-head">';
-                        html += cols[i];
-                        html += '</th>';
-                    }
-                }
+                // html += '<th part="td-action" class="td-head left-sticky">'
+                // html += 'Action';
+                // html += '</th>'
+                // for(var i = 0; i < cols.length; i++) {
+                //   if(!this.getIgnoreProjections().includes(cols[i])) {
+                //     html += '<th part="td-head" class="td-head">'
+                //     html += cols[i]
+                //     html += '</th>'
+                //   }
+                // }
                 html += '</thead>';
                 for (var i = 0; i < values.length; i++) {
+                    const cols = JSON.parse(values[i].fields.cols);
                     // console.log(JSON.parse(values[i].fields.data));
                     let data = JSON.parse(values[i].fields.data);
                     var classBg = "";
@@ -446,6 +446,7 @@ let SfIForm = class SfIForm extends LitElement {
                         console.log('getignoreprojects', this.getIgnoreProjections());
                         if (!this.getIgnoreProjections().includes(cols[j])) {
                             html += '<td part="td-body" class="td-body ' + classBg + '">';
+                            html += ('<div part="row-col-title">' + cols[j] + '</div>');
                             if (Array.isArray(data[j])) {
                                 for (var k = 0; k < data[j].length; k++) {
                                     html += ('<sf-i-elastic-text text="' + data[j][k] + '" minLength="80"></sf-i-elastic-text>');
@@ -583,7 +584,7 @@ let SfIForm = class SfIForm extends LitElement {
                 html += '</table>';
                 if (values.length === this.blockSize) {
                     html += '<div id="down-indicator" class="d-flex justify-center align-center mt-10 left-sticky">';
-                    html += '<span part="td-head" id="page-num">&nbsp;&nbsp;' + (this.prevCursor.length + 1) + "/" + (Math.ceil(parseInt(found) / 10)) + '&nbsp;&nbsp;</span>';
+                    html += '<span part="td-head" id="page-num">&nbsp;&nbsp;' + (this.prevCursor.length + 1) + "/" + (Math.ceil(parseInt(found) / this.blockSize)) + '&nbsp;&nbsp;</span>';
                     html += '<button id="button-next-cursor" part="button-icon-small" class="material-icons">expand_more</button>&nbsp;&nbsp;';
                     html += '</div>';
                 }
@@ -609,7 +610,7 @@ let SfIForm = class SfIForm extends LitElement {
             }
             else if (values.length > 0 && this.nextCursor.length > 0) {
                 this._SfSearchSelectContainer.querySelector('#select-list-table').insertAdjacentHTML('beforeend', this.renderListRows(values, multiSelect));
-                this._SfSearchSelectContainer.querySelector('#page-num').innerHTML = '&nbsp;&nbsp;' + (this.prevCursor.length + 1) + "/" + (Math.ceil(parseInt(found) / 10)) + '&nbsp;&nbsp;';
+                this._SfSearchSelectContainer.querySelector('#page-num').innerHTML = '&nbsp;&nbsp;' + (this.prevCursor.length + 1) + "/" + (Math.ceil(parseInt(found) / this.blockSize)) + '&nbsp;&nbsp;';
                 if (values.length < this.blockSize) {
                     this._SfSearchSelectContainer.querySelector('#down-indicator').style.display = 'none';
                 }
