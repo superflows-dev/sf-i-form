@@ -16,6 +16,7 @@ import { LitElement, PropertyValueMap } from 'lit';
  * @property selectedValue - callback function
  */
 export declare class SfIForm extends LitElement {
+    searchPhraseOriginal: string;
     blockSize: number;
     VALIDATION_TEXT_BASIC: string;
     VALIDATION_TEXT_DATE: string;
@@ -62,6 +63,7 @@ export declare class SfIForm extends LitElement {
     _sfButtonCalendar: any;
     _sfInputSearch: any;
     _sfInputSelect: any;
+    _sfInputSearchSelect: any;
     _sfInputList: any;
     _sfButtonDelete: any;
     _SfRowError: any;
@@ -88,6 +90,9 @@ export declare class SfIForm extends LitElement {
     _SfButtonEditCancel: any;
     _SfButtonDeleteCancel: any;
     _SfIEvents: any;
+    _SfButtonCopypasteOpen: any;
+    _SfButtonCopypasteCopy: any;
+    _SfButtonCopypastePaste: any;
     _SfFormC: any;
     _SfCalendarC: any;
     getInputFromField: (field: string) => any;
@@ -126,6 +131,7 @@ export declare class SfIForm extends LitElement {
     renderListRows: (values: any, multiSelect: boolean) => string;
     renderList: (values: any, found: any, cursor: any, multiSelect?: boolean) => void;
     renderLogs: (values: any) => void;
+    renderClipboard: (value: any) => void;
     renderDetail: (value: any) => void;
     renderSearchMultiselect: (values: Array<any>) => void;
     fetchSearch: (cursor?: any) => Promise<void>;
@@ -137,6 +143,7 @@ export declare class SfIForm extends LitElement {
     submitDelete: () => Promise<void>;
     submitNew: () => Promise<void>;
     submitEdit: () => Promise<void>;
+    populateValues: () => any;
     getValidationOfElement: (id: string) => any;
     evalSubmit: () => void;
     disableConfirm: (value: boolean) => void;
@@ -163,6 +170,7 @@ export declare class SfIForm extends LitElement {
     completeSelect: () => void;
     initListenersMultiselect: () => void;
     initListenersNew: () => void;
+    initListenersSearch: () => void;
     initListenersDetail: () => void;
     populateSelectedViewToDetailValues: () => void;
     checkIfAlreadySelected: (value: string) => boolean;
@@ -170,6 +178,8 @@ export declare class SfIForm extends LitElement {
     processDisabled: () => void;
     processUnitFiltersNew: () => void;
     processUnitFiltersDetail: () => void;
+    initListenerClipboardControls: () => void;
+    renderDetailAfterContentPopulated: () => void;
     loadMode: () => Promise<void>;
     constructor();
     protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void;

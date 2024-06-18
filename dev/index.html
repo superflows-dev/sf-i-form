@@ -321,7 +321,220 @@
     </style>
   </head>
   <body>
-    <sf-i-form name="Projects" apiid="est9egdho9" dependencies="[]" unitfiltersdetail="[]" unitfiltersnew="[]" inputids="[&quot;sf-i-name&quot;, &quot;sf-i-emails&quot;, &quot;sf-i-cycledate&quot;, &quot;sf-i-contractdate&quot;, &quot;sf-i-quality&quot;]" fields="[&quot;name&quot;,&quot;emails&quot;,&quot;cycledate&quot;,&quot;contractdate&quot;,&quot;quality&quot;]" ignoreprojections="[&quot;emails&quot;,&quot;cycledate&quot;,&quot;address&quot;,&quot;vertical&quot;]" validations="{&quot;sf-i-name&quot;:  &quot;text-basic&quot;, &quot;sf-i-emails&quot;:  &quot;text-basic&quot;, &quot;sf-i-contractdate&quot;:  &quot;text-date&quot;, &quot;sf-i-quality&quot;:  &quot;text-basic&quot;}" mode="view">
+
+    <!-- <sf-i-form id="tags-0" class="tags-input tags-0" name="Tags" label="Select locations" apiid="j385cxf2p0" mode="multiselect-dropdown" searchphrase="(BIDADI|Pune|Gujarat)&amp;Signode-India&amp;Location" selectprojection="name" mandatory=""></sf-i-form> -->
+
+    <sf-i-form 
+      name="Compliances"
+      apiId="r42gyc2xx1"
+      dependencies="[{&quot;type&quot;: &quot;foreignkey&quot;, &quot;parent&quot;: &quot;sf-i-countries&quot;, &quot;child&quot;: &quot;sf-i-states&quot;},{&quot;type&quot;: &quot;foreignkey&quot;, &quot;parent&quot;: &quot;sf-i-categories&quot;, &quot;child&quot;: &quot;sf-i-subcategories&quot;},{&quot;type&quot;: &quot;foreignkey&quot;, &quot;parent&quot;: &quot;sf-i-frequencies&quot;, &quot;child&quot;: &quot;sf-i-subfrequencies&quot;},{&quot;type&quot;: &quot;searchable&quot;, &quot;parents&quot;: [&quot;sf-i-countries&quot;, &quot;sf-i-states&quot;, &quot;sf-i-categories&quot;, &quot;sf-i-subcategories&quot;], &quot;child&quot;: &quot;sf-i-statutes&quot;}]"
+      unitFiltersDetail="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;},{&quot;op&quot;: &quot;hide&quot;, &quot;input&quot;: &quot;sf-i-jurisdictions&quot;, &quot;value&quot;: &quot;7898fc45-88d3-4d42-9ee4-18e70e465dfb&quot;, &quot;target&quot;: &quot;sf-i-states&quot;},{&quot;op&quot;: &quot;hide&quot;, &quot;input&quot;: &quot;sf-i-frequencies&quot;, &quot;value&quot;: [&quot;045d712f-cd9a-41e8-8890-abae36768d69&quot;,&quot;81beb2b8-63fb-4de0-9c4d-76fb966a1d62&quot;,&quot;b99599ce-9092-4403-af78-82ecf70060a5&quot;,&quot;c1cdd526-76f2-4a2e-8dfc-1f403328a910&quot;], &quot;target&quot;: [&quot;sf-i-timeframes&quot;,&quot;sf-i-responsedays&quot;,&quot;sf-i-responsedays-label&quot;,&quot;sf-i-question&quot;,&quot;sf-i-question-label&quot;,&quot;sf-i-alertschedule&quot;,&quot;sf-i-alertschedule-label&quot;]}]"
+      unitFiltersNew="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;20851e13-f0f7-4f8d-9bb8-ab96b1df6160&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;},{&quot;op&quot;: &quot;hide&quot;, &quot;input&quot;: &quot;sf-i-jurisdictions&quot;, &quot;value&quot;: &quot;7898fc45-88d3-4d42-9ee4-18e70e465dfb&quot;, &quot;target&quot;: &quot;sf-i-states&quot;},{&quot;op&quot;: &quot;hide&quot;, &quot;input&quot;: &quot;sf-i-frequencies&quot;, &quot;value&quot;: [&quot;045d712f-cd9a-41e8-8890-abae36768d69&quot;,&quot;81beb2b8-63fb-4de0-9c4d-76fb966a1d62&quot;,&quot;b99599ce-9092-4403-af78-82ecf70060a5&quot;,&quot;c1cdd526-76f2-4a2e-8dfc-1f403328a910&quot;], &quot;target&quot;: [&quot;sf-i-timeframes&quot;,&quot;sf-i-responsedays&quot;,&quot;sf-i-responsedays-label&quot;,&quot;sf-i-question&quot;,&quot;sf-i-question-label&quot;,&quot;sf-i-alertschedule&quot;,&quot;sf-i-alertschedule-label&quot;]}]"
+      inputIds="[&quot;sf-i-updatetypes&quot;, &quot;sf-i-countries&quot;, &quot;sf-i-jurisdictions&quot;, &quot;sf-i-states&quot;, &quot;sf-i-categories&quot;, &quot;sf-i-subcategories&quot;, &quot;sf-i-statutes&quot;, &quot;sf-i-reference&quot;, &quot;sf-i-applicability&quot;, &quot;sf-i-specificity&quot;, &quot;sf-i-obligationtypes&quot;, &quot;sf-i-obligationtitle&quot;, &quot;sf-i-obligation&quot;, &quot;sf-i-firstlineofdefence&quot;, &quot;sf-i-secondlineofdefence&quot;, &quot;sf-i-thirdlineofdefence&quot;, &quot;sf-i-internalcontrols&quot;, &quot;sf-i-form&quot;, &quot;sf-i-additionalurls&quot;, &quot;sf-i-definition&quot;, &quot;sf-i-authority&quot;, &quot;sf-i-penalties&quot;, &quot;sf-i-risks&quot;, &quot;sf-i-riskareas&quot;, &quot;sf-i-frequencies&quot;, &quot;sf-i-subfrequencies&quot;, &quot;sf-i-duedate&quot;, &quot;sf-i-timeframes&quot;, &quot;sf-i-responsedays&quot;, &quot;sf-i-question&quot;, &quot;sf-i-alertschedule&quot;, &quot;sf-i-clientquestion&quot;, &quot;sf-i-execmodules&quot;]"
+      validations="{&quot;sf-i-reference&quot;:  &quot;text-basic&quot;, &quot;sf-i-applicability&quot;:  &quot;text-basic&quot;, &quot;sf-i-obligationtitle&quot;:  &quot;text-basic&quot;, &quot;sf-i-obligation&quot;:  &quot;text-basic&quot;, &quot;sf-i-firstlineofdefence&quot;:  &quot;text-basic&quot;, &quot;sf-i-secondlineofdefence&quot;:  &quot;text-basic&quot;, &quot;sf-i-thirdlineofdefence&quot;:  &quot;text-basic&quot;, &quot;sf-i-form&quot;:  &quot;text-basic&quot;, &quot;sf-i-additionalurls&quot;:  &quot;text-basic&quot;, &quot;sf-i-definition&quot;:  &quot;text-basic&quot;, &quot;sf-i-internalcontrols&quot;:  &quot;text-basic&quot;, &quot;sf-i-authority&quot;:  &quot;text-basic&quot;, &quot;sf-i-panelties&quot;:  &quot;text-basic&quot;, &quot;sf-i-duedate&quot;:  &quot;text-basic&quot;, &quot;sf-i-responsedays&quot;:  &quot;text-basic&quot;}"
+      fields="[&quot;updatetype&quot;,&quot;country&quot;,&quot;jurisdiction&quot;,&quot;state&quot;,&quot;category&quot;,&quot;subcategory&quot;,&quot;statute&quot;,&quot;reference&quot;,&quot;applicability&quot;,&quot;specificity&quot;,&quot;obligationtype&quot;,&quot;obligationtitle&quot;,&quot;obligation&quot;,&quot;firstlineofdefence&quot;,&quot;secondlineofdefence&quot;,&quot;thirdlineofdefence&quot;,&quot;internalcontrols&quot;,&quot;form&quot;,&quot;additionalurls&quot;,&quot;definition&quot;,&quot;authority&quot;,&quot;penalty&quot;,&quot;risk&quot;,&quot;riskarea&quot;,&quot;frequency&quot;,&quot;subfrequency&quot;,&quot;duedate&quot;,&quot;timeframe&quot;,&quot;responsedays&quot;,&quot;question&quot;,&quot;alertschedule&quot;,&quot;clientquestion&quot;,&quot;execmodule&quot;]"
+      ignoreProjections="[&quot;updatetype&quot;,&quot;jurisdiction&quot;,&quot;state&quot;,&quot;category&quot;,&quot;subcategory&quot;,&quot;internalcontrols&quot;,&quot;form&quot;,&quot;authority&quot;,&quot;risk&quot;,&quot;riskarea&quot;,&quot;timeframe&quot;,&quot;responsedays&quot;,&quot;question&quot;,&quot;alertschedule&quot;]"
+      mode="view">
+
+      <div slot="form">
+
+        <div class="d-flex justify-center align-start">
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-updatetypes" apiId="oqze24s784" name="UpdateTypes" label="Select Update Type *" mandatory>
+            </sf-i-select>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-countries" apiId="zu3kh9cq2c" name="Countries" label="Select Country *" mandatory>
+            </sf-i-select>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-jurisdictions" apiId="5s7ih5uw4h" name="Jurisdictions" label="Select Jurisdiction *" mandatory>
+            </sf-i-select>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-sub-select id="sf-i-states" apiId="clnu4kk1ah" name="States" label="Select States *" mandatory>
+            </sf-i-sub-select>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-categories" apiId="8an2d4j1gc" name="Categories" label="Select Category *" mandatory>
+            </sf-i-select>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-sub-select id="sf-i-subcategories" apiId="mdkc0e2bo5" name="SubCategories" label="Select SubCategory *" mandatory>
+            </sf-i-sub-select>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-100-m-0 mt-20 mb-30">
+            <sf-i-form 
+              id="sf-i-statutes"
+              name="Statutes"
+              label="Select Statute *"
+              apiId="4wb2x6fkga"
+              mode="select"
+              searchString="foo"
+              selectProjection="name"
+              ignoreProjections="[&quot;updatetype&quot;,&quot;country&quot;,&quot;jurisdiction&quot;,&quot;state&quot;,&quot;category&quot;,&quot;subcategory&quot;,&quot;shortid&quot;]"
+              mandatory
+              >
+            </sf-i-form>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label>Statute Reference *</label><br />
+            <textarea rows="7" id="sf-i-reference" type="text" class="w-100-m-0" mandatory></textarea>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label>Applicability *</label><br />
+            <textarea rows="7" id="sf-i-applicability" type="text" class="w-100-m-0" mandatory></textarea>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-specificity" apiId="8ijy7mze67" name="Specificity" label="Select Universal / Industry Specific*" mandatory>
+            </sf-i-select>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-obligationtypes" apiId="vofssiq1t3" name="Obligation Type" label="Select Obligation Type *" mandatory>
+            </sf-i-select>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label>Obligation Title *</label><br />
+            <textarea rows="7" id="sf-i-obligationtitle" type="text" class="w-100-m-0" mandatory></textarea>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label>Compliance Obligation *</label><br />
+            <textarea rows="7" id="sf-i-obligation" type="text" class="w-100-m-0" mandatory></textarea>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label>First Line of Defence *</label><br />
+            <textarea rows="7" id="sf-i-firstlineofdefence" type="text" class="w-100-m-0" mandatory></textarea>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label>Second Line of Defence</label><br />
+            <textarea rows="7" id="sf-i-secondlineofdefence" type="text" class="w-100-m-0"></textarea>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label>Third Line of Defence</label><br />
+            <textarea rows="7" id="sf-i-thirdlineofdefence" type="text" class="w-100-m-0"></textarea>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label>Internal Controls *</label><br />
+            <textarea rows="7" id="sf-i-internalcontrols" type="text" class="w-100-m-0" mandatory></textarea>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label>Form</label><br />
+            <textarea rows="7" id="sf-i-form" type="text" class="w-100-m-0"></textarea>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label>Additional Urls</label><br />
+            <textarea rows="7" id="sf-i-additionalurls" type="text" class="w-100-m-0"></textarea>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label>Definition</label><br />
+            <textarea rows="7" id="sf-i-definition" type="text" class="w-100-m-0"></textarea>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label>Relevant Authority *</label><br />
+            <textarea rows="7" id="sf-i-authority" type="text" class="w-100-m-0" mandatory></textarea>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label>Offences and Penalties *</label><br />
+            <textarea rows="7" id="sf-i-penalties" type="text" class="w-100-m-0" mandatory></textarea>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-risks" apiId="et1hdzg882" name="Risk" label="Select Risk Severity *" mandatory>
+            </sf-i-select>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-riskareas" apiId="3z3fiubz8e" name="Risk Areas" label="Select Risk Area *" mode="multi" mandatory>
+            </sf-i-select>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-frequencies" apiId="lhpn6gh0il" name="Frequencies" label="Select Frequency *" mandatory>
+            </sf-i-select>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-sub-select id="sf-i-subfrequencies" apiId="aysa6i6723" name="SubFrequencies" label="Select Sub Frequency">
+            </sf-i-sub-select >
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label>Due Date *</label><br />
+            <input id="sf-i-duedate" type="text" class="w-100-m-0" mandatory/>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-timeframes" apiId="i6nxvld854" name="Timeframes" label="Select Timeframe *" mandatory>
+            </sf-i-select>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label id="sf-i-responsedays-label">Response Days *</label><br />
+            <input id="sf-i-responsedays" type="text" class="w-100-m-0" mandatory/>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-100-m-0 mt-20 mb-30">
+            <sf-i-form 
+              id="sf-i-documenttypes"
+              name="DocumentTypes"
+              label="Select DocumentType"
+              apiId="mxnshky7zj"
+              mode="select"
+              searchPhrase=""
+              selectProjection="name"
+              ignoreProjections="[&quot;description&quot;]"
+              >
+            </sf-i-form>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label id="sf-i-question-label">Question *</label><br />
+            <textarea rows="7" id="sf-i-question" type="text" class="w-100-m-0" mandatory></textarea>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label id="sf-i-alertschedule-label">Alerts Schedule *</label><br />
+            <input id="sf-i-alertschedule" type="text" class="w-100-m-0" mandatory/>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-100-m-0 mb-20">
+            <sf-i-select id="sf-i-clientquestion" apiId="7pzygp4d2l" name="ClientQuestion" label="Select ClientQuestion" mode="multiselect-dropdown">
+            </sf-i-select>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-execmodules" apiId="jib9prx3ji" name="ExecModule" label="Select ExecModule">
+            </sf-i-select>
+          </div>
+          <div class="w-20-p mb-20"></div>
+        </div>
+        <br /><br />
+      </div>
+
+    </sf-i-form>
+
+    <!-- <sf-i-form name="Projects" apiid="est9egdho9" dependencies="[]" unitfiltersdetail="[]" unitfiltersnew="[]" inputids="[&quot;sf-i-name&quot;, &quot;sf-i-emails&quot;, &quot;sf-i-cycledate&quot;, &quot;sf-i-contractdate&quot;, &quot;sf-i-quality&quot;]" fields="[&quot;name&quot;,&quot;emails&quot;,&quot;cycledate&quot;,&quot;contractdate&quot;,&quot;quality&quot;]" ignoreprojections="[&quot;emails&quot;,&quot;cycledate&quot;,&quot;address&quot;,&quot;vertical&quot;]" validations="{&quot;sf-i-name&quot;:  &quot;text-basic&quot;, &quot;sf-i-emails&quot;:  &quot;text-basic&quot;, &quot;sf-i-contractdate&quot;:  &quot;text-date&quot;, &quot;sf-i-quality&quot;:  &quot;text-basic&quot;}" mode="view">
 
       <div slot="form">
 
@@ -332,26 +545,12 @@
           </div>
         </div>
         <br><br>
-        <!-- <div class="d-flex justify-center align-start">
-            <div class="w-100-m-0">
-              <label>Address *</label><br />
-              <input id="sf-i-address" type="text" class="w-100-m-0" mandatory/>
-            </div>
-        </div>
-        <br /><br /> -->
         <div class="d-flex justify-center align-start">
             <div class="w-100-m-0">
               <label>Emails * <small>(multiple allowed, separate by comma)</small></label><br>
               <input id="sf-i-emails" type="text" class="w-100-m-0" mandatory="">
             </div>
         </div>
-        <!-- <br /><br />
-        <div class="d-flex justify-center align-start">
-            <div class="w-100-m-0">
-              <label>Business Vertical *</label><br />
-              <input id="sf-i-vertical" type="text" class="w-100-m-0" mandatory/>
-            </div>
-        </div> -->
         <br><br>
         <div class="d-flex justify-center align-start">
             <div class="w-100-m-0">
@@ -375,7 +574,7 @@
         </div>
       </div>
 
-    </sf-i-form>
+    </sf-i-form> -->
 <!-- apiIdCalendarDetail="r42gyc2xx1" -->
 <!-- 
     <sf-i-form 
@@ -1491,7 +1690,7 @@
       // setCookie('email', 'hrushi.mehendale@gmail.com', 10);
 
       setCookie('admin', 'true', 10);
-      setCookie('accessToken', 'lvkjmou48ganznmolze', 10);
+      setCookie('accessToken', 'lvql0aad5cl7ruy7co9', 10);
       setCookie('email', 'hrushi.mehendale@gmail.com', 10);
 
     </script>

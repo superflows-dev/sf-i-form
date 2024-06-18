@@ -35,6 +35,7 @@ DB: partitionKey, rangeKey, values
 let SfIForm = class SfIForm extends LitElement {
     constructor() {
         super();
+        this.searchPhraseOriginal = "";
         this.blockSize = 10;
         this.VALIDATION_TEXT_BASIC = "text-basic";
         this.VALIDATION_TEXT_DATE = "text-date";
@@ -442,6 +443,10 @@ let SfIForm = class SfIForm extends LitElement {
                     html += '<td part="td-action" class="left-sticky">';
                     html += '<div id="search-' + i + '"><button part="button" class="button-search-view">View</button></div>';
                     html += '</td>';
+                    html += '<td part="td-body" class="td-body ' + classBg + '">';
+                    html += ('<div part="row-col-title">id</div>');
+                    html += ('<sf-i-elastic-text text="' + values[i].id + '" minLength="10"></sf-i-elastic-text>');
+                    html += '</td>';
                     for (var j = 0; j < cols.length; j++) {
                         console.log('getignoreprojects', this.getIgnoreProjections());
                         if (!this.getIgnoreProjections().includes(cols[j])) {
@@ -756,10 +761,49 @@ let SfIForm = class SfIForm extends LitElement {
                 this._SfLogsListContainer.innerHTML = html;
             }
         };
-        this.renderDetail = (value) => {
+        this.renderClipboard = (value) => {
             var sValues = '';
+            console.log('fields', this.getFields().length);
+            for (var i = 0; i < this.getFields().length; i++) {
+                if (value[this.getFields()[i]] == null) {
+                    this.setError('Error in copy paste!');
+                    setTimeout(() => { this.clearMessages(); }, 3000);
+                    return;
+                }
+            }
             sValues += '[';
             for (var i = 0; i < this.getFields().length; i++) {
+                console.log('fields', i, value[this.getFields()[i]]);
+                if (value[this.getFields()[i]] != null && Array.isArray(value[this.getFields()[i]]['value'])) {
+                    sValues += '[';
+                    for (var j = 0; j < value[this.getFields()[i]]['value'].length; j++) {
+                        sValues += '"';
+                        sValues += value[this.getFields()[i]]['value'][j];
+                        sValues += '",';
+                        console.log('fields insrting', value[this.getFields()[i]]['value'][j]);
+                    }
+                    sValues = sValues.replace(/(^,)|(,$)/g, "");
+                    sValues += '],';
+                }
+                else {
+                    console.log('fields insrting', value[this.getFields()[i]]['value']);
+                    //sValues += '"';
+                    sValues += value[this.getFields()[i]] != null ? '"' + value[this.getFields()[i]]['value'].replace(/\n/g, '\\n') + '"' : '""';
+                    //sValues += '",';
+                    sValues += ',';
+                }
+            }
+            sValues = sValues.replace(/(^,)|(,$)/g, "");
+            sValues += ']';
+            console.log('selected values', sValues);
+            this.selectedViewToDetailValues = (sValues);
+        };
+        this.renderDetail = (value) => {
+            var sValues = '';
+            console.log('fields', this.getFields().length);
+            sValues += '[';
+            for (var i = 0; i < this.getFields().length; i++) {
+                console.log('fields', i, value[this.getFields()[i]]);
                 if (value[this.getFields()[i]] != null && Array.isArray(JSON.parse(value[this.getFields()[i]]))) {
                     sValues += '[';
                     for (var j = 0; j < JSON.parse(value[this.getFields()[i]]).length; j++) {
@@ -847,6 +891,7 @@ let SfIForm = class SfIForm extends LitElement {
         };
         this.fetchSearchSelect = async (cursor = "") => {
             const body = { "searchstring": this.searchPhrase, "cursor": cursor };
+            console.log(body);
             let url = "https://" + this.apiId + ".execute-api.us-east-1.amazonaws.com/test/list";
             console.log('fetchsearchselect searchphrase', this.searchPhrase);
             if (this.searchPhrase != null) {
@@ -980,12 +1025,7 @@ let SfIForm = class SfIForm extends LitElement {
             this.clearMessages();
             const body = {};
             let url = "";
-            const values = {};
-            for (var i = 0; i < this.getFields().length; i++) {
-                const field = this.getFields()[i];
-                console.log('field', field);
-                values[field] = this.getInputValue(this.getInputs()[i]);
-            }
+            const values = this.populateValues();
             body["values"] = values;
             body["id"] = this.selectedId;
             url = "https://" + this.apiId + ".execute-api.us-east-1.amazonaws.com/test/update";
@@ -1013,6 +1053,15 @@ let SfIForm = class SfIForm extends LitElement {
                 const jsonRespose = JSON.parse(xhr.responseText);
                 this.setError(jsonRespose.error);
             }
+        };
+        this.populateValues = () => {
+            const values = {};
+            for (var i = 0; i < this.getFields().length; i++) {
+                const field = this.getFields()[i];
+                console.log('field', field);
+                values[field] = this.getInputValue(this.getInputs()[i]);
+            }
+            return values;
         };
         this.getValidationOfElement = (id) => {
             let ret = "";
@@ -1932,6 +1981,22 @@ let SfIForm = class SfIForm extends LitElement {
                 }
             }
         };
+        this.initListenersSearch = () => {
+            if (this._sfInputSearchSelect != null) {
+                this._sfInputSearchSelect.addEventListener('keyup', (e) => {
+                    if (e.key.toLowerCase() == "enter") {
+                        this.searchPhrase = this.searchPhraseOriginal + '&(' + (this._sfInputSearchSelect.value + "|" + this._sfInputSearchSelect.value.toLowerCase() + "|" + this._sfInputSearchSelect.value.toUpperCase()) + ")";
+                        console.log(this.searchPhrase);
+                        this.prevCursor = [];
+                        this.nextCursor = [];
+                        this.fetchSearchSelect();
+                    }
+                    else {
+                        console.log(e);
+                    }
+                });
+            }
+        };
         this.initListenersDetail = () => {
             var _a;
             this._SfButtonBack.addEventListener('click', () => {
@@ -1940,33 +2005,49 @@ let SfIForm = class SfIForm extends LitElement {
                 this.nextCursor = [];
                 this.loadMode();
             });
-            this._SfButtonEdit.addEventListener('click', () => {
-                this.disableEdit(false);
-                this.initDisableInputs(false);
-            });
-            this._SfButtonEditCancel.addEventListener('click', () => {
-                this.disableEdit(true);
-                this.initDisableInputs(true);
-            });
-            this._SfButtonDelete.addEventListener('click', () => {
-                this.disableConfirm(false);
-            });
-            this._SfButtonDeleteCancel.addEventListener('click', () => {
-                this.disableConfirm(true);
-            });
-            (_a = this._sfButtonSubmit) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
-                console.log('submit clicked');
-                this.submitEdit();
-            });
-            this._SfButtonDeleteConfirm.addEventListener('click', () => {
-                this.submitDelete();
-            });
-            this._sfButtonCalendar.addEventListener('click', () => {
-                this.disableCalendar(false);
-            });
-            this._sfButtonCalendarCancel.addEventListener('click', () => {
-                this.disableCalendar(true);
-            });
+            if (this._SfButtonEdit != null) {
+                this._SfButtonEdit.addEventListener('click', () => {
+                    this.disableEdit(false);
+                    this.initDisableInputs(false);
+                });
+            }
+            if (this._SfButtonEditCancel != null) {
+                this._SfButtonEditCancel.addEventListener('click', () => {
+                    this.disableEdit(true);
+                    this.initDisableInputs(true);
+                });
+            }
+            if (this._SfButtonDelete != null) {
+                this._SfButtonDelete.addEventListener('click', () => {
+                    this.disableConfirm(false);
+                });
+            }
+            if (this._SfButtonDeleteCancel != null) {
+                this._SfButtonDeleteCancel.addEventListener('click', () => {
+                    this.disableConfirm(true);
+                });
+            }
+            if (this._sfButtonSubmit != null) {
+                (_a = this._sfButtonSubmit) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
+                    console.log('submit clicked');
+                    this.submitEdit();
+                });
+            }
+            if (this._SfButtonDeleteConfirm != null) {
+                this._SfButtonDeleteConfirm.addEventListener('click', () => {
+                    this.submitDelete();
+                });
+            }
+            if (this._sfButtonCalendar != null) {
+                this._sfButtonCalendar.addEventListener('click', () => {
+                    this.disableCalendar(false);
+                });
+            }
+            if (this._sfButtonCalendarCancel != null) {
+                this._sfButtonCalendarCancel.addEventListener('click', () => {
+                    this.disableCalendar(true);
+                });
+            }
             for (var i = 0; i < this.getInputs().length; i++) {
                 const element = this._sfSlottedForm[0].querySelector('#' + this.getInputs()[i]);
                 if (element.nodeName.toLowerCase() == "sf-i-select") {
@@ -2143,14 +2224,50 @@ let SfIForm = class SfIForm extends LitElement {
                 }
             }
         };
+        this.initListenerClipboardControls = () => {
+            if (this.mode == "new") {
+                Util.replaceElement(this._SfButtonCopypastePaste);
+                this._SfButtonCopypastePaste.addEventListener('click', async () => {
+                    let values = "";
+                    try {
+                        values = JSON.parse(await navigator.clipboard.readText());
+                    }
+                    catch (e) {
+                        console.log(e);
+                        this.setError('Clipboard contains no data!');
+                        setTimeout(() => { this.clearMessages(); }, 3000);
+                    }
+                    this.renderClipboard(values);
+                    this.renderDetailAfterContentPopulated();
+                });
+            }
+            if (this.mode == "detail") {
+                Util.replaceElement(this._SfButtonCopypasteCopy);
+                this._SfButtonCopypasteCopy.addEventListener('click', async () => {
+                    const values = JSON.stringify(this.populateValues());
+                    await navigator.clipboard.writeText((values));
+                    this.setSuccess('Copied to clipboard!');
+                    setTimeout(() => { this.clearMessages(); }, 3000);
+                    console.log(JSON.parse(await navigator.clipboard.readText()));
+                });
+            }
+        };
+        this.renderDetailAfterContentPopulated = () => {
+            this.populateSelectedViewToDetailValues();
+            this.initListenersDetail();
+            this.processFormLayouting();
+            this.clearUnitFilters();
+            // this.processUnitFiltersDetail();
+            this.processUnitFiltersNew();
+            // this.showControls();
+            this.initListenerClipboardControls();
+            if (this.mode == "consumer") {
+                this.hideDelete();
+                this.hideBack();
+            }
+        };
         this.loadMode = async () => {
             console.log('load mode', this.mode);
-            // if(this.mode == "list") {
-            //   setTimeout(() => {
-            //     // this.initListenersTrail();
-            //     this.fetchSearchList();
-            //   }, 500)
-            // } else 
             if (this.mode == "multiselect-dropdown") {
                 setTimeout(() => {
                     this.initListenersMultiselect();
@@ -2163,9 +2280,11 @@ let SfIForm = class SfIForm extends LitElement {
             else if (this.mode == "select" || this.mode == "list") {
                 setTimeout(() => {
                     // this.initListenersTrail();
+                    this.searchPhraseOriginal = this.searchPhrase;
                     this.prevCursor = [];
                     this.nextCursor = [];
                     this.fetchSearchSelect();
+                    this.initListenersSearch();
                 }, 500);
             }
             else if (this.mode == "trail") {
@@ -2184,6 +2303,8 @@ let SfIForm = class SfIForm extends LitElement {
                     this.clearInputs();
                     this.clearUnitFilters();
                     this.processUnitFiltersNew();
+                    // this.showControls();
+                    this.initListenerClipboardControls();
                 }, 500);
             }
             else if (this.mode == "view") {
@@ -2210,16 +2331,8 @@ let SfIForm = class SfIForm extends LitElement {
                     this.initDisableInputs(true);
                     this.processDependencies();
                     await this.fetchDetail();
-                    this.populateSelectedViewToDetailValues();
-                    this.initListenersDetail();
-                    this.processFormLayouting();
-                    this.clearUnitFilters();
-                    this.processUnitFiltersDetail();
-                    if (this.mode == "consumer") {
-                        this.hideDelete();
-                        this.hideBack();
-                    }
-                }, this.mode == "detail" ? 500 : 3000);
+                    this.renderDetailAfterContentPopulated();
+                }, this.mode == "detail" ? 3000 : 3000);
             }
         };
     }
@@ -2338,12 +2451,16 @@ let SfIForm = class SfIForm extends LitElement {
         
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <div class="SfIFormC">
+          <br />
           <label part="input-label">${this.label}</label>
           <div>
-            <div id="search-select-container">
-              <h3 part="results-title" class="left-sticky">No Results</h3>
+            <div>
+              <input part="input" id="select-search-input" class="mb-10" placeholder="Filter" />
+              <div id="search-select-container">
+                <h3 part="results-title" class="left-sticky">No Results</h3>
+              </div>
+              <div class="loader-element"></div>
             </div>
-            <div class="loader-element"></div>
           </div>
         </div>
       
@@ -2388,7 +2505,8 @@ let SfIForm = class SfIForm extends LitElement {
         else if (this.mode == "new") {
             return html `
         
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
         <div class="SfIFormC">
           <div class="d-flex justify-center">
               <h1 part="title">${this.name}</h1>
@@ -2402,6 +2520,7 @@ let SfIForm = class SfIForm extends LitElement {
             <div class="d-flex flex-grow justify-between">
               <button id="button-back" part="button-icon" class="button-icon"><span class="material-icons">keyboard_backspace</span></button>
               <div class="d-flex">
+                <button id="button-copypaste-paste" part="button-icon" class="button-icon"><span class="material-symbols-outlined">content_paste</span></button>
               </div>
             </div>
             <div class="rb"></div>
@@ -2507,6 +2626,7 @@ let SfIForm = class SfIForm extends LitElement {
         else if (this.mode == "detail" || this.mode == "consumer") {
             return html `
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
         <div class="SfIFormC">
           <div class="d-flex justify-center">
               <h1 part="title">${this.name}</h1>
@@ -2520,6 +2640,7 @@ let SfIForm = class SfIForm extends LitElement {
             <div class="d-flex flex-grow justify-between">
               <button id="button-back" part="button-icon" class="button-icon"><span class="material-icons">keyboard_backspace</span></button>
               <div class="d-flex">
+                <button id="button-copypaste-copy" part="button-icon" class="button-icon"><span class="material-symbols-outlined">content_copy</span></button>
                 <button id="button-calendar" part="button-icon" class="button-icon hide"><span class="material-icons">calendar_month</span></button>
                 <button id="button-calendar-cancel" part="button-icon" class="button-icon hide"><span class="material-icons">close</span></button>
                 <button id="button-edit" part="button-icon" class="button-icon"><span class="material-icons">edit</span></button>
@@ -2527,6 +2648,7 @@ let SfIForm = class SfIForm extends LitElement {
                 <button id="button-delete" part="button-icon" class="button-icon"><span class="material-icons">delete</span></button>
                 <button id="button-delete-cancel" part="button-icon" class="button-icon"><span class="material-icons">close</span></button>
                 <button id="button-delete-confirm" part="button-icon" class="button-icon"><span class="material-icons">delete</span><span class="material-icons">done</span></button>
+                
               </div>
             </div>
             <div class="rb" part="rb"></div>
@@ -3048,6 +3170,10 @@ SfIForm.styles = css `
   
     }
 
+    .w-100 {
+      width: 100%;
+    }
+
   `;
 __decorate([
     property()
@@ -3164,6 +3290,9 @@ __decorate([
     query('#input-select')
 ], SfIForm.prototype, "_sfInputSelect", void 0);
 __decorate([
+    query('#select-search-input')
+], SfIForm.prototype, "_sfInputSearchSelect", void 0);
+__decorate([
     query('#input-list')
 ], SfIForm.prototype, "_sfInputList", void 0);
 __decorate([
@@ -3241,6 +3370,15 @@ __decorate([
 __decorate([
     query('#sf-i-events')
 ], SfIForm.prototype, "_SfIEvents", void 0);
+__decorate([
+    query('#button-copypaste-open')
+], SfIForm.prototype, "_SfButtonCopypasteOpen", void 0);
+__decorate([
+    query('#button-copypaste-copy')
+], SfIForm.prototype, "_SfButtonCopypasteCopy", void 0);
+__decorate([
+    query('#button-copypaste-paste')
+], SfIForm.prototype, "_SfButtonCopypastePaste", void 0);
 __decorate([
     queryAssignedElements({ slot: 'form' })
 ], SfIForm.prototype, "_SfFormC", void 0);

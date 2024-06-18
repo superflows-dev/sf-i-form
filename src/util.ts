@@ -49,8 +49,15 @@ async function callApi(url: string, data: string, authorization: any) {
 
 }
 
+async function replaceElement(element: any) {
+    var old_element = element;
+    var new_element = old_element.cloneNode(true);
+    old_element.parentNode.replaceChild(new_element, old_element);
+    return new_element;
+}
+
 const exportFunctions = {
-   callApi, validateName, readCookie
+   callApi, validateName, readCookie, replaceElement
 };
 
 export default exportFunctions;
