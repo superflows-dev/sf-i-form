@@ -8,6 +8,7 @@
     <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
     <script src="../node_modules/lit/polyfill-support.js"></script>
     <script type="module" src="../sf-i-form.js"></script>
+    <script type="module" src="globals.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
@@ -1660,39 +1661,6 @@
       </div>
 
     </sf-i-form> -->
-    <script>
-
-      function setCookie(name,value,days) {
-          var expires = "";
-          if (days) {
-              var date = new Date();
-              date.setTime(date.getTime() + (days*24*60*60*1000));
-              expires = "; expires=" + date.toUTCString();
-          }
-          document.cookie = name + "=" + (value || "")  + expires + "; path=/";
-      }
-      function getCookie(name) {
-          var nameEQ = name + "=";
-          var ca = document.cookie.split(';');
-          for(var i=0;i < ca.length;i++) {
-              var c = ca[i];
-              while (c.charAt(0)==' ') c = c.substring(1,c.length);
-              if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-          }
-          return null;
-      }
-      function eraseCookie(name) {   
-          document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-      }
-      
-      // setCookie('admin', 'false', 10);
-      // setCookie('accessToken', 'lswr0qwuyso6z6c1vu', 10);
-      // setCookie('email', 'hrushi.mehendale@gmail.com', 10);
-
-      setCookie('admin', 'true', 10);
-      setCookie('accessToken', 'lvql0aad5cl7ruy7co9', 10);
-      setCookie('email', 'hrushi.mehendale@gmail.com', 10);
-
-    </script>
+    
   </body>
 </html>

@@ -2115,62 +2115,73 @@ export class SfIForm extends LitElement {
           }
 
           let errInValidation = false;
-          if(this.getValidationOfElement(id) == this.VALIDATION_TEXT_BASIC) {
 
-            let value = (element as HTMLInputElement).value;
+          console.log('testingvalidate', (element as HTMLInputElement).value, (/\s{2}/.test((element as HTMLInputElement).value)));
 
-            if((element as HTMLInputElement).value.length > 0) {
+          if(!(/\s{2}/.test((element as HTMLInputElement).value))) {
 
-              if(value.indexOf('[') >= 0 || value.indexOf(']') >= 0) {
-                errInValidation = true;
-              }
-              if(value.indexOf('"') >= 0) {
-                errInValidation = true;
+
+            if(this.getValidationOfElement(id) == this.VALIDATION_TEXT_BASIC) {
+
+              let value = (element as HTMLInputElement).value;
+  
+              if((element as HTMLInputElement).value.length > 0 && !(/\s{2}/.test((element as HTMLInputElement).value))) {
+  
+                if(value.indexOf('[') >= 0 || value.indexOf(']') >= 0) {
+                  errInValidation = true;
+                }
+                if(value.indexOf('"') >= 0) {
+                  errInValidation = true;
+                }
+    
+                if(errInValidation) {
+                  evaluate = false;
+                  const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
+                  parentElement.insertAdjacentHTML('beforeend', errorHtml);
+                  console.log('evaluate false return', element)
+                  evaluate = false;
+                  return;
+                }
+    
               }
   
-              if(errInValidation) {
-                evaluate = false;
-                const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
-                parentElement.insertAdjacentHTML('beforeend', errorHtml);
-                console.log('evaluate false return', element)
-                evaluate = false;
-                return;
-              }
-  
+              
             }
-
-            
-          }
-
-          if(this.getValidationOfElement(id) == this.VALIDATION_TEXT_DATE) {
-
-            let value = (element as HTMLInputElement).value;
-
-            if((element as HTMLInputElement).value.length > 0) {
-
-              if(value.indexOf(' ') >= 0) {
-                errInValidation = true;
-              }
-
-              var regExpAlpha = /[a-zA-Z]/g;
-              var regExpSpecial = /[ `!@#$%^&()_+\-=\[\]{};':"|.<>?~]/;
-
-              if(regExpAlpha.test(value) || regExpSpecial.test(value)) {
-                errInValidation = true;
+  
+            if(this.getValidationOfElement(id) == this.VALIDATION_TEXT_DATE) {
+  
+              let value = (element as HTMLInputElement).value;
+  
+              if((element as HTMLInputElement).value.length > 0) {
+  
+                if(value.indexOf(' ') >= 0) {
+                  errInValidation = true;
+                }
+  
+                var regExpAlpha = /[a-zA-Z]/g;
+                var regExpSpecial = /[ `!@#$%^&()_+\-=\[\]{};':"|.<>?~]/;
+  
+                if(regExpAlpha.test(value) || regExpSpecial.test(value)) {
+                  errInValidation = true;
+                }
+    
+                if(errInValidation) {
+                  evaluate = false;
+                  const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
+                  parentElement.insertAdjacentHTML('beforeend', errorHtml);
+                  console.log('evaluate false return', element)
+                  evaluate = false;
+                  return;
+                }
+    
               }
   
-              if(errInValidation) {
-                evaluate = false;
-                const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
-                parentElement.insertAdjacentHTML('beforeend', errorHtml);
-                console.log('evaluate false return', element)
-                evaluate = false;
-                return;
-              }
-  
+              
             }
-
-            
+  
+          } else {
+            errInValidation = true;
+            evaluate = false;
           }
 
           if(!errInValidation) {
