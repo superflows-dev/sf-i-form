@@ -1205,6 +1205,8 @@ let SfIForm = class SfIForm extends LitElement {
                             }
                         }
                         else {
+                            const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
+                            parentElement.insertAdjacentHTML('beforeend', errorHtml);
                             errInValidation = true;
                             evaluate = false;
                         }
