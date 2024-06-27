@@ -993,6 +993,7 @@ let SfIForm = class SfIForm extends LitElement {
         };
         this.submitNew = async () => {
             this.clearMessages();
+            console.log('submitNew called');
             const body = {};
             let url = "https://" + this.apiId + ".execute-api.us-east-1.amazonaws.com/test/create";
             const values = {};
@@ -1023,6 +1024,7 @@ let SfIForm = class SfIForm extends LitElement {
         };
         this.submitEdit = async () => {
             this.clearMessages();
+            console.log('submitEdit called');
             const body = {};
             let url = "";
             const values = this.populateValues();
@@ -1113,7 +1115,7 @@ let SfIForm = class SfIForm extends LitElement {
                             evaluate = false;
                             break;
                         }
-                        else {
+                        else if (elementSfISubSelect.style.display != "none") {
                             const errorHtml = '<div class="error-icon d-flex justify-end color-success"><div class="material-icons">done</div></div>';
                             parentElement.insertAdjacentHTML('beforeend', errorHtml);
                         }
@@ -1224,6 +1226,13 @@ let SfIForm = class SfIForm extends LitElement {
                             }
                         }
                         console.log('getvalidationofelement', id, this.getValidationOfElement(id));
+                    }
+                }
+                else {
+                    const parentElement = element.parentElement;
+                    const icon = parentElement.querySelector('.error-icon');
+                    if (icon != null) {
+                        parentElement.removeChild(icon);
                     }
                 }
             }
@@ -2247,7 +2256,7 @@ let SfIForm = class SfIForm extends LitElement {
                         setTimeout(() => { this.clearMessages(); }, 3000);
                     }
                     this.renderClipboard(values);
-                    this.renderDetailAfterContentPopulated();
+                    this.renderNewAfterContentPopulated();
                 });
             }
             if (this.mode == "detail") {
@@ -2261,14 +2270,25 @@ let SfIForm = class SfIForm extends LitElement {
                 });
             }
         };
+        this.renderNewAfterContentPopulated = () => {
+            console.log('renderNewAfterContentPopulated');
+            this.populateSelectedViewToDetailValues();
+            // this.initListenersNew();
+            this.processFormLayouting();
+            this.clearUnitFilters();
+            this.processUnitFiltersNew();
+            this.initListenerClipboardControls();
+            if (this.mode == "consumer") {
+                this.hideDelete();
+                this.hideBack();
+            }
+        };
         this.renderDetailAfterContentPopulated = () => {
             this.populateSelectedViewToDetailValues();
             this.initListenersDetail();
             this.processFormLayouting();
             this.clearUnitFilters();
-            // this.processUnitFiltersDetail();
-            this.processUnitFiltersNew();
-            // this.showControls();
+            this.processUnitFiltersDetail();
             this.initListenerClipboardControls();
             if (this.mode == "consumer") {
                 this.hideDelete();

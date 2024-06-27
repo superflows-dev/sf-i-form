@@ -1918,6 +1918,8 @@ export class SfIForm extends LitElement {
 
     this.clearMessages();
 
+    console.log('submitNew called');
+
     const body: any = {};
     let url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/create";
 
@@ -1958,6 +1960,8 @@ export class SfIForm extends LitElement {
   submitEdit = async () => {
 
     this.clearMessages();
+
+    console.log('submitEdit called');
 
     const body: any = {};
     let url = "";
@@ -2065,7 +2069,7 @@ export class SfIForm extends LitElement {
             parentElement.insertAdjacentHTML('beforeend', errorHtml);
             evaluate = false;
             break;
-          } else {
+          } else if(elementSfISubSelect.style.display != "none") {
             const errorHtml = '<div class="error-icon d-flex justify-end color-success"><div class="material-icons">done</div></div>';
             parentElement.insertAdjacentHTML('beforeend', errorHtml);
           }
@@ -2203,6 +2207,12 @@ export class SfIForm extends LitElement {
 
         }
 
+      } else {
+        const parentElement = (element.parentElement as HTMLDivElement);
+        const icon = parentElement.querySelector('.error-icon') as HTMLElement;
+        if(icon != null) {
+          parentElement.removeChild(icon);
+        }
       }
 
     }
@@ -3128,7 +3138,7 @@ export class SfIForm extends LitElement {
     this._sfButtonSubmit.addEventListener('click', () => {
       this.submitNew();
     });
-
+    
 
     for(var i = 0; i < this.getInputs().length; i++) {
 
@@ -3527,7 +3537,7 @@ export class SfIForm extends LitElement {
           setTimeout(() => {this.clearMessages()}, 3000);
         }
         this.renderClipboard(values);
-        this.renderDetailAfterContentPopulated();
+        this.renderNewAfterContentPopulated();
       });
 
     }
@@ -3547,15 +3557,29 @@ export class SfIForm extends LitElement {
 
   }
 
+  renderNewAfterContentPopulated = () => {
+
+    console.log('renderNewAfterContentPopulated');
+
+    this.populateSelectedViewToDetailValues();
+    // this.initListenersNew();
+    this.processFormLayouting();
+    this.clearUnitFilters();
+    this.processUnitFiltersNew();
+    this.initListenerClipboardControls();
+
+    if(this.mode == "consumer") {
+      this.hideDelete();
+      this.hideBack();
+    }
+  }
+
   renderDetailAfterContentPopulated = () => {
     this.populateSelectedViewToDetailValues();
     this.initListenersDetail();
     this.processFormLayouting();
     this.clearUnitFilters();
-    // this.processUnitFiltersDetail();
-    this.processUnitFiltersNew();
-
-    // this.showControls();
+    this.processUnitFiltersDetail();
     this.initListenerClipboardControls();
 
     if(this.mode == "consumer") {

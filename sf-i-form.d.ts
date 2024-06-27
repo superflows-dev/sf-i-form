@@ -179,6 +179,7 @@ export declare class SfIForm extends LitElement {
     processUnitFiltersNew: () => void;
     processUnitFiltersDetail: () => void;
     initListenerClipboardControls: () => void;
+    renderNewAfterContentPopulated: () => void;
     renderDetailAfterContentPopulated: () => void;
     loadMode: () => Promise<void>;
     constructor();
