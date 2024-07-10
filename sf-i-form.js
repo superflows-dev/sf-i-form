@@ -41,6 +41,7 @@ let SfIForm = class SfIForm extends LitElement {
         this.VALIDATION_TEXT_DATE = "text-date";
         this.flow = "";
         this.showCalendar = false;
+        this.searchPhrase = "";
         this.ignoreProjections = "[]";
         this.getIgnoreProjections = () => {
             try {
@@ -588,7 +589,7 @@ let SfIForm = class SfIForm extends LitElement {
                 html += this.renderListRows(values, multiSelect);
                 html += '</table>';
                 if (values.length === this.blockSize) {
-                    html += '<div id="down-indicator" class="d-flex justify-center align-center mt-10 left-sticky">';
+                    html += '<div id="down-indicator" class="d-flex justify-start align-center mt-10 left-sticky">';
                     html += '<span part="td-head" id="page-num">&nbsp;&nbsp;' + (this.prevCursor.length + 1) + "/" + (Math.ceil(parseInt(found) / this.blockSize)) + '&nbsp;&nbsp;</span>';
                     html += '<button id="button-next-cursor" part="button-icon-small" class="material-icons">expand_more</button>&nbsp;&nbsp;';
                     html += '</div>';
@@ -857,7 +858,7 @@ let SfIForm = class SfIForm extends LitElement {
         this.fetchSearch = async (cursor = "") => {
             this.clearMessages();
             const body = { "searchstring": this._sfInputSearch != null ? this._sfInputSearch.value : "", "cursor": cursor };
-            let url = "https://" + this.apiId + ".execute-api.us-east-1.amazonaws.com/test/list";
+            let url = "https://" + this.apiId + "/list";
             const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
             const xhr = (await this.prepareXhr(body, url, this._SfLoader, authorization));
             this._SfLoader.innerHTML = '';
@@ -874,7 +875,7 @@ let SfIForm = class SfIForm extends LitElement {
         this.fetchSearchMultiselect = async (cursor = "") => {
             this.clearMessages();
             const body = { "searchstring": this._SfSearchMultiselectInput.value + "&" + this.searchPhrase, "cursor": cursor };
-            let url = "https://" + this.apiId + ".execute-api.us-east-1.amazonaws.com/test/list";
+            let url = "https://" + this.apiId + "/list";
             const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
             const xhr = (await this.prepareXhr(body, url, this._SfLoader, authorization));
             this._SfLoader.innerHTML = '';
@@ -890,9 +891,9 @@ let SfIForm = class SfIForm extends LitElement {
             }
         };
         this.fetchSearchSelect = async (cursor = "") => {
-            const body = { "searchstring": this.searchPhrase, "cursor": cursor };
+            const body = { "searchstring": this.searchPhrase != null ? this.searchPhrase : "", "cursor": cursor };
             console.log(body);
-            let url = "https://" + this.apiId + ".execute-api.us-east-1.amazonaws.com/test/list";
+            let url = "https://" + this.apiId + "/list";
             console.log('fetchsearchselect searchphrase', this.searchPhrase);
             if (this.searchPhrase != null) {
                 console.log('fetchsearchselect', body);
@@ -919,7 +920,7 @@ let SfIForm = class SfIForm extends LitElement {
         };
         this.fetchSearchList = async (cursor = "") => {
             const body = { "searchstring": this.searchPhrase, "cursor": cursor };
-            let url = "https://" + this.apiId + ".execute-api.us-east-1.amazonaws.com/test/list";
+            let url = "https://" + this.apiId + "/list";
             const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
             const xhr = (await this.prepareXhr(body, url, this._SfLoader, authorization));
             this._SfLoader.innerHTML = '';
@@ -935,7 +936,7 @@ let SfIForm = class SfIForm extends LitElement {
         };
         this.fetchDetail = async () => {
             const body = { "id": this.selectedId };
-            let url = "https://" + this.apiId + ".execute-api.us-east-1.amazonaws.com/test/detail";
+            let url = "https://" + this.apiId + "/detail";
             const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
             const xhr = (await this.prepareXhr(body, url, this._SfLoader, authorization));
             this._SfLoader.innerHTML = '';
@@ -956,7 +957,7 @@ let SfIForm = class SfIForm extends LitElement {
             return null;
         };
         this.fetchLogs = async () => {
-            let url = "https://" + this.apiId + ".execute-api.us-east-1.amazonaws.com/test/logs";
+            let url = "https://" + this.apiId + "/logs";
             const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
             const xhr = (await this.prepareXhr({}, url, this._SfLoader, authorization));
             this._SfLoader.innerHTML = '';
@@ -975,7 +976,7 @@ let SfIForm = class SfIForm extends LitElement {
             const body = {};
             let url = "";
             body["id"] = this.selectedId;
-            url = "https://" + this.apiId + ".execute-api.us-east-1.amazonaws.com/test/delete";
+            url = "https://" + this.apiId + "/delete";
             const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
             const xhr = (await this.prepareXhr(body, url, this._SfLoader, authorization));
             this._SfLoader.innerHTML = '';
@@ -995,7 +996,7 @@ let SfIForm = class SfIForm extends LitElement {
             this.clearMessages();
             console.log('submitNew called');
             const body = {};
-            let url = "https://" + this.apiId + ".execute-api.us-east-1.amazonaws.com/test/create";
+            let url = "https://" + this.apiId + "/create";
             const values = {};
             for (var i = 0; i < this.getFields().length; i++) {
                 const field = this.getFields()[i];
@@ -1030,7 +1031,7 @@ let SfIForm = class SfIForm extends LitElement {
             const values = this.populateValues();
             body["values"] = values;
             body["id"] = this.selectedId;
-            url = "https://" + this.apiId + ".execute-api.us-east-1.amazonaws.com/test/update";
+            url = "https://" + this.apiId + "/update";
             console.log(body, url);
             const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
             const xhr = (await this.prepareXhr(body, url, this._SfLoader, authorization));
@@ -2310,6 +2311,7 @@ let SfIForm = class SfIForm extends LitElement {
                 setTimeout(() => {
                     // this.initListenersTrail();
                     this.searchPhraseOriginal = this.searchPhrase;
+                    console.log('searchPhrase loadmode', this.searchPhrase);
                     this.prevCursor = [];
                     this.nextCursor = [];
                     this.fetchSearchSelect();
@@ -2665,7 +2667,7 @@ let SfIForm = class SfIForm extends LitElement {
           </div>
           <br />
           <div class="d-flex">
-            <div class="lb" part="lb"></div>
+            <div class="lb"></div>
             <div class="d-flex flex-grow justify-between">
               <button id="button-back" part="button-icon" class="button-icon"><span class="material-icons">keyboard_backspace</span></button>
               <div class="d-flex">
@@ -2680,26 +2682,26 @@ let SfIForm = class SfIForm extends LitElement {
                 
               </div>
             </div>
-            <div class="rb" part="rb"></div>
+            <div class="rb"></div>
           </div>
           <br />
           <div class="d-flex justify-center">
-            <div class="lb" part="lb"></div>
+            <div class="lb"></div>
             <div class="flex-grow" id="form-container">
               <slot name="form"></slot>
             </div>
-            <div class="rb" part="rb"></div>
+            <div class="rb"></div>
           </div>
           <div class="d-flex justify-center">
-            <div class="lb" part="lb"></div>
+            <div class="lb"></div>
             <div class="flex-grow flexpcol hide" part="calendar-container" id="calendar-container">
               <div><h3 part="results-title"  class="text-center">Compliance Calendar</h3></div>
               <slot name="calendar"></slot>
             </div>
-            <div class="rb" part="rb"></div>
+            <div class="rb"></div>
           </div>
           <div class="d-flex justify-between">
-            <div class="lb" part="lb"></div>
+            <div class="lb"></div>
             <div>
               <div class="div-row-error div-row-submit gone">
                 <div part="errormsg" class="div-row-error-message"></div>
@@ -2711,18 +2713,18 @@ let SfIForm = class SfIForm extends LitElement {
                 <div part="notifmsg" class="div-row-notif-message"></div>
               </div>
             </div>
-            <div class="rb" part="rb"></div>
+            <div class="rb"></div>
           </div>
           <br />
           <div class="d-flex justify-center">
             <div class="loader-element"></div>
           </div>
           <div class="d-flex justify-center">
-            <div class="lb" part="lb"></div>
-            <div class="d-flex justify-start flex-grow">
+            <div class="lb"></div>
+            <div class="d-flex justify-center flex-grow">
               <button part="button-lg" id="button-submit" disabled>Submit</button>
             </div>
-            <div class="rb" part="rb"></div>
+            <div class="rb"></div>
           </div>
           
         </div>
@@ -2769,6 +2771,7 @@ SfIForm.styles = css `
       flex-direction: column;
       align-items: stretch;
       justify-content: space-between;
+      overflow-x: auto;
     }
 
     .SfIFormCAdmin {
@@ -2937,6 +2940,7 @@ SfIForm.styles = css `
 
     #input-search {
       margin-bottom: 5px;
+      width: 300px;
     }
     
     .button-icon {

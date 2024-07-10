@@ -51,7 +51,7 @@ export class SfIForm extends LitElement {
   showCalendar: boolean = false;
 
   @property()
-  searchPhrase!: string;
+  searchPhrase: string = "";
 
   @property()
   selectProjection!: string;
@@ -273,6 +273,7 @@ export class SfIForm extends LitElement {
       flex-direction: column;
       align-items: stretch;
       justify-content: space-between;
+      overflow-x: auto;
     }
 
     .SfIFormCAdmin {
@@ -441,6 +442,7 @@ export class SfIForm extends LitElement {
 
     #input-search {
       margin-bottom: 5px;
+      width: 300px;
     }
     
     .button-icon {
@@ -1387,7 +1389,7 @@ export class SfIForm extends LitElement {
       html += '</table>';
 
       if(values.length === this.blockSize) {
-        html += '<div id="down-indicator" class="d-flex justify-center align-center mt-10 left-sticky">';
+        html += '<div id="down-indicator" class="d-flex justify-start align-center mt-10 left-sticky">';
         html += '<span part="td-head" id="page-num">&nbsp;&nbsp;'+(this.prevCursor.length+1) + "/" + (Math.ceil(parseInt(found)/this.blockSize))+'&nbsp;&nbsp;</span>'
         html += '<button id="button-next-cursor" part="button-icon-small" class="material-icons">expand_more</button>&nbsp;&nbsp;';
         html += '</div>';
@@ -1751,7 +1753,7 @@ export class SfIForm extends LitElement {
     this.clearMessages();
 
     const body: any = {"searchstring": this._sfInputSearch != null ? this._sfInputSearch.value : "", "cursor": cursor};
-    let url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/list";
+    let url = "https://"+this.apiId+"/list";
 
     const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
     const xhr : any = (await this.prepareXhr(body, url, this._SfLoader, authorization)) as any;
@@ -1773,7 +1775,7 @@ export class SfIForm extends LitElement {
     this.clearMessages();
 
     const body: any = {"searchstring": (this._SfSearchMultiselectInput as HTMLInputElement).value + "&" + this.searchPhrase, "cursor": cursor};
-    let url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/list";
+    let url = "https://"+this.apiId+"/list";
 
     const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
     const xhr : any = (await this.prepareXhr(body, url, this._SfLoader, authorization)) as any;
@@ -1793,9 +1795,9 @@ export class SfIForm extends LitElement {
 
   fetchSearchSelect = async (cursor: any = "") => {
 
-    const body: any = {"searchstring": this.searchPhrase, "cursor": cursor};
+    const body: any = {"searchstring": this.searchPhrase != null ? this.searchPhrase : "", "cursor": cursor};
     console.log(body);
-    let url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/list";
+    let url = "https://"+this.apiId+"/list";
 
     console.log('fetchsearchselect searchphrase', this.searchPhrase);
 
@@ -1828,7 +1830,7 @@ export class SfIForm extends LitElement {
   fetchSearchList = async (cursor: any = "") => {
 
     const body: any = {"searchstring": this.searchPhrase, "cursor": cursor};
-    let url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/list";
+    let url = "https://"+this.apiId+"/list";
 
     const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
     const xhr : any = (await this.prepareXhr(body, url, this._SfLoader, authorization)) as any;
@@ -1847,7 +1849,7 @@ export class SfIForm extends LitElement {
   fetchDetail = async () => {
 
     const body: any = {"id": this.selectedId};
-    let url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/detail";
+    let url = "https://"+this.apiId+"/detail";
 
     const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
     const xhr : any = (await this.prepareXhr(body, url, this._SfLoader, authorization)) as any;
@@ -1871,7 +1873,7 @@ export class SfIForm extends LitElement {
 
   fetchLogs = async () => {
 
-    let url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/logs";
+    let url = "https://"+this.apiId+"/logs";
     const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
     const xhr : any = (await this.prepareXhr({}, url, this._SfLoader, authorization)) as any;
     this._SfLoader.innerHTML = '';
@@ -1895,7 +1897,7 @@ export class SfIForm extends LitElement {
     let url = "";
 
     body["id"] = this.selectedId;
-    url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/delete";
+    url = "https://"+this.apiId+"/delete";
 
     const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
     const xhr : any = (await this.prepareXhr(body, url, this._SfLoader, authorization)) as any;
@@ -1921,7 +1923,7 @@ export class SfIForm extends LitElement {
     console.log('submitNew called');
 
     const body: any = {};
-    let url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/create";
+    let url = "https://"+this.apiId+"/create";
 
     const values: any = {};
 
@@ -1970,7 +1972,7 @@ export class SfIForm extends LitElement {
 
     body["values"] = values;
     body["id"] = this.selectedId;
-    url = "https://"+this.apiId+".execute-api.us-east-1.amazonaws.com/test/update";
+    url = "https://"+this.apiId+"/update";
 
     console.log(body, url);
 
@@ -3608,6 +3610,7 @@ export class SfIForm extends LitElement {
       setTimeout(() => {
         // this.initListenersTrail();
         this.searchPhraseOriginal = this.searchPhrase;
+        console.log('searchPhrase loadmode', this.searchPhrase);
         this.prevCursor = [];
         this.nextCursor = [];
         this.fetchSearchSelect();
@@ -4006,7 +4009,7 @@ export class SfIForm extends LitElement {
           </div>
           <br />
           <div class="d-flex">
-            <div class="lb" part="lb"></div>
+            <div class="lb"></div>
             <div class="d-flex flex-grow justify-between">
               <button id="button-back" part="button-icon" class="button-icon"><span class="material-icons">keyboard_backspace</span></button>
               <div class="d-flex">
@@ -4021,26 +4024,26 @@ export class SfIForm extends LitElement {
                 
               </div>
             </div>
-            <div class="rb" part="rb"></div>
+            <div class="rb"></div>
           </div>
           <br />
           <div class="d-flex justify-center">
-            <div class="lb" part="lb"></div>
+            <div class="lb"></div>
             <div class="flex-grow" id="form-container">
               <slot name="form"></slot>
             </div>
-            <div class="rb" part="rb"></div>
+            <div class="rb"></div>
           </div>
           <div class="d-flex justify-center">
-            <div class="lb" part="lb"></div>
+            <div class="lb"></div>
             <div class="flex-grow flexpcol hide" part="calendar-container" id="calendar-container">
               <div><h3 part="results-title"  class="text-center">Compliance Calendar</h3></div>
               <slot name="calendar"></slot>
             </div>
-            <div class="rb" part="rb"></div>
+            <div class="rb"></div>
           </div>
           <div class="d-flex justify-between">
-            <div class="lb" part="lb"></div>
+            <div class="lb"></div>
             <div>
               <div class="div-row-error div-row-submit gone">
                 <div part="errormsg" class="div-row-error-message"></div>
@@ -4052,18 +4055,18 @@ export class SfIForm extends LitElement {
                 <div part="notifmsg" class="div-row-notif-message"></div>
               </div>
             </div>
-            <div class="rb" part="rb"></div>
+            <div class="rb"></div>
           </div>
           <br />
           <div class="d-flex justify-center">
             <div class="loader-element"></div>
           </div>
           <div class="d-flex justify-center">
-            <div class="lb" part="lb"></div>
-            <div class="d-flex justify-start flex-grow">
+            <div class="lb"></div>
+            <div class="d-flex justify-center flex-grow">
               <button part="button-lg" id="button-submit" disabled>Submit</button>
             </div>
-            <div class="rb" part="rb"></div>
+            <div class="rb"></div>
           </div>
           
         </div>
