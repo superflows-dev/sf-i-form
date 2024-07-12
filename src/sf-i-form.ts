@@ -825,6 +825,15 @@ export class SfIForm extends LitElement {
   @query('#button-copypaste-paste')
   _SfButtonCopypastePaste: any;
 
+  @query('#input-startdate')
+  _SfInputStartDate: any;
+
+  @query('#input-enddate')
+  _SfInputEndDate: any;
+
+  @query('#button-fetch-log')
+  _SfButtonFetchLog: any;
+
   @queryAssignedElements({slot: 'form'})
   _SfFormC: any;
 
@@ -1480,13 +1489,13 @@ export class SfIForm extends LitElement {
         html += '<div><button part="button-icon-small" id="button-collapse-'+i+'" class="material-icons gone button-icon-small">expand_less</button><button part="button-icon-small" id="button-expand-'+i+'" class="material-icons button-icon-small">expand_more</button></div>';
         html += '</td>';
         html += '<td>';
-        html += '<div id="search-'+i+'"><strong>' + JSON.parse(values[i].message).op + '</strong></div>';
+        html += '<div id="search-'+i+'"><strong>' + values[i].message.op + '</strong></div>';
         html += '</td>';
         html += '<td>';
-        html += '<div>&nbsp;<strong>' + JSON.parse(values[i].message).httpCode + '</strong></div>';
+        html += '<div>&nbsp;<strong>' + values[i].message.httpCode + '</strong></div>';
         html += '</td>';
         html += '<td>';
-        html += '<div>&nbsp;' + JSON.parse(values[i].message).userId+ '</div>';
+        html += '<div>&nbsp;' + values[i].message.userId+ '</div>';
         html += '</td>';
         html += '<td>';
         html += '<div>&nbsp;' + (new Date(values[i].timestamp) + "").split(' (')[0] + '</div>';
@@ -1499,42 +1508,42 @@ export class SfIForm extends LitElement {
         html += '<td>';
         html += '<div id="row-expand-'+i+'" class="gone">';
 
-        if(JSON.parse(values[i].message).delta != null) {
+        if(values[i].message.delta != null) {
 
-          const jsonDelta = (JSON.parse(values[i].message).delta);
-          console.log(jsonDelta);
+          const jsonDelta = (values[i].message.delta);
+          console.log("delta",jsonDelta);
           html += '<div><strong>Delta</strong></div>'
           html += '<table>';
           html += '<thead>';
           for(var j = 0; j < jsonDelta.length; j++) {
-            if(jsonDelta[j].split(":")[1] == jsonDelta[j].split(":")[2]) {
+            if(jsonDelta[j].oldValue == jsonDelta[j].newValue) {
               html += '<th class="td-head">';
             } else {
               html += '<th class="td-highlight">';
             }
-            html += jsonDelta[j].split(":")[0];
+            html += jsonDelta[j].field;
             html += '</th>';
           }
           html += '</thead>';
           html += '<tr>';
           for(var j = 0; j < jsonDelta.length; j++) {
-            if(jsonDelta[j].split(":")[1] == jsonDelta[j].split(":")[2]) {
+            if(jsonDelta[j].oldValue == jsonDelta[j].newValue) {
               html += '<td class="td-dark">';
             } else {
               html += '<td class="td-highlight">';
             }
-            html += jsonDelta[j].split(":")[1];
+            html += jsonDelta[j].oldValue;
             html += '</td>';
           }
           html += '</tr>';
           html += '<tr>';
           for(var j = 0; j < jsonDelta.length; j++) {
-            if(jsonDelta[j].split(":")[1] == jsonDelta[j].split(":")[2]) {
+            if(jsonDelta[j].oldValue == jsonDelta[j].newValue) {
               html += '<td class="td-light">';
             } else {
               html += '<td class="td-highlight">';
             }
-            html += jsonDelta[j].split(":")[2];
+            html += jsonDelta[j].newValue;
             html += '</td>';
           }
           html += '</tr>';
@@ -1542,7 +1551,7 @@ export class SfIForm extends LitElement {
 
         }
 
-        const req = JSON.parse(JSON.parse(values[i].message).req.body).values;
+        const req = JSON.parse(values[i].message.req.body).values;
 
         if(req != null) {
 
@@ -1568,10 +1577,10 @@ export class SfIForm extends LitElement {
           html += '</table>';
 
         } else {
-          html += '<strong>Request</strong> - ' + JSON.stringify(JSON.parse(values[i].message).req.body) + '<br />';
+          html += '<strong>Request</strong> - ' + JSON.stringify(values[i].message.req.body) + '<br />';
         }
         
-        html += '<strong>Response</strong> - ' + JSON.stringify(JSON.parse(values[i].message).resp.body) + '';
+        html += '<strong>Response</strong> - ' + JSON.stringify(values[i].message.resp.body) + '';
         html += '</div>';
         html += '</td>';
         html += '</tr>';
@@ -1872,10 +1881,15 @@ export class SfIForm extends LitElement {
   }
 
   fetchLogs = async () => {
-
+    let startDate = (this._SfInputStartDate as HTMLInputElement).value
+    let endDate = (this._SfInputEndDate as HTMLInputElement).value
+    let startTime = new Date(startDate).getTime()
+    let endTime = (new Date(endDate).getTime()) + 1000
+    const body: any = {"starttime": startTime + "","endtime": endTime + ""}
+    console.log(body)
     let url = "https://"+this.apiId+"/logs";
     const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
-    const xhr : any = (await this.prepareXhr({}, url, this._SfLoader, authorization)) as any;
+    const xhr : any = (await this.prepareXhr(body, url, this._SfLoader, authorization)) as any;
     this._SfLoader.innerHTML = '';
     if(xhr.status == 200) {
       const jsonRespose = JSON.parse(xhr.responseText);
@@ -2838,13 +2852,29 @@ export class SfIForm extends LitElement {
       this.loopThroughSearchResults();
     });
 
+
   }
 
-  initListenersTrail = () => {
+  initListenersTrail = async () => {
 
     this._SfButtonBack.addEventListener('click', () => {
       this.mode = "view";
       this.loadMode();
+    });
+
+    console.log(this._SfButtonFetchLog)
+    this._SfButtonFetchLog.addEventListener('click', () => {
+      console.log("fetch logs clicked", (this._SfInputStartDate as HTMLInputElement).value, (this._SfInputEndDate as HTMLInputElement).value)
+      this.fetchLogs()
+    })
+
+    this._SfInputStartDate.addEventListener('change', () => {
+      this._SfInputEndDate.setAttribute('min', new Date((this._SfInputStartDate as HTMLInputElement).value).toISOString().slice(0, 10) )
+      this.fetchLogs()
+    });
+    this._SfInputEndDate.addEventListener('change', () => {
+      this._SfInputStartDate.setAttribute('max', new Date((this._SfInputEndDate as HTMLInputElement).value).toISOString().slice(0, 10) )
+      this.fetchLogs()
     });
 
   }
@@ -3619,9 +3649,18 @@ export class SfIForm extends LitElement {
 
     } else if(this.mode == "trail") {
 
-      setTimeout(() => {
+      setTimeout(async () => {
         this.initListenersTrail();
-        this.fetchLogs();
+        let d = new Date();
+        let [day,month,year] = Util.getDayMonthYear(d)
+        let lastWeek = new Date();
+        lastWeek.setDate(d.getDate() - 7);
+        let [lastday,lastmonth,lastyear] = Util.getDayMonthYear(lastWeek);
+        (this._SfInputStartDate as HTMLInputElement).value = "" + lastyear + "-" + lastmonth + "-" + lastday; 
+        (this._SfInputEndDate as HTMLInputElement).value = "" + year + "-" + month + "-" + day 
+        this._SfInputEndDate.setAttribute('min', new Date((this._SfInputStartDate as HTMLInputElement).value).toISOString().slice(0, 10) )
+        this._SfInputStartDate.setAttribute('max', new Date((this._SfInputEndDate as HTMLInputElement).value).toISOString().slice(0, 10) )
+        this.fetchLogs()
       }, 500)
 
     } else if(this.mode == "new") {
@@ -3858,6 +3897,22 @@ export class SfIForm extends LitElement {
             <div class="rb"></div>
           </div>
           <br />
+          <div class="d-flex">
+            <div class="lb"></div>
+            <div class="w-50-m-0">
+              <label part="input-label">From Date *</label><br>
+              <input part="input" id="input-startdate" type="date" class="w-100-m-0" mandatory="" autocomplete="off" style="display: block;">
+            </div>
+            <div class="w-50-m-0">
+              <label part="input-label">To Date *</label><br>
+              <input part="input" id="input-enddate" type="date" class="w-100-m-0" mandatory="" autocomplete="off" style="display: block;">
+            </div>
+            <div class="w-50-m-0">
+              <br>
+              <button id="button-fetch-log" part="button-icon" class="material-icons button-icon">receipt_long</button>
+            </div>
+            <div class="rb"></div>
+          </div>
           <div class="d-flex justify-center">
             <div class="loader-element"></div>
           </div>

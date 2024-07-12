@@ -56,8 +56,20 @@ async function replaceElement(element: any) {
     return new_element;
 }
 
+function getDayMonthYear(d: Date) {
+    let month = '' + (d.getMonth() + 1);
+    let day = '' + d.getDate();
+    let year = d.getFullYear();
+    
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+    return [day, month, year]
+}
+
 const exportFunctions = {
-   callApi, validateName, readCookie, replaceElement
+   callApi, validateName, readCookie, replaceElement, getDayMonthYear
 };
 
 export default exportFunctions;
