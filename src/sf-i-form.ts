@@ -1425,7 +1425,7 @@ export class SfIForm extends LitElement {
       
       html += '</table>';
 
-      if(values.length === this.blockSize) {
+      if(values.length === this.blockSize && this.flow != "read") {
         html += '<div id="down-indicator" class="d-flex justify-start align-center mt-10 left-sticky">';
         html += '<span part="td-head" id="page-num">&nbsp;&nbsp;'+(this.prevCursor.length+1) + "/" + (Math.ceil(parseInt(found)/this.blockSize))+'&nbsp;&nbsp;</span>'
         html += '<button id="button-next-cursor" part="button-icon-small" class="material-icons">expand_more</button>&nbsp;&nbsp;';
