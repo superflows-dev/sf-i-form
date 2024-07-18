@@ -9,6 +9,7 @@ import {customElement, query, queryAssignedElements, property} from 'lit/decorat
 import {SfISelect} from 'sf-i-select';
 import {SfISubSelect} from 'sf-i-sub-select';
 import {SfIEvents} from 'sf-i-events';
+import {SfIUploader} from 'sf-i-uploader';
 // import {customElement, query, property} from 'lit/decorators.js';
 import Util from './util';
 // import {LitElement, html, css} from 'lit';
@@ -40,6 +41,7 @@ export class SfIForm extends LitElement {
   blockSize = 10;
   VALIDATION_TEXT_BASIC = "text-basic"
   VALIDATION_TEXT_DATE = "text-date"
+  // VALIDATION_UPLOADER = "uploader"
 
   @property()
   mode!: string;
@@ -898,7 +900,7 @@ export class SfIForm extends LitElement {
 
   dispatchMyEvent = (ev: string, args?: any) => {
 
-    console.log('dispatching event', ev);
+    console.log('dispatching event', ev, args);
     const event = new CustomEvent(ev, {detail: args, bubbles: true, composed: true});
     this.dispatchEvent(event);
 
@@ -1007,6 +1009,30 @@ export class SfIForm extends LitElement {
           type: "sf-i-form",
           value: (this._SfFormC[0].querySelector('#' + id) as SfIForm).selectedValues(),
           text: (this._SfFormC[0].querySelector('#' + id) as SfIForm).selectedTexts()  
+        }
+      }
+      
+    } else if ((this._SfFormC[0].querySelector('#' + id) as HTMLElement).tagName.toLowerCase() == "sf-i-uploader") {
+      console.log('selectedvalues',(this._SfFormC[0].querySelector('#' + id) as SfIForm).selectedValues())
+      if((this._SfFormC[0].querySelector('#' + id) as HTMLElement).style.display == "none") {
+        if(this.getUseInApi().includes(this.getFieldFromInput(id))) {
+          value = {
+            type: "sf-i-uploader",
+            value: (this._SfFormC[0].querySelector('#' + id) as SfIUploader).selectedValues(),
+            text: (this._SfFormC[0].querySelector('#' + id) as SfIUploader).selectedTexts()  
+          }
+        } else {
+          value = {
+            type: "sf-i-uploader",
+            value: [],
+            text: []  
+          }
+        }
+      } else {
+        value = {
+          type: "sf-i-uploader",
+          value: (this._SfFormC[0].querySelector('#' + id) as SfIUploader).selectedValues(),
+          text: (this._SfFormC[0].querySelector('#' + id) as SfIUploader).selectedTexts()  
         }
       }
       
@@ -1689,11 +1715,16 @@ export class SfIForm extends LitElement {
         sValues += '[';
 
         for(var j = 0; j < JSON.parse(value[this.getFields()[i]]).length; j++) {
-
-          sValues += '"';
-          sValues += JSON.parse(value[this.getFields()[i]])[j];
-          sValues += '",';
-
+          console.log("adding object", JSON.parse(value[this.getFields()[i]])[j], typeof JSON.parse(value[this.getFields()[i]])[j])
+          if(typeof JSON.parse(value[this.getFields()[i]])[j] == "object"){
+            sValues += JSON.stringify(value[this.getFields()[i]]);
+            console.log('added object', sValues)  
+          }else{
+            sValues += '"';
+            sValues += JSON.parse(value[this.getFields()[i]])[j];
+            sValues += '",';
+          }
+          
         }
 
         sValues = sValues.replace(/(^,)|(,$)/g, "")
@@ -2127,6 +2158,34 @@ export class SfIForm extends LitElement {
     
           }
           
+        }else if(element.nodeName.toLowerCase() == "sf-i-uploader") {
+          const elementSfIUploader = element as SfIUploader;
+          const parentElement = ((elementSfIUploader as SfIUploader).parentElement as HTMLDivElement);
+          const icon = parentElement.querySelector('.error-icon') as HTMLElement;
+          if(icon != null) {
+            parentElement.removeChild(icon);
+          }
+          let errInValidation = true
+          console.log('elementSfUploader uploadvalid', elementSfIUploader.uploadValid, elementSfIUploader.inputArr.length)
+          if(element.hasAttribute('mandatory')){
+            errInValidation = !(elementSfIUploader.uploadValid)
+          }else{
+            errInValidation = !(elementSfIUploader.uploadValid || elementSfIUploader.inputArr.length == 0)
+          } 
+          
+          if(errInValidation ) {
+            const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
+            parentElement.insertAdjacentHTML('beforeend', errorHtml);
+            console.log('evaluate false return', element)
+            evaluate = false;
+            break;
+          } else {
+            const errorHtml = '<div class="error-icon d-flex justify-end color-success"><div class="material-icons">done</div></div>';
+            parentElement.insertAdjacentHTML('beforeend', errorHtml);
+          }
+    
+          
+          
         } else {
           const parentElement = (element.parentElement as HTMLDivElement);
           const icon = parentElement.querySelector('.error-icon') as HTMLElement;
@@ -2136,7 +2195,7 @@ export class SfIForm extends LitElement {
 
           let errInValidation = false;
 
-          console.log('testingvalidate', (element as HTMLInputElement).value, (/\s{2}/.test((element as HTMLInputElement).value)));
+          console.log('testingvalidate', (element as HTMLInputElement).value, (/\s{2}/.test((element as HTMLInputElement).value)), this.getValidationOfElement(id));
 
           if(!(/\s{2}/.test((element as HTMLInputElement).value))) {
 
@@ -2419,6 +2478,7 @@ export class SfIForm extends LitElement {
           if(parentElement.nodeName.toLowerCase() == "sf-i-form" || parentElement.nodeName.toLowerCase() == "sf-i-select" || parentElement.nodeName.toLowerCase() == "sf-i-sub-select") {
 
             parentElement?.addEventListener('valueChanged', () => {
+              console.log('value changed', parentElement.nodeName.toLowerCase(), (parentElement as HTMLInputElement).value)
               this.updateShortlistedSearchPhrase(parents, childElement);
             });
   
@@ -2426,6 +2486,18 @@ export class SfIForm extends LitElement {
               this.updateShortlistedSearchPhrase(parents, childElement);
             });
   
+          } else if(parentElement.nodeName.toLowerCase() == "sf-i-uploader"){
+            parentElement?.addEventListener('uploadValid', () => {
+              this.updateShortlistedSearchPhrase(parents, childElement);
+            })
+            // parentElement?.addEventListener('uploadComplete', () => {
+            //   console.log('value changed', parentElement.nodeName.toLowerCase(), (parentElement as HTMLInputElement).value)
+            //   this.updateShortlistedSearchPhrase(parents, childElement);
+            // });
+            // parentElement?.addEventListener('analysisCompleted', () => {
+            //   console.log('value changed', parentElement.nodeName.toLowerCase(), (parentElement as HTMLInputElement).value)
+            //   this.updateShortlistedSearchPhrase(parents, childElement);
+            // });
           } else {
 
             parentElement?.addEventListener('keyup', () => {
@@ -2501,6 +2573,11 @@ export class SfIForm extends LitElement {
         (element as SfIForm).flow = value ? "read" : "";
         (element as SfIForm).loadMode();
         //(element as SfIForm).initState();
+      } else if (element.nodeName.toLowerCase() == "sf-i-uploader") {
+        console.log('init disabling form', (element as SfIUploader).readOnly, value, (element as SfIUploader).max, (element as SfIUploader).current);
+        (element as SfIUploader).readOnly = value;
+        (element as SfIUploader).loadMode();
+        //(element as SfIForm).initState();
       } else {
         if(value) {
           (element as HTMLInputElement).setAttribute('disabled', 'disabled');
@@ -2543,6 +2620,16 @@ export class SfIForm extends LitElement {
         (element as SfIForm).selectedSearchId = [];
         (element as SfIForm).clearSelection();
 
+        // if((element as SfIForm).selectedSearchId == null || (element as SfIForm).selectedSearchId == "") {
+        //   (element as SfIForm).clearSelection();
+        // }
+        
+
+      } else if (element.nodeName.toLowerCase() == "sf-i-uploader") {
+        console.log('clearing inputs');
+        (element as SfIUploader).clearUploads();
+        (element as SfIUploader).loadMode();
+        console.log('clearing inputs');
         // if((element as SfIForm).selectedSearchId == null || (element as SfIForm).selectedSearchId == "") {
         //   (element as SfIForm).clearSelection();
         // }
@@ -3197,6 +3284,22 @@ export class SfIForm extends LitElement {
           this.processFiltersByEvent();
         });
 
+      } else if (element.nodeName.toLowerCase() == "sf-i-uploader") {
+        element.addEventListener('uploadValid', () => {
+          this.evalSubmit();
+          this.processFiltersByEvent();
+        })
+        // element.addEventListener('uploadCompleted', () => {
+        //   console.log('value changed', element.nodeName.toLowerCase(), element.value)
+        //   this.evalSubmit();
+        //   this.processFiltersByEvent();
+        // });
+        // element.addEventListener('analysisCompleted', () => {
+        //   console.log('value changed', element.nodeName.toLowerCase(), element.value)
+        //   this.evalSubmit();
+        //   this.processFiltersByEvent();
+        // });
+
       } else {
 
         element.addEventListener('keyup', () => {
@@ -3296,6 +3399,7 @@ export class SfIForm extends LitElement {
       if(element.nodeName.toLowerCase() == "sf-i-select") {
 
         element.addEventListener('valueChanged', () => {
+          console.log('value changed', element.nodeName.toLowerCase(), element.value)
           this.evalSubmit();
           this.processFiltersByEvent();
         });
@@ -3313,6 +3417,22 @@ export class SfIForm extends LitElement {
           this.evalSubmit();
           this.processFiltersByEvent();
         });
+
+      } else if (element.nodeName.toLowerCase() == "sf-i-uploader") {
+        element.addEventListener('uploadValid', () => {
+          this.evalSubmit();
+          this.processFiltersByEvent();
+        })
+        // element.addEventListener('uploadCompleted', () => {
+        //   console.log('value changed', element.nodeName.toLowerCase(), element.value)
+        //   this.evalSubmit();
+        //   this.processFiltersByEvent();
+        // });
+        // element.addEventListener('analysisCompleted', () => {
+        //   console.log('value changed', element.nodeName.toLowerCase(), element.value)
+        //   this.evalSubmit();
+        //   this.processFiltersByEvent();
+        // });
 
       } else {
 
@@ -3348,10 +3468,13 @@ export class SfIForm extends LitElement {
 
       } else if (element.nodeName.toLowerCase() == "sf-i-form") {
 
-        console.log('populating selected', (element as SfIForm).mode, element);
+        // console.log('populating selected', (element as SfIForm).mode, element);
 
         (element as SfIForm).selectedSearchId = this.getSelectedViewToDetailValues()[i];
         (element as SfISubSelect).loadMode();
+      } else if (element.nodeName.toLowerCase() == "sf-i-uploader") {
+        (element as SfIUploader).prepopulatedInputArr = this.getSelectedViewToDetailValues()[i][0];
+        (element as SfIUploader).loadMode();
 
       } else {
 
