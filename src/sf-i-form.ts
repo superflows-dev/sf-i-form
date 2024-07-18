@@ -1348,7 +1348,9 @@ export class SfIForm extends LitElement {
       if(this.flow == "read") {
         disabled = 'disabled';
       }
-
+      if(this.flow == "read" && checked != "checked"){
+        continue;
+      }
       html += '<tr>';
       html += '<td part="td-action" class="left-sticky">';
       if(multiSelect) {
@@ -1398,9 +1400,9 @@ export class SfIForm extends LitElement {
     let html = '';
 
     if(values.length > 0 && this.nextCursor.length === 0) {
-
-      html += '<h3 part="results-title" class="left-sticky">Search Results ('+found+')</h3>'
-      
+      if(this.flow != "read"){
+        html += '<h3 part="results-title" class="left-sticky">Search Results ('+found+')</h3>'
+      }
       html += '<table id="select-list-table">';
       //console.log('search', values)
 
