@@ -1705,22 +1705,23 @@ export class SfIForm extends LitElement {
 
     var sValues = '';
 
-    console.log('fields', this.getFields().length);
+    console.log('selected fields', this.getFields().length);
 
     sValues += '[';
     for(var i = 0; i < this.getFields().length; i++) {
 
-      console.log('fields', i, value[this.getFields()[i]]);
+      console.log('selected fields', i, value[this.getFields()[i]], Array.isArray(JSON.parse(value[this.getFields()[i]])));
 
       if(value[this.getFields()[i]] != null && Array.isArray(JSON.parse(value[this.getFields()[i]]))) {
 
         sValues += '[';
 
         for(var j = 0; j < JSON.parse(value[this.getFields()[i]]).length; j++) {
-          console.log("adding object", JSON.parse(value[this.getFields()[i]])[j], typeof JSON.parse(value[this.getFields()[i]])[j])
+          console.log("selected adding object", JSON.parse(value[this.getFields()[i]])[j], typeof JSON.parse(value[this.getFields()[i]])[j])
           if(typeof JSON.parse(value[this.getFields()[i]])[j] == "object"){
-            sValues += JSON.stringify(value[this.getFields()[i]]);
-            console.log('added object', sValues)  
+            sValues += JSON.stringify(JSON.parse(value[this.getFields()[i]])[j]);
+            console.log('selected added object', sValues)
+            sValues += ","  
           }else{
             sValues += '"';
             sValues += JSON.parse(value[this.getFields()[i]])[j];
@@ -1745,7 +1746,7 @@ export class SfIForm extends LitElement {
     sValues = sValues.replace(/(^,)|(,$)/g, "")
     sValues += ']';
 
-    console.log('selected values', sValues);
+    console.log('selected values', sValues, value);
 
     this.selectedViewToDetailValues = sValues;
     
@@ -1994,6 +1995,7 @@ export class SfIForm extends LitElement {
       this.clearInputs();
       setTimeout(() => {
         this.clearMessages();
+        this._SfButtonBack.click();
       }, 2000);
       
     } else {
@@ -2030,6 +2032,7 @@ export class SfIForm extends LitElement {
       this.setSuccess('Operation Successful!');
       if(this.mode == "detail") {
         setTimeout(() => {
+          this.clearMessages();
           this._SfButtonBack.click();
         }, 2000);
       } else {
@@ -3475,7 +3478,8 @@ export class SfIForm extends LitElement {
         (element as SfIForm).selectedSearchId = this.getSelectedViewToDetailValues()[i];
         (element as SfISubSelect).loadMode();
       } else if (element.nodeName.toLowerCase() == "sf-i-uploader") {
-        (element as SfIUploader).prepopulatedInputArr = this.getSelectedViewToDetailValues()[i][0];
+        console.log("uploader populated", this.getSelectedViewToDetailValues()[i]);
+        (element as SfIUploader).prepopulatedInputArr = JSON.stringify(this.getSelectedViewToDetailValues()[i]);
         (element as SfIUploader).loadMode();
 
       } else {

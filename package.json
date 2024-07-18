@@ -56,7 +56,7 @@
     "sf-i-events": "^1.0.22",
     "sf-i-select": "^1.0.51",
     "sf-i-sub-select": "^1.0.80",
-    "sf-i-uploader": "^1.0.76",
+    "sf-i-uploader": "^1.0.77",
     "sinon": "^15.0.1"
   },
   "devDependencies": {
