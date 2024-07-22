@@ -4,7 +4,16 @@ const validateName = (name: string) => {
       return true;
     }
     return false;
-  }
+}
+
+function isJsonString(str: string) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
 
 function readCookie(key: string) {
     let name = key + "=";
@@ -69,7 +78,7 @@ function getDayMonthYear(d: Date) {
 }
 
 const exportFunctions = {
-   callApi, validateName, readCookie, replaceElement, getDayMonthYear
+   callApi, validateName, readCookie, replaceElement, getDayMonthYear, isJsonString
 };
 
 export default exportFunctions;

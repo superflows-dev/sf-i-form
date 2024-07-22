@@ -1235,15 +1235,20 @@ export class SfIForm extends LitElement {
           console.log('getignoreprojects', this.getIgnoreProjections());
 
           if(!this.getIgnoreProjections().includes(cols[j])) {
-
             html += '<td part="td-body" class="td-body '+classBg+'">';
             html += ('<div part="row-col-title">'+cols[j]+'</div>')
             if(Array.isArray(data[j])) {
-
-              for(var k = 0; k < data[j].length; k++) {
-                html +=  ('<sf-i-elastic-text text="'+data[j][k]+'" minLength="80"></sf-i-elastic-text>');
-                if(k < (data[j].length - 1)) {
-                  html += "; ";
+              if(data[j][0] != null && Util.isJsonString(data[j][0]) && JSON.parse(data[j][0])['key'] != null && JSON.parse(data[j][0])['ext'] != null){
+                console.log('displaying cols Arr', cols[j], data[j])
+              }
+              if(data[j][0] != null && Util.isJsonString(data[j][0]) && JSON.parse(data[j][0])['key'] != null && JSON.parse(data[j][0])['ext'] != null) {
+                  html += ('<sf-i-elastic-text text="files['+data[j].length+']" minLength="80"></sf-i-elastic-text>')
+              } else {
+                for(var k = 0; k < data[j].length; k++) {
+                  html +=  ('<sf-i-elastic-text text="'+data[j][k]+'" minLength="80"></sf-i-elastic-text>');
+                  if(k < (data[j].length - 1)) {
+                    html += "; ";
+                  }
                 }
               }
 
@@ -1369,11 +1374,15 @@ export class SfIForm extends LitElement {
 
           html += '<td part="td-body" class="td-body '+classBg+'">';
           if(Array.isArray(data[j])) {
-
-            for(var k = 0; k < data[j].length; k++) {
-              html += data[j][k];
-              if(k < (data[j].length - 1)) {
-                html += " &nbsp; ";
+            if(data[j][0] != null && Util.isJsonString(data[j][0]) && JSON.parse(data[j][0])['key'] != null && JSON.parse(data[j][0])['ext'] != null) {
+              html += 'files['+data[j].length+']'
+            } else {
+              for(var k = 0; k < data[j].length; k++) {
+                
+                html += data[j][k];
+                if(k < (data[j].length - 1)) {
+                  html += " &nbsp; ";
+                }
               }
             }
 
@@ -1668,11 +1677,17 @@ export class SfIForm extends LitElement {
 
         for(var j = 0; j < value[this.getFields()[i]]['value'].length; j++) {
 
-          sValues += '"';
-          sValues += value[this.getFields()[i]]['value'][j];
-          sValues += '",';
-
-          console.log('fields insrting', value[this.getFields()[i]]['value'][j]);
+          
+          if(value[this.getFields()[i]]['value'][j]['key'] != null && value[this.getFields()[i]]['value'][j]['ext'] != null){
+            sValues += JSON.stringify(value[this.getFields()[i]]['value'][j]);
+          }else{
+            sValues += '"';
+            sValues += value[this.getFields()[i]]['value'][j];
+            sValues += '"';
+          }
+          sValues += ',';
+          //data[j][0] != null && Util.isJsonString(data[j][0]) && JSON.parse(data[j][0])['key'] != null && JSON.parse(data[j][0])['ext'] != null
+          console.log('fields insrting 1', value[this.getFields()[i]]['value'][j]);
 
         }
 
@@ -2060,6 +2075,7 @@ export class SfIForm extends LitElement {
       values[field] = this.getInputValue(this.getInputs()[i])
 
     }
+    console.log('copied values', values)
     return values;
   }
 
@@ -2171,11 +2187,19 @@ export class SfIForm extends LitElement {
             parentElement.removeChild(icon);
           }
           let errInValidation = true
-          console.log('elementSfUploader uploadvalid', elementSfIUploader.uploadValid, elementSfIUploader.inputArr.length)
+          console.log('elementSfUploader uploadvalid', elementSfIUploader.uploadValid, elementSfIUploader.inputArr.length, element.hasAttribute('mandatory'))
           if(element.hasAttribute('mandatory')){
-            errInValidation = !(elementSfIUploader.uploadValid)
+            if(elementSfIUploader.uploadValid){
+              errInValidation = false
+            }
+            // errInValidation = !(elementSfIUploader.uploadValid || elementSfIUploader.inputArr.length == 0)
           }else{
-            errInValidation = !(elementSfIUploader.uploadValid || elementSfIUploader.inputArr.length == 0)
+            if(elementSfIUploader.uploadValid){
+              errInValidation = false
+            } else if( elementSfIUploader.inputArr.length === 0){
+              errInValidation = false
+            }
+            // errInValidation = !(elementSfIUploader.uploadValid)
           } 
           
           if(errInValidation ) {
@@ -2632,6 +2656,7 @@ export class SfIForm extends LitElement {
 
       } else if (element.nodeName.toLowerCase() == "sf-i-uploader") {
         console.log('clearing inputs');
+        (element as SfIUploader).prepopulatedInputArr = "[]";
         (element as SfIUploader).clearUploads();
         (element as SfIUploader).loadMode();
         console.log('clearing inputs');
