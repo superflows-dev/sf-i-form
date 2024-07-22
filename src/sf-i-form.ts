@@ -1725,7 +1725,7 @@ export class SfIForm extends LitElement {
     sValues += '[';
     for(var i = 0; i < this.getFields().length; i++) {
 
-      console.log('selected fields', i, value[this.getFields()[i]], Array.isArray(JSON.parse(value[this.getFields()[i]])));
+      // console.log('selected fields', i, value[this.getFields()[i]], Array.isArray(JSON.parse(value[this.getFields()[i]])));
 
       if(value[this.getFields()[i]] != null && Array.isArray(JSON.parse(value[this.getFields()[i]]))) {
 
