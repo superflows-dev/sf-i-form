@@ -133,6 +133,9 @@ export class SfIForm extends LitElement {
   label!: string;
 
   @property()
+  latestDaysBlock: number = 7;
+
+  @property()
   name!: string;
 
   @property()
@@ -152,6 +155,9 @@ export class SfIForm extends LitElement {
 
   @property()
   nextCursor: Array<any> = [];
+  
+  @property()
+  noLatestMessage: string = "";
 
   selectedValues = () => {
 
@@ -442,6 +448,11 @@ export class SfIForm extends LitElement {
       overflow-x: auto;
     }
 
+    #latest-list-container {
+      overflow-x: auto;
+      flex-direction: column;
+    }
+
     #input-search {
       margin-bottom: 5px;
       width: 300px;
@@ -697,6 +708,10 @@ export class SfIForm extends LitElement {
         width: 40%;
       }
 
+      #latest-list-container {
+        overflow-x: auto;
+      }
+
       #form-container {
         width: 40%;
       }
@@ -781,6 +796,9 @@ export class SfIForm extends LitElement {
 
   @query('#logs-list-container')
   _SfLogsListContainer: any;
+
+  @query('#latest-list-container')
+  _SfLatestListContainer: any;
 
   @query('#button-back')
   _SfButtonBack: any;
@@ -1653,6 +1671,104 @@ export class SfIForm extends LitElement {
 
   }
 
+  renderLatestListRows = (values: any) => {
+
+    console.log('renderlatestlistrows', values);
+
+    var html = '';
+
+    for(var i = 0; i < values.length; i++) {
+
+      
+      const cols = JSON.parse(values[i].fields.cols);
+
+      // console.log(JSON.parse(values[i].fields.data));
+      let data = JSON.parse(values[i].fields.data);
+      // let data = Object.values(values[i]);
+      // let cols = Object.keys(values[i]);
+      // console.log('data', data, cols);
+
+      var classBg = "";
+
+      if(i%2 === 0) {
+        classBg = 'td-light';
+      } else {
+        classBg = 'td-dark';
+      }
+
+
+      html += '<tr>';
+      
+      for(let j = 0; j < cols.length; j++) {
+
+       
+
+        if(!this.getIgnoreProjections().includes(cols[j])) {
+
+          html += '<td part="td-body" class="td-body '+classBg+'">';
+          html += ('<div part="row-col-title">'+cols[j]+'</div>')
+          let txt = ""
+          if(Array.isArray(data[j])) {
+            if(data[j] != null && Util.isJsonString(data[j] as string) && JSON.parse(data[j] as string)['key'] != null && JSON.parse(data[j] as string)['ext'] != null) {
+              txt += 'files['+(data[j] as Array<any>).length+']'
+            } else {
+              for(var k = 0; k < (data[j] as Array<string>).length; k++) {
+                
+                txt += (data[j] as Array<string>)[k];
+                if(k < ((data[j] as Array<string>).length - 1)) {
+                  txt += " &nbsp; ";
+                }
+              }
+            }
+
+          } else {
+            if(data[j] != null && Util.isJsonString(data[j] as string) && JSON.parse(data[j] as string)[0]['key'] != null && JSON.parse(data[j] as string)[0]['ext'] != null) {
+              txt += 'files['+(JSON.parse(data[j] as string)).length+']'
+            } else {
+              txt += (Util.isJsonString((data[j] as string) ?? "") ? JSON.parse((data[j] as string)) : ((data[j] as string) ?? "undef"))
+            }
+          }
+          html +=  '<sf-i-elastic-text text="'+txt+'" minLength="10"></sf-i-elastic-text>';
+          html += '</td>';
+
+        }
+
+      }
+      html += '</tr>';
+
+    }
+
+    return html;
+
+  }
+
+  renderLatest = (values: any) => {
+
+    console.log('values', values);
+
+    let html = '';
+
+    if(values.length > 0) {
+
+      html += '<h3 part="latest-title">Latest '+this.name+'</h3>'
+
+      html += '<table id="latest-list-table">';
+
+      html += this.renderLatestListRows(values);
+      
+      html += '</table>';
+      this._SfLatestListContainer.innerHTML = html;
+
+    } else {
+      if(this.noLatestMessage != ""){
+        html += `<h3 part="no-latest-title">${this.noLatestMessage}</h3>`
+      }
+      this._SfLatestListContainer.innerHTML = html;
+
+    }
+
+  }
+
   renderClipboard = (value: any) => {
 
     var sValues = '';
@@ -1944,6 +2060,27 @@ export class SfIForm extends LitElement {
       const jsonRespose = JSON.parse(xhr.responseText);
       console.log(jsonRespose);
       this.renderLogs(jsonRespose.data);
+      
+    } else {
+      const jsonRespose = JSON.parse(xhr.responseText);
+      this.setError(jsonRespose.error);
+    }
+
+  }
+
+  fetchLatest = async () => {
+    let endTime = new Date().getTime()
+    let startTime = endTime - (this.latestDaysBlock * 24 * 60 * 60 * 1000)
+    const body: any = {"starttime": startTime + "","endtime": endTime + ""}
+    console.log(body)
+    let url = "https://"+this.apiId+"/getlatestlist";
+    const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
+    const xhr : any = (await this.prepareXhr(body, url, this._SfLoader, authorization)) as any;
+    this._SfLoader.innerHTML = '';
+    if(xhr.status == 200) {
+      const jsonRespose = JSON.parse(xhr.responseText);
+      console.log(jsonRespose);
+      this.renderLatest(jsonRespose.data);
       
     } else {
       const jsonRespose = JSON.parse(xhr.responseText);
@@ -3817,6 +3954,13 @@ export class SfIForm extends LitElement {
         this.fetchLogs()
       }, 500)
 
+    } else if(this.mode == "latest") {
+
+      setTimeout(async () => {
+        // this.initListenersTrail();
+        this.fetchLatest()
+      }, 500)
+
     } else if(this.mode == "new") {
 
       setTimeout(() => {
@@ -3978,6 +4122,22 @@ export class SfIForm extends LitElement {
           <div>
             <select id="input-select" @change="${this.onChangeSelect}" disabled>
             </select>
+            <div class="loader-element"></div>
+          </div>
+        </div>
+      
+      `;
+
+    } else if(this.mode == "latest") {
+
+
+      return html`
+        
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <div class="SfIFormC">
+          <label part="input-label" >${this.label}</label>
+          <div id="latest-list-container" class="flex-grow"></div>
+          <div>
             <div class="loader-element"></div>
           </div>
         </div>
