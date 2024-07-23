@@ -158,6 +158,9 @@ export class SfIForm extends LitElement {
   
   @property()
   noLatestMessage: string = "";
+  
+  @property()
+  titleMessage: string = "";
 
   selectedValues = () => {
 
@@ -1750,9 +1753,9 @@ export class SfIForm extends LitElement {
 
     if(values.length > 0) {
 
-      html += '<h3 part="latest-title">Latest '+this.name+'</h3>'
+      html += '<h3 part="latest-title">'+this.titleMessage+'</h3>'
 
-      html += '<table id="latest-list-table">';
+      html += '<table part="latest-list-table" id="latest-list-table">';
 
       html += this.renderLatestListRows(values);
       
@@ -1761,6 +1764,7 @@ export class SfIForm extends LitElement {
 
     } else {
       if(this.noLatestMessage != ""){
+        html += `<h3 part="latest-title">${this.titleMessage}</h3>`
         html += `<h3 part="no-latest-title">${this.noLatestMessage}</h3>`
       }
       this._SfLatestListContainer.innerHTML = html;
@@ -4136,7 +4140,9 @@ export class SfIForm extends LitElement {
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <div class="SfIFormC">
           <label part="input-label" >${this.label}</label>
-          <div id="latest-list-container" class="flex-grow"></div>
+          <div part="latest-container">
+            <div part="latest-list-container" id="latest-list-container" class="flex-grow"></div>
+          </div>
           <div>
             <div class="loader-element"></div>
           </div>
