@@ -47,6 +47,9 @@ export class SfIForm extends LitElement {
   mode!: string;
 
   @property()
+  maxSelect!: string;
+
+  @property()
   flow: string = "";
 
   @property()
@@ -185,10 +188,12 @@ export class SfIForm extends LitElement {
       const values = [];
 
       var divArr = (this._SfSearchMultiselectSelected as HTMLDivElement).querySelectorAll('div');
-
       for(var i = 0; i < divArr.length; i++) {
-
-        values.push(divArr[i].innerHTML);
+        if(this.flow == "read" || this.maxSelect != null){
+          values.push((divArr[i]).getAttribute('value'));
+        }else{
+          values.push(divArr[i].innerHTML);
+        }
 
       }
 
@@ -350,6 +355,16 @@ export class SfIForm extends LitElement {
       white-space: nowrap;
       overflow: hidden !important;
       width: 50px;
+    }
+
+    .badge-multiselected-name {
+      font-size: 70%;
+      padding: 5px;
+      border-radius: 10px;
+      border: solid 1px #dddddd;
+      white-space: nowrap;
+      overflow: hidden !important;
+      min-width: 50px;
     }
 
     ul {
@@ -1571,7 +1586,7 @@ export class SfIForm extends LitElement {
       if(this.flow == "read" || (this.selectedSearchId.length > 0 && hideEdit) ){
         if(renderedRowsArr[1]){
           this.dispatchMyEvent("valueChanged", {bubbles: true, newValue: {}, newText: {}});
-        }else{
+        }else if(values.length > 0){
           console.log('nextlistRead called1', cursor)
           this.nextListRead(cursor);
         }
@@ -1612,7 +1627,7 @@ export class SfIForm extends LitElement {
       if(this.flow == "read" || (this.selectedSearchId.length > 0 && hideEdit)){
         if(renderedRowsArr[1]){
           this.dispatchMyEvent("valueChanged", {bubbles: true, newValue: {}, newText: {}});
-        }else{
+        }else  if(values.length > 0){
           console.log('nextlistRead called1', cursor)
           this.nextListRead(cursor);
         }
@@ -2007,41 +2022,90 @@ export class SfIForm extends LitElement {
 
   }
 
-  renderSearchMultiselect = (values:  Array<any>) => {
+  renderSearchMultiselectRead = (values:  Array<any>, cursor="", preselect: boolean = false) => {
 
     var html = '';
-
-    html += '<option value="noselect">Select</option>';
-
+    let flagFound = false
+    var divArr = (this._SfSearchMultiselectSelected as HTMLDivElement).querySelectorAll('div');
     for(var i = 0; i < values.length; i++) {
 
       const id = values[i].id;
       const cols = JSON.parse(values[i].fields.cols[0]) as Array<any>;
       const data = JSON.parse(values[i].fields.data[0]) as Array<any>;
-
-      let selectProjectionValue = "";
-      let selectAnotherProjectionValue = "";
-
-      for(var j = 0; j < cols.length; j++) {
-        if(cols[j] == this.selectProjection) {
-          selectProjectionValue = Array.isArray(data[j]) ? data[j][0] : data[j];
-        }
-        if(this.selectAnotherProjection != null && this.selectAnotherProjection.length > 0) {
-          if(cols[j] == this.selectAnotherProjection) {
-            selectAnotherProjectionValue = Array.isArray(data[j]) ? data[j][0] : data[j];
+      if(this.selectedSearchId.includes(id)){
+        flagFound = true;
+        let flagExisting = false
+        for(let div of divArr){
+          if(div.getAttribute('value') == id){
+            flagExisting = true;
+            break;            
           }
         }
-      }
+        if(flagExisting){
 
-      if(this.selectAnotherProjection != null && selectAnotherProjectionValue.length > 0) {
-        html += '<option value="'+selectProjectionValue+';'+id+';'+selectAnotherProjectionValue+'">'+selectProjectionValue+'</option>';
-      } else {
-        html += '<option value="'+selectProjectionValue+';'+id+'">'+selectProjectionValue+'</option>';
+        }else{
+          let selectProjectionValue = "";
+          for(var j = 0; j < cols.length; j++) {
+            if(cols[j] == this.selectProjection) {
+              selectProjectionValue = Array.isArray(data[j]) ? data[j][0] : data[j];
+            }
+          }
+          html += `<div part="badge-multiselected-name" class="badge-multiselected-name" value="${id}">`+selectProjectionValue+`</div>`;
+        }
+        
       }
 
     }
+    (this._SfSearchMultiselectSelected as HTMLDivElement).insertAdjacentHTML('beforeend', html);
+    var divArr = (this._SfSearchMultiselectSelected as HTMLDivElement).querySelectorAll('div');
+    if((this.maxSelect != null && divArr.length >= parseInt(this.maxSelect)) || this.flow == "read"){
+      (this._SfSearchMultiselectInput as HTMLInputElement).style.display = 'none';
+    }else{
+      (this._SfSearchMultiselectInput as HTMLInputElement).style.display = 'block';
+    }
+    if(!flagFound && values.length > 0){
+      this.fetchSearchMultiselect(cursor, preselect)
+    }
+  }
 
-    (this._SfSearchMultiselectSelect as HTMLSelectElement)!.innerHTML = html;
+  renderSearchMultiselect = (values:  Array<any>, cursor = "", preselect: boolean = false) => {
+
+    var html = '';
+    if(!preselect){
+      html += '<option value="noselect">Select</option>';
+
+      for(var i = 0; i < values.length; i++) {
+
+        const id = values[i].id;
+        const cols = JSON.parse(values[i].fields.cols[0]) as Array<any>;
+        const data = JSON.parse(values[i].fields.data[0]) as Array<any>;
+
+        let selectProjectionValue = "";
+        let selectAnotherProjectionValue = "";
+
+        for(var j = 0; j < cols.length; j++) {
+          if(cols[j] == this.selectProjection) {
+            selectProjectionValue = Array.isArray(data[j]) ? data[j][0] : data[j];
+          }
+          if(this.selectAnotherProjection != null && this.selectAnotherProjection.length > 0) {
+            if(cols[j] == this.selectAnotherProjection) {
+              selectAnotherProjectionValue = Array.isArray(data[j]) ? data[j][0] : data[j];
+            }
+          }
+        }
+
+        if(this.selectAnotherProjection != null && selectAnotherProjectionValue.length > 0) {
+          html += '<option value="'+selectProjectionValue+';'+id+';'+selectAnotherProjectionValue+'">'+selectProjectionValue+'</option>';
+        } else {
+          html += '<option value="'+selectProjectionValue+';'+id+'">'+selectProjectionValue+'</option>';
+        }
+
+      }
+
+      (this._SfSearchMultiselectSelect as HTMLSelectElement)!.innerHTML = html;
+    }else{
+      this.renderSearchMultiselectRead(values, cursor, preselect)
+    }
 
   }
 
@@ -2067,7 +2131,7 @@ export class SfIForm extends LitElement {
 
   }
 
-  fetchSearchMultiselect = async (cursor: any = "") => {
+  fetchSearchMultiselect = async (cursor: any = "", preselect: boolean = false) => {
 
     this.clearMessages();
 
@@ -2080,7 +2144,11 @@ export class SfIForm extends LitElement {
     if(xhr.status == 200) {
       const jsonRespose = JSON.parse(xhr.responseText);
       console.log('multiselected', jsonRespose);
-      this.renderSearchMultiselect(jsonRespose.values as Array<any>);
+      if(this.flow == "read"){
+        this.renderSearchMultiselectRead(jsonRespose.values as Array<any>, jsonRespose.cursor, preselect);
+      }else{
+        this.renderSearchMultiselect(jsonRespose.values as Array<any>, jsonRespose.cursor, preselect);
+      }
       //this.renderSearch(jsonRespose.values, jsonRespose.found, jsonRespose.cursor);
       
     } else {
@@ -3568,7 +3636,38 @@ export class SfIForm extends LitElement {
   }
 
   completeSelect = () => {
-
+    if(this.selectedSearchId.length > 0 || this.maxSelect != null){
+      var found = false;
+      var html = '';
+      let valToAdd = (this._SfSearchMultiselectSelect as HTMLSelectElement)!.value.split(';')[0]
+      let idToAdd = (this._SfSearchMultiselectSelect as HTMLSelectElement)!.value.split(';')[1]
+      var divArr = (this._SfSearchMultiselectSelected as HTMLDivElement).querySelectorAll('div');
+      for(let div of divArr){
+        if(div.getAttribute('value') == idToAdd){
+          found = true;
+        }
+      }
+      if(!found){
+        html += `<div part="badge-multiselected-name" class="badge-multiselected-name" value="${idToAdd}">`+valToAdd+`</div>`;
+      }
+      (this._SfSearchMultiselectSelected as HTMLDivElement).insertAdjacentHTML('beforeend', html);
+      divArr = (this._SfSearchMultiselectSelected as HTMLDivElement).querySelectorAll('div');
+      (this._SfSearchMultiselectInput as HTMLInputElement).value = '';
+      console.log(this.maxSelect, divArr.length)
+      if(this.maxSelect != null && divArr.length >= parseInt(this.maxSelect)){
+        (this._SfSearchMultiselectInput as HTMLInputElement).style.display = 'none';  
+      }else{
+        (this._SfSearchMultiselectInput as HTMLInputElement).focus();
+      }
+      (this._SfSearchMultiselectSelect as HTMLSelectElement).selectedIndex = 0;
+      (this._SfSearchMultiselectSelect as HTMLSelectElement).style.display = 'none';
+      (this._SfSearchMultiselectDelete as HTMLElement).style.display = divArr.length > 0 ? 'flex' : 'none';
+      if(!found){
+        this.dispatchMyEvent("valueChanged", {});
+        console.log(this.selectedValues())
+      }
+      return;
+    }
     var found = false;
     let valToAdd = (this._SfSearchMultiselectSelect as HTMLSelectElement)!.value
     console.log('valToAdd', valToAdd)
@@ -3583,7 +3682,9 @@ export class SfIForm extends LitElement {
     //   this.multiselectArr.push(valToAdd)
     // }
     var divArr = (this._SfSearchMultiselectSelected as HTMLDivElement).querySelectorAll('div');
-    
+    if(this.maxSelect != null && divArr.length >= parseInt(this.maxSelect)){
+      return
+    }
     for(var i = 0; i < divArr.length; i++) {
 
       console.log(divArr[i], divArr[i].innerHTML)
@@ -3634,7 +3735,7 @@ export class SfIForm extends LitElement {
       (this._SfSearchMultiselectInput as HTMLInputElement).focus();
       (this._SfSearchMultiselectSelect as HTMLSelectElement).selectedIndex = 0;
       (this._SfSearchMultiselectSelect as HTMLSelectElement).style.display = 'none';
-      (this._SfSearchMultiselectDelete as HTMLSelectElement).style.display = 'flex';
+      (this._SfSearchMultiselectDelete as HTMLElement).style.display = 'flex';
       // ((this._SfSearchMultiselectSelected as HTMLDivElement).querySelector('#search-multiselect-delete-' + count) as HTMLDivElement).addEventListener('click',() => {
       //   console.log("deleting 1", val , count)
       //   this.removeFromMultiselect(val, count)
@@ -3665,9 +3766,13 @@ export class SfIForm extends LitElement {
   initListenersMultiselect = () => {
 
     (this._SfSearchMultiselectInput as HTMLInputElement)!.addEventListener('keyup', () => {
-
-      (this._SfSearchMultiselectSelect as HTMLSelectElement)!.style.display = 'block';  
-      this.fetchSearchMultiselect();
+      var divArr = (this._SfSearchMultiselectSelected as HTMLDivElement).querySelectorAll('div');
+      if(this.maxSelect != null && divArr.length >= parseInt(this.maxSelect)){
+        
+      }else{
+        (this._SfSearchMultiselectSelect as HTMLSelectElement)!.style.display = 'block';  
+        this.fetchSearchMultiselect();
+      }
 
     });
 
@@ -3682,9 +3787,22 @@ export class SfIForm extends LitElement {
     (this._SfSearchMultiselectDelete as HTMLSelectElement)!.addEventListener('click', () => {
       (this._SfSearchMultiselectSelected as HTMLDivElement)!.innerHTML = '';
       (this._SfSearchMultiselectDelete as HTMLSelectElement)!.style.display = 'none';
+      (this._SfSearchMultiselectInput as HTMLSelectElement)!.style.display = 'block';
       this.dispatchMyEvent("valueChanged", {});
     });
 
+  }
+
+  disableEditMultiselect = (disable: boolean) => {
+    (this._SfSearchMultiselectSelected as HTMLDivElement)!.innerHTML = '';
+    if(disable){
+      (this._SfSearchMultiselectDelete as HTMLElement).style.display = 'none';
+      (this._SfSearchMultiselectInput as HTMLInputElement).style.display = 'none';
+      (this._SfSearchMultiselectSelect as HTMLSelectElement).style.display = 'none';
+    }else{
+      (this._SfSearchMultiselectDelete as HTMLElement).style.display = 'flex';
+      (this._SfSearchMultiselectInput as HTMLInputElement).style.display = 'block';
+    }
   }
 
   initListenersNew = () => {
@@ -3977,7 +4095,10 @@ export class SfIForm extends LitElement {
   }
 
   populatePreselected = () => {
-
+    if(this.selectedSearchId.length > 0 && this.maxSelect != null){
+      this.fetchSearchMultiselect("", true)
+      return
+    }
     (this._SfSearchMultiselectSelected as HTMLDivElement).innerHTML = '';
 
     for(var i = 0; i < (this.getPreselectedValues() as Array<any>).length; i++) {
@@ -4234,7 +4355,15 @@ export class SfIForm extends LitElement {
     if(this.mode == "multiselect-dropdown") {
 
       setTimeout(() => {
+        if(this.flow == "read"){
+          this.disableEditMultiselect(true)
+        }else{
+          this.disableEditMultiselect(false)
+        }
         this.initListenersMultiselect();
+        if(this.flow == "read"){
+          this.fetchSearchMultiselect("", true)
+        }
         this.populatePreselected();
       }, 500)
 
@@ -4339,8 +4468,12 @@ export class SfIForm extends LitElement {
 
   protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
 
-    this.loadMode();
+    this.firtUpdatedLoadMode()
 
+  }
+
+  firtUpdatedLoadMode = () => {
+    this.loadMode();
   }
   
   override connectedCallback() {
