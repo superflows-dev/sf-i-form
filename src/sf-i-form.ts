@@ -1002,7 +1002,7 @@ export class SfIForm extends LitElement {
   getInputValue = (id: string) => {
     console.log('id', this._SfFormC, (this._SfFormC[0].querySelector('#' + id) as HTMLElement).tagName);
     console.log('field getuseapi', this.getUseInApi());
-    var value = null;
+    var value: any = null;
 
     if((this._SfFormC[0].querySelector('#' + id) as HTMLElement).tagName.toLowerCase() == "sf-i-select") {
       if((this._SfFormC[0].querySelector('#' + id) as HTMLElement).style.display == "none") {
@@ -1120,7 +1120,6 @@ export class SfIForm extends LitElement {
       }
       
     }
-
     return value;
   }
 
@@ -2322,7 +2321,7 @@ export class SfIForm extends LitElement {
 
       const field = this.getFields()[i] as string;
       values[field] = this.getInputValue(this.getInputs()[i])
-
+      
     }
 
     body["values"] = values; 
@@ -3874,10 +3873,16 @@ export class SfIForm extends LitElement {
         // });
 
       } else {
-
+        let evalTimeout:any;
         element.addEventListener('keyup', () => {
-          this.evalSubmit();
-          this.processFiltersByEvent();
+          if(evalTimeout != null){
+            clearTimeout(evalTimeout)
+          }
+          evalTimeout = setTimeout(() => {
+            this.evalSubmit();
+            this.processFiltersByEvent();
+          },2000)
+
         });
 
       }
@@ -4024,10 +4029,16 @@ export class SfIForm extends LitElement {
         // });
 
       } else {
-
+        let evalTimeout: any
         element.addEventListener('keyup', () => {
-          this.evalSubmit();
-          this.processFiltersByEvent();
+          if(evalTimeout != null){
+            clearTimeout(evalTimeout)
+          }
+          evalTimeout = setTimeout(() => {
+            this.evalSubmit();
+            this.processFiltersByEvent();
+          },2000)
+
         });
 
       }
