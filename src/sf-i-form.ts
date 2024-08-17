@@ -1369,7 +1369,7 @@ export class SfIForm extends LitElement {
 
   }
 
-  renderListRows = (values: any, multiSelect: boolean, cursor = "") => {
+  renderListRows = (values: any, multiSelect: boolean, cursor = "", fromFetchDetails: boolean = false) => {
 
     console.log('renderlistrows', values, cursor);
 
@@ -1377,9 +1377,17 @@ export class SfIForm extends LitElement {
     let foundFlag = false
     for(var i = 0; i < values.length; i++) {
 
-
-      let data = JSON.parse(values[i].fields.data);
-      let cols = JSON.parse(values[i].fields.cols);
+      let data;
+      let cols;
+      if(fromFetchDetails){
+        data = Object.values(values[i]);
+        cols = Object.keys(values[i]);
+        console.log('renderlistrows', cols)
+      }else{
+        data = JSON.parse(values[i].fields.data);
+        cols = JSON.parse(values[i].fields.cols);
+      }
+      
 
 
       var classBg = "";
@@ -1393,7 +1401,7 @@ export class SfIForm extends LitElement {
       var appendStr = "";
       for(var j = 0; j < cols.length; j++) {
         // console.log('data[j]', data[j]);
-        if(!this.getIgnoreProjections().includes(cols[j])) {
+        if(!(this.getIgnoreProjections().includes(cols[j])) && cols[j] != "id") {
 
           if(Array.isArray(data[j])) {
 
@@ -1405,7 +1413,7 @@ export class SfIForm extends LitElement {
             }
   
           } else {
-            appendStr += (data[j] + " ");
+            appendStr += ((fromFetchDetails ? JSON.parse(data[j]) : data[j]) + " ");
           }
 
         }
@@ -1414,8 +1422,14 @@ export class SfIForm extends LitElement {
       }
 
       var checked = '';
-      console.log("Checking", values[i].id, this.selectedSearchId)
-      if(this.selectedSearchId.includes(values[i].id)) {
+      console.log("Checking", values[i].id, this.selectedSearchId, this.selectedSearchId.includes(values[i].id))
+      if(fromFetchDetails){
+        if(this.selectedSearchId.includes(values[i].id)) {
+          checked = "checked";
+        } else {
+          checked = "";
+        }
+      }else if(this.selectedSearchId.includes(values[i].id)) {
         checked = "checked";
       } else {
         checked = "";
@@ -1450,7 +1464,7 @@ export class SfIForm extends LitElement {
 
        // console.log('data', data[j]);
 
-        if(!this.getIgnoreProjections().includes(cols[j])) {
+        if(!this.getIgnoreProjections().includes(cols[j]) && cols[j] != "id") {
 
           rowhtml += '<td part="td-body" class="td-body '+classBg+'">';
           if(Array.isArray(data[j])) {
@@ -1467,7 +1481,7 @@ export class SfIForm extends LitElement {
             }
 
           } else {
-            rowhtml += data[j]
+            rowhtml += (fromFetchDetails ? JSON.parse(data[j]) : data[j])
           }
           rowhtml += '</td>';
 
@@ -1485,20 +1499,46 @@ export class SfIForm extends LitElement {
 
   }
 
-  renderList = (values: any, found: any, cursor: any, multiSelect: boolean = false, hideEdit: boolean = true) => {
+  renderList = (values: any, found: any, cursor: any, multiSelect: boolean = false, hideEdit: boolean = true, fromFetchDetails: boolean = false) => {
 
     console.log('renderlist search', values, this.nextCursor, this.prevCursor, this.searchPhrase, hideEdit);
 
     let html = '';
+    if(fromFetchDetails){
+      html += '<table id="select-list-table">';
+      //console.log('search', values)
 
-    if(values.length > 0 && this.nextCursor.length === 0) {
+      let cols = Object.keys(values[0]);
+
+      html += '<thead>';
+      html += '<th part="td-action" class="td-head left-sticky">'
+      html += 'Action';
+      html += '</th>'
+      for(var i = 0; i < cols.length; i++) {
+        if(!this.getIgnoreProjections().includes(cols[i]) && cols[i] != "id") {
+          html += '<th part="td-head" class="td-head">'
+          html += cols[i]
+          html += '</th>'
+        }
+      }
+      html += '</thead>'
+      let renderedRowsArr = this.renderListRows(values, multiSelect, cursor, fromFetchDetails)
+      html += renderedRowsArr[0];
+      
+      html += '</table>';
+      this._SfSearchSelectContainer.innerHTML = html;
+      if(renderedRowsArr[1]){
+        this.dispatchMyEvent("valueChanged", {bubbles: true, newValue: {}, newText: {}});
+      }
+    }else if(values.length > 0 && this.nextCursor.length === 0) {
       if(this.flow != "read"){
         html += '<h3 part="results-title" class="left-sticky">Search Results ('+found+')</h3>'
       }
       html += '<table id="select-list-table">';
       //console.log('search', values)
-
-      const cols = JSON.parse(values[0].fields.cols);
+      let renderedRowsArr = []
+      
+      let cols = JSON.parse(values[0].fields.cols);
 
       html += '<thead>';
       html += '<th part="td-action" class="td-head left-sticky">'
@@ -1512,7 +1552,7 @@ export class SfIForm extends LitElement {
         }
       }
       html += '</thead>'
-      let renderedRowsArr = this.renderListRows(values, multiSelect, cursor)
+      renderedRowsArr = this.renderListRows(values, multiSelect, cursor)
       html += renderedRowsArr[0];
       
       html += '</table>';
@@ -1529,7 +1569,7 @@ export class SfIForm extends LitElement {
         }
         html += '</div>';
       }
-
+      console.log('renderlist search 1', html)
       this._SfSearchSelectContainer.innerHTML = html;
 
       const inputElements = (this._SfSearchSelectContainer as HTMLDivElement).querySelectorAll('.search-select-input') as NodeListOf<HTMLInputElement>;
@@ -2212,7 +2252,7 @@ export class SfIForm extends LitElement {
 
   fetchDetail = async () => {
 
-    const body: any = {"id": this.selectedId};
+    const body: any = {"id": this.mode == "select" ? this.selectedSearchId[0]:this.selectedId};
     let url = "https://"+this.apiId+"/detail";
 
     const authorization = btoa(Util.readCookie('email') + ":" + Util.readCookie('accessToken'));
@@ -2223,7 +2263,9 @@ export class SfIForm extends LitElement {
       console.log('detail', jsonRespose);
       if(this.mode == "text") {
         return jsonRespose.data.value[this.projectField].replace(/"/g, '');
-      } else {
+      } else if(this.mode == "select" && this.flow == "read"){
+        this.renderList([jsonRespose.data.value], 1, "", false, true, true)
+      }else {
         this.renderDetail(jsonRespose.data.value);
       }
     } else {
@@ -2496,7 +2538,7 @@ export class SfIForm extends LitElement {
             if(element.hasAttribute('mandatory') && elementSfIForm.selectedValues().length === 0) {
               const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
             parentElement.insertAdjacentHTML('beforeend', errorHtml);
-              console.log('evaluate false return', element, elementSfIForm.selectedValues())
+              console.log('evaluate false return', element, elementSfIForm.selectedValues(), elementSfIForm.mode, elementSfIForm.flow)
               evaluate = false;
               break;
             } else {
@@ -2819,22 +2861,25 @@ export class SfIForm extends LitElement {
     
     childElement.formatShortlistedSearchPhrase();
     
-    console.log('updateshortlistedsearchphrase 1234', oldShortlistedPhrases, childElement.shortlistedSearchPhrases)
+    
     // if(childElement.searchPhrase != oldSearchPhrase){
-      console.log('loadmode called', childElement)
-      let refreshFlag = false
-      for (let key of Object.keys(childElement.shortlistedSearchPhrases)){
-        if(JSON.parse(oldShortlistedPhrases)[key] == childElement.shortlistedSearchPhrases[key] || JSON.parse(oldShortlistedPhrases)[key] == '' || JSON.parse(oldShortlistedPhrases)[key] == null){
-          // refreshFlag = false
-        }else{
-          refreshFlag = true
-        }
+    
+    let refreshFlag = false
+    for (let key of Object.keys(childElement.shortlistedSearchPhrases)){
+      console.log('updateshortlistedsearchphrase assessing key', key, childElement.shortlistedSearchPhrases[key], JSON.parse(oldShortlistedPhrases)[key])
+      if(JSON.parse(oldShortlistedPhrases)[key] == childElement.shortlistedSearchPhrases[key]){
+        // refreshFlag = false
+      }else{
+        refreshFlag = true
       }
-      if(refreshFlag){
-        console.log('updateshortlistedsearchphrase 123', oldShortlistedPhrases, childElement.shortlistedSearchPhrases, childElement.selectedSearchId)
-        childElement.selectedSearchId = []
-      // }
+    }
+    console.log('updateshortlistedsearchphrase 1234', oldShortlistedPhrases, childElement.shortlistedSearchPhrases, refreshFlag)
+    if(refreshFlag && childElement.flow != "read"){
+      console.log('updateshortlistedsearchphrase 123', oldShortlistedPhrases, childElement.shortlistedSearchPhrases, childElement.selectedSearchId)
+      childElement.selectedSearchId = []
+    // }
       childElement.loadMode();
+      console.log('loadmode called', childElement)
     }
 
   }
@@ -3298,13 +3343,24 @@ export class SfIForm extends LitElement {
   initListenersView = () => {
 
     console.log('init listeners view');
-
-    this._sfInputSearch?.addEventListener('keyup', () => {
-
-      console.log('keyup called');
-      this.searchPhrase = this._sfInputSearch.value;
-      if(this._sfInputSearch.value.length > 2) {
-        this.fetchSearch();
+    let searchTimeout:any;
+    this._sfInputSearch?.addEventListener('keyup', (e:any) => {
+      if(searchTimeout != null){
+        clearTimeout(searchTimeout)
+      }
+      console.log('keyup called', e.key);
+      if(e.key.toLowerCase() == "enter"){
+        this.searchPhrase = this._sfInputSearch.value;
+        if(this._sfInputSearch.value.length > 2) {
+          this.fetchSearch();
+        }
+      }else{
+        searchTimeout = setTimeout(()=> {
+          this.searchPhrase = this._sfInputSearch.value;
+          if(this._sfInputSearch.value.length > 2) {
+            this.fetchSearch();
+          }
+        }, 2000)
       }
       
     });
@@ -4391,7 +4447,13 @@ export class SfIForm extends LitElement {
         this.prevCursor = [];
         this.nextCursor = [];
         console.log("fetchsearchSelect calling loadmode")
-        this.fetchSearchSelect("", this.selectedSearchId.length > 0);
+        if(this.flow == "read"){
+          console.log('details fetching', this.selectedSearchId)
+          if(this.selectedSearchId.length > 0)
+          this.fetchDetail()
+        }else{
+          this.fetchSearchSelect("", this.selectedSearchId.length > 0);
+        }
         this.initListenersSearch();
       }, 500)
 
