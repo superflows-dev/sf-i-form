@@ -3349,7 +3349,7 @@ export class SfIForm extends LitElement {
         clearTimeout(searchTimeout)
       }
       console.log('keyup called', e.key);
-      if(e.key.toLowerCase() == "enter"){
+      if(e.key == null || e.key.toLowerCase() == "enter"){
         this.searchPhrase = this._sfInputSearch.value;
         if(this._sfInputSearch.value.length > 2) {
           this.fetchSearch();
