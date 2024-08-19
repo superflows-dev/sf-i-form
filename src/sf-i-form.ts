@@ -1310,6 +1310,9 @@ export class SfIForm extends LitElement {
           if(!this.getIgnoreProjections().includes(cols[j])) {
             html += '<td part="td-body" class="td-body '+classBg+'">';
             html += ('<div part="row-col-title">'+cols[j]+'</div>')
+            if(cols[j] == "lastModifiedTime"){
+              html += `<sf-i-elastic-text text="${new Date(parseInt(data[j])).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata'})}-${new Date(parseInt(data[j])).toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata'})}" minLength="80"></sf-i-elastic-text>`
+            }else 
             if(Array.isArray(data[j])) {
               if(data[j][0] != null && Util.isJsonString(data[j][0]) && JSON.parse(data[j][0])['key'] != null && JSON.parse(data[j][0])['ext'] != null){
                 console.log('displaying cols Arr', cols[j], data[j])
@@ -1467,7 +1470,9 @@ export class SfIForm extends LitElement {
         if(!this.getIgnoreProjections().includes(cols[j]) && cols[j] != "id") {
 
           rowhtml += '<td part="td-body" class="td-body '+classBg+'">';
-          if(Array.isArray(data[j])) {
+          if(cols[j] == "lastModifiedTime"){
+            rowhtml += `${new Date(parseInt(data[j])).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata'})}-${new Date(parseInt(data[j])).toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata'})}`
+          }else if(Array.isArray(data[j])) {
             if(data[j][0] != null && Util.isJsonString(data[j][0]) && JSON.parse(data[j][0])['key'] != null && JSON.parse(data[j][0])['ext'] != null) {
               rowhtml += 'files['+data[j].length+']'
             } else {
