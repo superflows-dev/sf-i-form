@@ -3057,6 +3057,7 @@ export class SfIForm extends LitElement {
 
         (element as SfIForm).selectedSearchId = [];
         (element as SfIForm).clearSelection();
+        (element as SfIForm).loadMode();
 
         // if((element as SfIForm).selectedSearchId == null || (element as SfIForm).selectedSearchId == "") {
         //   (element as SfIForm).clearSelection();
@@ -3381,6 +3382,8 @@ export class SfIForm extends LitElement {
       if(this.searchPhrase == null || this.searchPhrase.length === 0) {
         this.searchPhrase = "";
       }
+      this.prevCursor = []
+      this.nextCursor = []
       this.fetchSearch();
     });
 
