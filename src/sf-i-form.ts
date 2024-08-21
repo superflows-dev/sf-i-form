@@ -1307,7 +1307,7 @@ export class SfIForm extends LitElement {
 
           console.log('getignoreprojects', this.getIgnoreProjections());
 
-          if(!this.getIgnoreProjections().includes(cols[j])) {
+          if(!this.getIgnoreProjections().includes(cols[j].toLowerCase())) {
             html += '<td part="td-body" class="td-body '+classBg+'">';
             html += ('<div part="row-col-title">'+cols[j]+'</div>')
             if(cols[j] == "lastModifiedTime"){
@@ -1404,7 +1404,8 @@ export class SfIForm extends LitElement {
       var appendStr = "";
       for(var j = 0; j < cols.length; j++) {
         // console.log('data[j]', data[j]);
-        if(!(this.getIgnoreProjections().includes(cols[j])) && cols[j] != "id") {
+        console.log('this.getIgnoreProjections()', this.getIgnoreProjections().includes(cols[j].toLowerCase()), cols[j].toLowerCase())
+        if(!(this.getIgnoreProjections().includes(cols[j].toLowerCase())) && cols[j] != "id") {
 
           if(Array.isArray(data[j])) {
 
@@ -1467,7 +1468,7 @@ export class SfIForm extends LitElement {
 
        // console.log('data', data[j]);
 
-        if(!this.getIgnoreProjections().includes(cols[j]) && cols[j] != "id") {
+        if(!this.getIgnoreProjections().includes(cols[j].toLowerCase()) && cols[j] != "id") {
 
           rowhtml += '<td part="td-body" class="td-body '+classBg+'">';
           if(cols[j] == "lastModifiedTime"){
@@ -1520,7 +1521,7 @@ export class SfIForm extends LitElement {
       html += 'Action';
       html += '</th>'
       for(var i = 0; i < cols.length; i++) {
-        if(!this.getIgnoreProjections().includes(cols[i]) && cols[i] != "id") {
+        if(!this.getIgnoreProjections().includes(cols[i].toLowerCase()) && cols[i] != "id") {
           html += '<th part="td-head" class="td-head">'
           html += cols[i]
           html += '</th>'
@@ -1550,7 +1551,7 @@ export class SfIForm extends LitElement {
       html += 'Action';
       html += '</th>'
       for(var i = 0; i < cols.length; i++) {
-        if(!this.getIgnoreProjections().includes(cols[i])) {
+        if(!this.getIgnoreProjections().includes(cols[i].toLowerCase())) {
           html += '<th part="td-head" class="td-head">'
           html += cols[i]
           html += '</th>'
@@ -1884,7 +1885,7 @@ export class SfIForm extends LitElement {
 
        
 
-        if(!this.getIgnoreProjections().includes(cols[j])) {
+        if(!this.getIgnoreProjections().includes(cols[j].toLowerCase())) {
 
           html += '<td part="td-body" class="td-body '+classBg+'">';
           html += ('<div part="row-col-title">'+cols[j]+'</div>')
