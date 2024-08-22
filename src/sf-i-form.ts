@@ -3830,14 +3830,24 @@ export class SfIForm extends LitElement {
   }
 
   initListenersMultiselect = () => {
-
-    (this._SfSearchMultiselectInput as HTMLInputElement)!.addEventListener('keyup', () => {
+    let searchTimeout:any;
+    (this._SfSearchMultiselectInput as HTMLInputElement)!.addEventListener('keyup', (e:any) => {
       var divArr = (this._SfSearchMultiselectSelected as HTMLDivElement).querySelectorAll('div');
       if(this.maxSelect != null && divArr.length >= parseInt(this.maxSelect)){
         
       }else{
-        (this._SfSearchMultiselectSelect as HTMLSelectElement)!.style.display = 'block';  
-        this.fetchSearchMultiselect();
+        if(searchTimeout != null){
+          clearTimeout(searchTimeout);
+        }
+        if(e.key == null || e.key.toLowerCase() == "enter"){
+          (this._SfSearchMultiselectSelect as HTMLSelectElement)!.style.display = 'block';  
+          this.fetchSearchMultiselect();
+        }else{
+          searchTimeout = setTimeout(() => {
+            (this._SfSearchMultiselectSelect as HTMLSelectElement)!.style.display = 'block';  
+            this.fetchSearchMultiselect();
+          },2000)
+        }
       }
 
     });
