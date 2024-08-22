@@ -1311,7 +1311,8 @@ export class SfIForm extends LitElement {
             html += '<td part="td-body" class="td-body '+classBg+'">';
             html += ('<div part="row-col-title">'+cols[j]+'</div>')
             if(cols[j] == "lastModifiedTime"){
-              html += `<sf-i-elastic-text text="${new Date(parseInt(data[j])).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata'})}-${new Date(parseInt(data[j])).toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata'})}" minLength="80"></sf-i-elastic-text>`
+              // html += `<sf-i-elastic-text text="${new Date(parseInt(data[j])).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata'})}-${new Date(parseInt(data[j])).toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata'})}" minLength="80"></sf-i-elastic-text>`
+              html += `<sf-i-elastic-text text="${Util.timeSince(parseInt(data[j]))}ago" minLength="80"></sf-i-elastic-text>`
             }else 
             if(Array.isArray(data[j])) {
               if(data[j][0] != null && Util.isJsonString(data[j][0]) && JSON.parse(data[j][0])['key'] != null && JSON.parse(data[j][0])['ext'] != null){
@@ -1472,7 +1473,8 @@ export class SfIForm extends LitElement {
 
           rowhtml += '<td part="td-body" class="td-body '+classBg+'">';
           if(cols[j] == "lastModifiedTime"){
-            rowhtml += `${new Date(parseInt(data[j])).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata'})}-${new Date(parseInt(data[j])).toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata'})}`
+            // rowhtml += `${new Date(parseInt(data[j])).toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata'})}-${new Date(parseInt(data[j])).toLocaleTimeString('en-US', { timeZone: 'Asia/Kolkata'})}`
+            rowhtml += `${Util.timeSince(parseInt(data[j]))}ago`
           }else if(Array.isArray(data[j])) {
             if(data[j][0] != null && Util.isJsonString(data[j][0]) && JSON.parse(data[j][0])['key'] != null && JSON.parse(data[j][0])['ext'] != null) {
               rowhtml += 'files['+data[j].length+']'
