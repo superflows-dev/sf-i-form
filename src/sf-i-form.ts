@@ -767,9 +767,6 @@ export class SfIForm extends LitElement {
     }
 
   `;
-
-  @query('#button-refresh')
-  _sfButtonRefresh: any;
   
   @query('#button-submit')
   _sfButtonSubmit: any;
@@ -1497,8 +1494,10 @@ export class SfIForm extends LitElement {
 
       }
       rowhtml += '</tr>';
-      console.log(rowhtml, !html.includes(values[i].id), (!(this._SfSearchSelectContainer as HTMLElement).innerHTML.includes(values[i].id) || this.flow != "read"))
+      console.log('rendering search rows', rowhtml, !html.includes(values[i].id), (!(this._SfSearchSelectContainer as HTMLElement).innerHTML.includes(values[i].id) || this.flow != "read"))
+      // console.log('rendering search rows', rowhtml, !(this._SfSearchSelectContainer as HTMLElement).innerHTML.includes(values[i].id))
       if(!html.includes(values[i].id) && (!(this._SfSearchSelectContainer as HTMLElement).innerHTML.includes(values[i].id) || this.flow != "read")){
+      // if(!(this._SfSearchSelectContainer as HTMLElement).innerHTML.includes(values[i].id)){
         html += rowhtml
       }
     }
@@ -2715,6 +2714,7 @@ export class SfIForm extends LitElement {
       (this._sfButtonCalendar as HTMLButtonElement).style.display = 'none';
       (this._sfButtonCalendarCancel as HTMLButtonElement).style.display = 'none';
       (this._SfButtonEditCancel as HTMLButtonElement).style.display = 'none';
+      (this._SfButtonCopypastePaste as HTMLButtonElement).style.display = 'none';
       (this._SfButtonDeleteConfirm as HTMLButtonElement).style.display = 'block';
       (this._SfButtonDeleteCancel as HTMLButtonElement).style.display = 'block';
       (this._SfButtonEdit as HTMLButtonElement).style.display = 'none';
@@ -2732,6 +2732,7 @@ export class SfIForm extends LitElement {
       (this._sfButtonCalendar as HTMLButtonElement).style.display = 'block';
       (this._sfButtonCalendarCancel as HTMLButtonElement).style.display = 'none';
       (this._SfButtonEditCancel as HTMLButtonElement).style.display = 'none';
+      (this._SfButtonCopypastePaste as HTMLButtonElement).style.display = 'none';
       (this._SfButtonDeleteConfirm as HTMLButtonElement).style.display = 'none';
       (this._SfButtonDeleteCancel as HTMLButtonElement).style.display = 'none';
       (this._SfButtonEdit as HTMLButtonElement).style.display = 'block';
@@ -2744,6 +2745,7 @@ export class SfIForm extends LitElement {
       (this._sfButtonCalendar as HTMLButtonElement).style.display = 'none';
       (this._sfButtonCalendarCancel as HTMLButtonElement).style.display = 'block';
       (this._SfButtonEditCancel as HTMLButtonElement).style.display = 'none';
+      (this._SfButtonCopypastePaste as HTMLButtonElement).style.display = 'none';
       (this._SfButtonDeleteConfirm as HTMLButtonElement).style.display = 'none';
       (this._SfButtonDeleteCancel as HTMLButtonElement).style.display = 'none';
       (this._SfButtonEdit as HTMLButtonElement).style.display = 'none';
@@ -2763,6 +2765,7 @@ export class SfIForm extends LitElement {
         (this._sfButtonCalendarCancel as HTMLButtonElement).style.display = 'none';
       }
       (this._SfButtonEditCancel as HTMLButtonElement).style.display = 'none';
+      (this._SfButtonCopypastePaste as HTMLButtonElement).style.display = 'none';
       (this._SfButtonDeleteConfirm as HTMLButtonElement).style.display = 'none';
       (this._SfButtonDeleteCancel as HTMLButtonElement).style.display = 'none';
       (this._SfButtonEdit as HTMLButtonElement).style.display = 'block';
@@ -2777,6 +2780,7 @@ export class SfIForm extends LitElement {
         (this._sfButtonCalendarCancel as HTMLButtonElement).style.display = 'none';
       }
       (this._SfButtonEditCancel as HTMLButtonElement).style.display = 'block';
+      (this._SfButtonCopypastePaste as HTMLButtonElement).style.display = 'block';
       (this._SfButtonDeleteConfirm as HTMLButtonElement).style.display = 'none';
       (this._SfButtonDeleteCancel as HTMLButtonElement).style.display = 'none';
       (this._SfButtonEdit as HTMLButtonElement).style.display = 'none';
@@ -2811,7 +2815,7 @@ export class SfIForm extends LitElement {
     this.searchPhrase = searchStr;
 
   }
-
+  updateShortlistedSearchTimeout:any;
   updateShortlistedSearchPhrase = (parents: any, childElement: any) => {
     // let oldSearchPhrase = childElement.searchPhrase
     let oldShortlistedPhrases = JSON.stringify(childElement.shortlistedSearchPhrases)
@@ -2884,10 +2888,18 @@ export class SfIForm extends LitElement {
     console.log('updateshortlistedsearchphrase 1234', oldShortlistedPhrases, childElement.shortlistedSearchPhrases, refreshFlag)
     if(refreshFlag && childElement.flow != "read"){
       console.log('updateshortlistedsearchphrase 123', oldShortlistedPhrases, childElement.shortlistedSearchPhrases, childElement.selectedSearchId)
+      console.log("populating clearing input");
       childElement.selectedSearchId = []
     // }
       childElement.loadMode();
       console.log('loadmode called', childElement)
+      if(this.updateShortlistedSearchTimeout != null){
+        clearTimeout(this.updateShortlistedSearchTimeout);
+      }
+      let thisObj = this
+      this.updateShortlistedSearchTimeout = setTimeout(()=>{
+        thisObj.populateSelectedFields([(childElement as HTMLElement).id])
+      },2000)
     }
 
   }
@@ -3062,7 +3074,7 @@ export class SfIForm extends LitElement {
         // }
 
       } else if (element.nodeName.toLowerCase() == "sf-i-form") {
-
+        console.log('clearing form input 1');
         (element as SfIForm).selectedSearchId = [];
         (element as SfIForm).clearSelection();
         (element as SfIForm).loadMode();
@@ -3394,12 +3406,6 @@ export class SfIForm extends LitElement {
       this.nextCursor = []
       this.fetchSearch();
     });
-
-    this._sfButtonRefresh.addEventListener('click', async () => {
-      await this.fetchSearch();
-      this.loopThroughSearchResults();
-    });
-
 
   }
 
@@ -3979,7 +3985,7 @@ export class SfIForm extends LitElement {
           console.log(this.searchPhrase);
           this.prevCursor = [];
           this.nextCursor = [];
-          console.log('fetchSearchSelect calling keyup')
+          console.log('fetchSearchSelect calling keyup', e)
           this.fetchSearchSelect("", this.selectedSearchId.length > 0 && this.searchPhrase == "");
         } else {
           console.log(e);
@@ -4145,10 +4151,58 @@ export class SfIForm extends LitElement {
 
       } else if (element.nodeName.toLowerCase() == "sf-i-form") {
 
-        console.log('populating selected form', (element as SfIForm).mode, element);
+        console.log('populating selected form', (element as SfIForm).mode, element,(element as SfIForm).selectedSearchId, this.getSelectedViewToDetailValues()[i]);
         let oldSearcheId = (element as SfIForm).selectedSearchId; 
         (element as SfIForm).selectedSearchId = this.getSelectedViewToDetailValues()[i];
         if((element as SfIForm).selectedSearchId != oldSearcheId){
+          console.log('populating selected sf-i-form loadmode called', (element as SfIForm).selectedSearchId);
+          (element as SfIForm).loadMode();
+        }
+      } else if (element.nodeName.toLowerCase() == "sf-i-uploader") {
+        console.log("uploader populated", this.getSelectedViewToDetailValues()[i]);
+        (element as SfIUploader).prepopulatedInputArr = JSON.stringify(this.getSelectedViewToDetailValues()[i]);
+        (element as SfIUploader).loadMode();
+
+      } else {
+
+        (element as HTMLInputElement).value = this.getSelectedViewToDetailValues()[i];
+        (element as HTMLInputElement).dispatchEvent(new Event('keyup'));
+
+      }
+
+    }
+
+  }
+
+  populateSelectedFields = (fieldsToBePopulated: string[]) => {
+
+    console.log('populating only selected', this.getSelectedViewToDetailValues());
+
+    for(var i = 0; i < this.getInputs().length; i++) {
+      if(!fieldsToBePopulated.includes(this.getInputs()[i])){
+        continue
+      }
+      const element = this._sfSlottedForm[0].querySelector('#' + this.getInputs()[i]);
+
+      console.log(element, element.nodeName.toLowerCase());
+
+      if(element.nodeName.toLowerCase() == "sf-i-select") {
+
+        (element as SfISelect).selectedId = this.getSelectedViewToDetailValues()[i];
+        (element as SfISelect).loadMode();
+
+      } else if (element.nodeName.toLowerCase() == "sf-i-sub-select") {
+
+        (element as SfISubSelect).selectedId = this.getSelectedViewToDetailValues()[i];
+        (element as SfISubSelect).loadMode();
+
+      } else if (element.nodeName.toLowerCase() == "sf-i-form") {
+
+        console.log('populating selected form', (element as SfIForm).mode, element,(element as SfIForm).selectedSearchId, this.getSelectedViewToDetailValues()[i]);
+        let oldSearcheId = (element as SfIForm).selectedSearchId; 
+        (element as SfIForm).selectedSearchId = this.getSelectedViewToDetailValues()[i];
+        if((element as SfIForm).selectedSearchId != oldSearcheId){
+          console.log('populating selected sf-i-form loadmode called', (element as SfIForm).selectedSearchId);
           (element as SfIForm).loadMode();
         }
       } else if (element.nodeName.toLowerCase() == "sf-i-uploader") {
@@ -4255,6 +4309,7 @@ export class SfIForm extends LitElement {
 
           console.log('filters-select', "sf-i-form", value);
           let oldSearcheId = (inputElement as SfIForm).selectedSearchId;
+          console.log('clearing form input 2', value);
           (inputElement as SfIForm).selectedSearchId = value;
           if((inputElement as SfIForm).selectedSearchId != oldSearcheId){
             (inputElement as SfIForm).loadMode();
@@ -4328,6 +4383,7 @@ export class SfIForm extends LitElement {
 
           console.log('filters-select', "sf-i-form", value);
           let oldSearcheId = (inputElement as SfIForm).selectedSearchId;
+          console.log('clearing form input 3', value);
           (inputElement as SfIForm).selectedSearchId = value;
           if((inputElement as SfIForm).selectedSearchId != oldSearcheId){
             (inputElement as SfIForm).loadMode();
@@ -4401,6 +4457,19 @@ export class SfIForm extends LitElement {
         console.log(JSON.parse(await navigator.clipboard.readText()));
       });
 
+      Util.replaceElement((this._SfButtonCopypastePaste as HTMLButtonElement));
+      (this._SfButtonCopypastePaste as HTMLButtonElement).addEventListener('click', async () => {
+        let values: string = "";
+        try{
+          values = JSON.parse(await navigator.clipboard.readText());
+        } catch (e: any) {
+          console.log(e);
+          this.setError('Clipboard contains no data!');
+          setTimeout(() => {this.clearMessages()}, 3000);
+        }
+        this.renderClipboard(values);
+        this.renderDetailAfterContentPopulated();
+      });
     }
 
   }
@@ -4871,7 +4940,6 @@ export class SfIForm extends LitElement {
                 <div class="loader-element"></div>
               </div>
               <div class="d-flex">
-                <button id="button-refresh" part="button-icon" class="material-icons button-icon">autorenew</button>
                 <button id="button-trail" part="button-icon" class="material-icons button-icon">receipt_long</button>
                 <button id="button-new" part="button-icon" class="material-icons button-icon">add</button>
               </div>
@@ -4933,6 +5001,7 @@ export class SfIForm extends LitElement {
                 <button id="button-calendar" part="button-icon" class="button-icon hide"><span class="material-icons">calendar_month</span></button>
                 <button id="button-calendar-cancel" part="button-icon" class="button-icon hide"><span class="material-icons">close</span></button>
                 <button id="button-edit" part="button-icon" class="button-icon"><span class="material-icons">edit</span></button>
+                <button id="button-copypaste-paste" part="button-icon" class="button-icon"><span class="material-symbols-outlined">content_paste</span></button>
                 <button id="button-edit-cancel" part="button-icon" class="button-icon"><span class="material-icons">edit_off</span></button>
                 <button id="button-delete" part="button-icon" class="button-icon"><span class="material-icons">delete</span></button>
                 <button id="button-delete-cancel" part="button-icon" class="button-icon"><span class="material-icons">close</span></button>
