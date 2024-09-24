@@ -16,10 +16,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@200;300;400;600&display=swap" rel="stylesheet">
     <script type="module">
-        import {SfISelect} from 'https://unpkg.com/sf-i-select@1.0.91/sf-i-select.js?module';
-        import {SfISubSelect} from 'https://unpkg.com/sf-i-sub-select@1.0.82/sf-i-sub-select.js?module';
-        import {SfIEvents} from 'https://unpkg.com/sf-i-events@1.0.22/sf-i-events.js?module';
-        import {SfIElasticText} from 'https://unpkg.com/sf-i-elastic-text@1.0.7/sf-i-elastic-text.js?module';
+        import {SfISelect} from 'https://unpkg.com/sf-i-select@1.0.93/sf-i-select.js?module';
+        import {SfISubSelect} from 'https://unpkg.com/sf-i-sub-select@1.0.83/sf-i-sub-select.js?module';
+        import {SfIEvents} from 'https://unpkg.com/sf-i-events@1.0.513/sf-i-events.js?module';
+        import {SfIElasticText} from 'https://unpkg.com/sf-i-elastic-text@1.0.16/sf-i-elastic-text.js?module';
+        import {SfIUploader} from 'https://esm.run/sf-i-uploader@1.0.92/sf-i-uploader.js';
     </script>
     <style>
       
@@ -72,6 +73,9 @@
 
       .w-100-m-0 {
         width: 100%;
+      }
+      .w-50-m-0 {
+        width: 50%;
       }
 
       .w-33 {
@@ -322,7 +326,241 @@
     </style>
   </head>
   <body>
+    <!-- <sf-i-form id="sf-i-statutes" name="Statutes" label="Select Statute *" apiid="dnytrdlrmxgsy.cloudfront.net/statute" mode="select" searchstring="foo" selectprojection="name" ignoreprojections="[&quot;updatetype&quot;,&quot;country&quot;,&quot;jurisdiction&quot;,&quot;state&quot;,&quot;category&quot;,&quot;subcategory&quot;,&quot;applicability&quot;,&quot;shortid&quot;,&quot;shortnumid&quot;]" mandatory="" enableEditButton="yes">
+    </sf-i-form> -->
+    <!-- <sf-i-form id="sf-i-project" name="Projects" label="Project *" apiid="dnytrdlrmxgsy.cloudfront.net/project" mode="multiselect-dropdown" selectprojection="name" searchphrase="" ignoreprojections="[&quot;logo&quot;,&quot;plan&quot;,&quot;address&quot;,&quot;emails&quot;,&quot;vertical&quot;,&quot;cycledate&quot;,&quot;shortid&quot;,&quot;startdate&quot;,&quot;contractdate&quot;,&quot;quality&quot;,&quot;locations&quot;,&quot;shortnumid&quot;]" mandatory="" maxselect="1" style="display: flex;">
+    </sf-i-form> -->
+    <!-- <sf-i-form id="sf-i-statutes" name="Statutes" label="Select Statute *" apiid="dnytrdlrmxgsy.cloudfront.net/statute" mode="select" searchstring="foo" selectprojection="name" ignoreprojections="[&quot;updatetype&quot;,&quot;country&quot;,&quot;jurisdiction&quot;,&quot;state&quot;,&quot;category&quot;,&quot;subcategory&quot;,&quot;applicability&quot;,&quot;shortid&quot;,&quot;shortnumid&quot;,&quot;lastmodifiedby&quot;,&quot;lastmodifiedtime&quot;]" mandatory="" style="display: block;">
+    </sf-i-form> -->
+    <sf-i-form name="Compliances" apiid="dnytrdlrmxgsy.cloudfront.net/compliance" dependencies="[{&quot;type&quot;: &quot;foreignkey&quot;, &quot;parent&quot;: &quot;sf-i-countries&quot;, &quot;child&quot;: &quot;sf-i-states&quot;},{&quot;type&quot;: &quot;foreignkey&quot;, &quot;parent&quot;: &quot;sf-i-categories&quot;, &quot;child&quot;: &quot;sf-i-subcategories&quot;},{&quot;type&quot;: &quot;foreignkey&quot;, &quot;parent&quot;: &quot;sf-i-frequencies&quot;, &quot;child&quot;: &quot;sf-i-subfrequencies&quot;},{&quot;type&quot;: &quot;searchable&quot;, &quot;parents&quot;: [&quot;sf-i-countries&quot;, &quot;sf-i-states&quot;, &quot;sf-i-categories&quot;, &quot;sf-i-subcategories&quot;], &quot;child&quot;: &quot;sf-i-statutes&quot;}]" unitfiltersdetail="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;},{&quot;op&quot;: &quot;hide&quot;, &quot;input&quot;: &quot;sf-i-jurisdictions&quot;, &quot;value&quot;: &quot;7898fc45-88d3-4d42-9ee4-18e70e465dfb&quot;, &quot;target&quot;: &quot;sf-i-states&quot;},{&quot;op&quot;: &quot;hide&quot;, &quot;input&quot;: &quot;sf-i-frequencies&quot;, &quot;value&quot;: [&quot;045d712f-cd9a-41e8-8890-abae36768d69&quot;,&quot;81beb2b8-63fb-4de0-9c4d-76fb966a1d62&quot;,&quot;b99599ce-9092-4403-af78-82ecf70060a5&quot;,&quot;c1cdd526-76f2-4a2e-8dfc-1f403328a910&quot;], &quot;target&quot;: [&quot;sf-i-timeframes&quot;,&quot;sf-i-responsedays&quot;,&quot;sf-i-responsedays-label&quot;,&quot;sf-i-question&quot;,&quot;sf-i-question-label&quot;,&quot;sf-i-alertschedule&quot;,&quot;sf-i-alertschedule-label&quot;]}]" unitfiltersnew="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;20851e13-f0f7-4f8d-9bb8-ab96b1df6160&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;},{&quot;op&quot;: &quot;hide&quot;, &quot;input&quot;: &quot;sf-i-jurisdictions&quot;, &quot;value&quot;: &quot;7898fc45-88d3-4d42-9ee4-18e70e465dfb&quot;, &quot;target&quot;: &quot;sf-i-states&quot;},{&quot;op&quot;: &quot;hide&quot;, &quot;input&quot;: &quot;sf-i-frequencies&quot;, &quot;value&quot;: [&quot;045d712f-cd9a-41e8-8890-abae36768d69&quot;,&quot;81beb2b8-63fb-4de0-9c4d-76fb966a1d62&quot;,&quot;b99599ce-9092-4403-af78-82ecf70060a5&quot;,&quot;c1cdd526-76f2-4a2e-8dfc-1f403328a910&quot;], &quot;target&quot;: [&quot;sf-i-timeframes&quot;,&quot;sf-i-responsedays&quot;,&quot;sf-i-responsedays-label&quot;,&quot;sf-i-question&quot;,&quot;sf-i-question-label&quot;,&quot;sf-i-alertschedule&quot;,&quot;sf-i-alertschedule-label&quot;,&quot;sf-i-adhocquestionschedule&quot;,&quot;sf-i-adhocquestionschedule-label&quot;,&quot;sf-i-adhocinstances&quot;,&quot;sf-i-adhocinstances-label&quot;,&quot;sf-i-adhocquestion&quot;]}]" inputids="[&quot;sf-i-updatetypes&quot;, &quot;sf-i-countries&quot;, &quot;sf-i-jurisdictions&quot;, &quot;sf-i-states&quot;, &quot;sf-i-categories&quot;, &quot;sf-i-subcategories&quot;, &quot;sf-i-statutes&quot;, &quot;sf-i-reference&quot;, &quot;sf-i-applicability&quot;, &quot;sf-i-specificity&quot;, &quot;sf-i-obligationtypes&quot;, &quot;sf-i-obligationtitle&quot;, &quot;sf-i-obligation&quot;, &quot;sf-i-firstlineofdefence&quot;, &quot;sf-i-secondlineofdefence&quot;, &quot;sf-i-thirdlineofdefence&quot;, &quot;sf-i-internalcontrols&quot;, &quot;sf-i-form&quot;, &quot;sf-i-additionalurls&quot;, &quot;sf-i-definition&quot;, &quot;sf-i-authority&quot;, &quot;sf-i-penalties&quot;, &quot;sf-i-risks&quot;, &quot;sf-i-riskareas&quot;, &quot;sf-i-frequencies&quot;, &quot;sf-i-subfrequencies&quot;, &quot;sf-i-duedate&quot;, &quot;sf-i-timeframes&quot;, &quot;sf-i-responsedays&quot;, &quot;sf-i-question&quot;, &quot;sf-i-alertschedule&quot;, &quot;sf-i-documenttype&quot;, &quot;sf-i-adhocquestion&quot;, &quot;sf-i-adhocinstances&quot;, &quot;sf-i-adhocquestionschedule&quot;, &quot;sf-i-attachment&quot;, &quot;sf-i-uploadguidance&quot;]" validations="{&quot;sf-i-reference&quot;:  &quot;text-basic&quot;, &quot;sf-i-applicability&quot;:  &quot;text-basic&quot;, &quot;sf-i-obligationtitle&quot;:  &quot;text-basic&quot;, &quot;sf-i-obligation&quot;:  &quot;text-basic&quot;, &quot;sf-i-firstlineofdefence&quot;:  &quot;text-basic&quot;, &quot;sf-i-secondlineofdefence&quot;:  &quot;text-basic&quot;, &quot;sf-i-thirdlineofdefence&quot;:  &quot;text-basic&quot;, &quot;sf-i-form&quot;:  &quot;text-basic&quot;, &quot;sf-i-additionalurls&quot;:  &quot;text-basic&quot;, &quot;sf-i-definition&quot;:  &quot;text-basic&quot;, &quot;sf-i-internalcontrols&quot;:  &quot;text-basic&quot;, &quot;sf-i-authority&quot;:  &quot;text-basic&quot;, &quot;sf-i-panelties&quot;:  &quot;text-basic&quot;, &quot;sf-i-duedate&quot;:  &quot;text-basic&quot;, &quot;sf-i-responsedays&quot;:  &quot;text-basic&quot;}" fields="[&quot;updatetype&quot;,&quot;country&quot;,&quot;jurisdiction&quot;,&quot;state&quot;,&quot;category&quot;,&quot;subcategory&quot;,&quot;statute&quot;,&quot;reference&quot;,&quot;applicability&quot;,&quot;specificity&quot;,&quot;obligationtype&quot;,&quot;obligationtitle&quot;,&quot;obligation&quot;,&quot;firstlineofdefence&quot;,&quot;secondlineofdefence&quot;,&quot;thirdlineofdefence&quot;,&quot;internalcontrols&quot;,&quot;form&quot;,&quot;additionalurls&quot;,&quot;definition&quot;,&quot;authority&quot;,&quot;penalty&quot;,&quot;risk&quot;,&quot;riskarea&quot;,&quot;frequency&quot;,&quot;subfrequency&quot;,&quot;duedate&quot;,&quot;timeframe&quot;,&quot;responsedays&quot;,&quot;question&quot;,&quot;alertschedule&quot;,&quot;documenttype&quot;,&quot;adhocquestion&quot;,&quot;adhocinstances&quot;,&quot;adhocquestionschedule&quot;,&quot;attachment&quot;,&quot;uploadguidance&quot;]" ignoreprojections="[&quot;attachment&quot;,&quot;updatetype&quot;,&quot;jurisdiction&quot;,&quot;state&quot;,&quot;category&quot;,&quot;subcategory&quot;,&quot;internalcontrols&quot;,&quot;form&quot;,&quot;authority&quot;,&quot;risk&quot;,&quot;riskarea&quot;,&quot;timeframe&quot;,&quot;responsedays&quot;,&quot;alertschedule&quot;,&quot;uploadguidance&quot;]" mode="view">
 
+      <div slot="form">
+
+        <div class="d-flex justify-center align-start">
+          <div class="w-100-m-0 mb-20">
+            <sf-i-select id="sf-i-updatetypes" apiid="dnytrdlrmxgsy.cloudfront.net/updatetype" name="UpdateTypes" label="Select Update Type *" mandatory="">
+            </sf-i-select>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <sf-i-select id="sf-i-countries" apiid="dnytrdlrmxgsy.cloudfront.net/country" name="Countries" label="Select Country *" mandatory="">
+            </sf-i-select>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <sf-i-select id="sf-i-jurisdictions" apiid="dnytrdlrmxgsy.cloudfront.net/jurisdiction" name="Jurisdictions" label="Select Jurisdiction *" mandatory="">
+            </sf-i-select>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <sf-i-sub-select id="sf-i-states" apiid="dnytrdlrmxgsy.cloudfront.net/state" name="States" label="Select States *" mandatory="">
+            </sf-i-sub-select>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <sf-i-select id="sf-i-categories" apiid="dnytrdlrmxgsy.cloudfront.net/category" name="Categories" label="Select Category *" mandatory="">
+            </sf-i-select>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <sf-i-sub-select id="sf-i-subcategories" apiid="dnytrdlrmxgsy.cloudfront.net/subcategory" name="SubCategories" label="Select SubCategory *" mandatory="">
+            </sf-i-sub-select>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <sf-i-form id="sf-i-statutes" name="Statutes" label="Select Statute *" apiid="dnytrdlrmxgsy.cloudfront.net/statute" mode="select" searchstring="foo" selectprojection="name" ignoreprojections="[&quot;updatetype&quot;,&quot;country&quot;,&quot;jurisdiction&quot;,&quot;state&quot;,&quot;category&quot;,&quot;subcategory&quot;,&quot;applicability&quot;,&quot;definitions&quot;,&quot;shortid&quot;,&quot;shortnumid&quot;,&quot;lastmodifiedby&quot;,&quot;lastmodifiedtime&quot;]" mandatory="">
+            </sf-i-form>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label>Statute Reference *</label><br>
+            <textarea rows="7" id="sf-i-reference" type="text" class="w-100-m-0" mandatory=""></textarea>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label>Applicability *</label><br>
+            <textarea rows="7" id="sf-i-applicability" type="text" class="w-100-m-0" mandatory=""></textarea>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <sf-i-select id="sf-i-specificity" apiid="dnytrdlrmxgsy.cloudfront.net/specificity" name="Specificity" label="Select Universal / Industry Specific*" mandatory="">
+            </sf-i-select>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <sf-i-select id="sf-i-obligationtypes" apiid="dnytrdlrmxgsy.cloudfront.net/obligationtype" name="Obligation Type" label="Select Obligation Type *" mandatory="">
+            </sf-i-select>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label>Obligation Title *</label><br>
+            <textarea rows="7" id="sf-i-obligationtitle" type="text" class="w-100-m-0" mandatory=""></textarea>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label>Compliance Obligation *</label><br>
+            <textarea rows="7" id="sf-i-obligation" type="text" class="w-100-m-0" mandatory=""></textarea>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label>First Line of Defence *</label><br>
+            <textarea rows="7" id="sf-i-firstlineofdefence" type="text" class="w-100-m-0" mandatory=""></textarea>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label>Second Line of Defence</label><br>
+            <textarea rows="7" id="sf-i-secondlineofdefence" type="text" class="w-100-m-0"></textarea>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label>Third Line of Defence</label><br>
+            <textarea rows="7" id="sf-i-thirdlineofdefence" type="text" class="w-100-m-0"></textarea>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label>Internal Controls *</label><br>
+            <textarea rows="7" id="sf-i-internalcontrols" type="text" class="w-100-m-0" mandatory=""></textarea>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label>Form</label><br>
+            <textarea rows="7" id="sf-i-form" type="text" class="w-100-m-0"></textarea>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label>Additional Urls</label><br>
+            <textarea rows="7" id="sf-i-additionalurls" type="text" class="w-100-m-0"></textarea>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label>Definition</label><br>
+            <textarea rows="7" id="sf-i-definition" type="text" class="w-100-m-0"></textarea>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label>Relevant Authority *</label><br>
+            <textarea rows="7" id="sf-i-authority" type="text" class="w-100-m-0" mandatory=""></textarea>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label>Offences and Penalties *</label><br>
+            <textarea rows="7" id="sf-i-penalties" type="text" class="w-100-m-0" mandatory=""></textarea>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <sf-i-select id="sf-i-risks" apiid="dnytrdlrmxgsy.cloudfront.net/risk" name="Risk" label="Select Risk Severity *" mandatory="">
+            </sf-i-select>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <sf-i-select id="sf-i-riskareas" apiid="dnytrdlrmxgsy.cloudfront.net/riskarea" name="Risk Areas" label="Select Risk Area *" mode="multi" mandatory="">
+            </sf-i-select>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <sf-i-select id="sf-i-frequencies" apiid="dnytrdlrmxgsy.cloudfront.net/frequency" name="Frequencies" label="Select Frequency *" mandatory="">
+            </sf-i-select>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <sf-i-sub-select id="sf-i-subfrequencies" apiid="dnytrdlrmxgsy.cloudfront.net/subfrequency" name="SubFrequencies" label="Select Sub Frequency">
+            </sf-i-sub-select>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label>Due Date *</label><br>
+            <input id="sf-i-duedate" type="text" class="w-100-m-0" mandatory="">
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <sf-i-select id="sf-i-timeframes" apiid="dnytrdlrmxgsy.cloudfront.net/timeframe" name="Timeframes" label="Select Timeframe *" mandatory="">
+            </sf-i-select>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label id="sf-i-responsedays-label">Response Days *</label><br>
+            <input id="sf-i-responsedays" type="text" class="w-100-m-0" mandatory="">
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <sf-i-form id="sf-i-documenttype" name="DocumentTypes" label="Select DocumentType" apiid="dwqyez2puoxmu.cloudfront.net/documenttype" mode="select" searchphrase="" selectprojection="name" ignoreprojections="[&quot;templatelink&quot;,&quot;minimalcontent&quot;,&quot;shortid&quot;,&quot;shortnumid&quot;,&quot;lastmodifiedby&quot;,&quot;lastmodifiedtime&quot;]">
+            </sf-i-form>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label id="sf-i-question-label">Question *</label><br>
+            <textarea rows="7" id="sf-i-question" type="text" class="w-100-m-0" mandatory=""></textarea>
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <label id="sf-i-alertschedule-label">Alerts Schedule *</label><br>
+            <input id="sf-i-alertschedule" type="text" class="w-100-m-0" mandatory="">
+          </div>
+          
+          <div class="w-100-m-0 mb-20">
+            <sf-i-form id="sf-i-adhocquestion" name="AdhocQuestion" label="Select Adhoc Question" apiid="dwqyez2puoxmu.cloudfront.net/adhocquestion" mode="select" searchphrase="" selectprojection="content" ignoreprojections="[&quot;shortid&quot;,&quot;shortnumid&quot;,&quot;lastmodifiedby&quot;,&quot;lastmodifiedtime&quot;]">
+            </sf-i-form>
+          </div>
+
+          <div class="w-100-m-0 mb-20">
+            <label id="sf-i-adhocquestionschedule-label">Adhoc Questions Schedule *</label><br>
+            <input id="sf-i-adhocquestionschedule" type="text" class="w-100-m-0">
+          </div>
+
+          <div class="w-100-m-0 mb-20">
+            <label id="sf-i-adhocinstances-label">Adhoc Instances *</label><br>
+            <input id="sf-i-adhocinstances" type="text" class="w-100-m-0">
+          </div>
+
+          <div class="w-100-m-0 mb-20">
+              <label>Attachment</label><br>
+              <sf-i-uploader id="sf-i-attachment" max="10" apiid="1peg5170d3" allowedextensions="[&quot;jpg&quot;,&quot;png&quot;,&quot;pdf&quot;]" extract="no"></sf-i-uploader>
+          </div>
+
+          <div class="w-100-m-0 mb-20">
+            <label>Upload Document Guidance</label><br>
+            <textarea rows="7" id="sf-i-uploadguidance" type="text" class="w-100-m-0"></textarea>
+          </div>
+          
+        </div>
+        <br><br>
+      </div>
+
+    </sf-i-form>
+    <!-- <sf-i-form name="Tags" apiid="dnytrdlrmxgsy.cloudfront.net/tagging" dependencies="[]" inputids="[&quot;sf-i-updatetypes&quot;, &quot;name&quot;, &quot;sf-i-projects&quot;, &quot;sf-i-tagtypes&quot;]" fields="[&quot;updatetype&quot;,&quot;name&quot;,&quot;project&quot;,&quot;tagtype&quot;]" unitfiltersdetail="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;}]" unitfiltersnew="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;20851e13-f0f7-4f8d-9bb8-ab96b1df6160&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;}]" ignoreprojections="[&quot;updatetype&quot;,&quot;tagtype&quot;,&quot;shortid&quot;]" mode="view">
+      <div slot="form">
+        <div class="d-flex justify-center align-start">
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-updatetypes" apiid="dnytrdlrmxgsy.cloudfront.net/updatetype" name="UpdateTypes" label="Select Update Type *" mandatory="">
+            </sf-i-select>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-tagtypes" apiid="dnytrdlrmxgsy.cloudfront.net/tagtype" name="TagTypes" label="Select Tag Types" mandatory="">
+            </sf-i-select>
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <label>Name</label><br>
+            <input id="name" type="text" class="w-100-m-0" mandatory="">
+          </div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-300-p mb-20"></div>
+          <div class="w-20-p mb-20"></div>
+          <div class="w-100-m-0 mb-20">
+              <sf-i-form id="sf-i-projects" name="Projects" label="Select Project *" apiid="dnytrdlrmxgsy.cloudfront.net/project" mode="select" selectprojection="name" searchphrase="" ignoreprojections="[&quot;locations&quot;,&quot;plan&quot;,&quot;logo&quot;,&quot;shortid&quot;,&quot;plan&quot;,&quot;confighome&quot;]" mandatory="">
+              </sf-i-form>
+          </div>
+        </div>
+        <br>
+        
+      </div>
+
+    </sf-i-form> -->
+    <!-- <sf-i-form id="sf-i-projects" name="Projects" label="Select Project *" apiid="dnytrdlrmxgsy.cloudfront.net/project" mode="select" selectprojection="name" searchphrase="" mandatory="" style="display: block;"></sf-i-form> -->
+    
+    <!-- <sf-i-form id="tags-0" class="tags-input tags-0" name="Tags" label="Select locations" apiid="dnytrdlrmxgsy.cloudfront.net/tagging" mode="multiselect-dropdown" searchphrase="ABC Global&amp;Location" selectprojection="name" mandatory=""></sf-i-form> -->
+    <!-- <sf-i-form id="tags-0" class="tags-input tags-0" name="Tags" label="Select countries" apiid="dnytrdlrmxgsy.cloudfront.net/tagging" mode="multiselect-dropdown" searchphrase="Signode-Country" selectprojection="name" mandatory=""></sf-i-form> -->
     <!-- <sf-i-form 
       id="sf-i-plan"
       name="Plan"
@@ -335,8 +573,127 @@
       >
     </sf-i-form> -->
 
-    <sf-i-form id="sf-i-documenttype" name="DocumentTypes" label="Select DocumentType" apiid="dwqyez2puoxmu.cloudfront.net/documenttype" mode="select" searchphrase="" selectprojection="name" ignoreprojections="[&quot;templatelink&quot;,&quot;minimalcontent&quot;,&quot;shortid&quot;,&quot;shortnumid&quot;]" style="display: block;">
-    </sf-i-form>
+    <!-- <sf-i-form id="sf-i-documenttype" name="DocumentTypes" label="Select DocumentType" apiid="dwqyez2puoxmu.cloudfront.net/documenttype" mode="select" searchphrase="" selectprojection="name" ignoreprojections="[&quot;templatelink&quot;,&quot;minimalcontent&quot;,&quot;shortid&quot;,&quot;shortnumid&quot;]" style="display: block;"> -->
+      <!-- <sf-i-form name="Projects" apiid="dnytrdlrmxgsy.cloudfront.net/project" dependencies="[]" unitfiltersdetail="[]" unitfiltersnew="[]" inputids="[&quot;sf-i-name&quot;, &quot;sf-i-emails&quot;, &quot;sf-i-cycledate&quot;, &quot;sf-i-startdate&quot;, &quot;sf-i-contractdate&quot;, &quot;sf-i-quality&quot;, &quot;sf-i-locations&quot;, &quot;sf-i-plan&quot;, &quot;sf-i-logo&quot;]" fields="[&quot;name&quot;,&quot;emails&quot;,&quot;cycledate&quot;,&quot;startdate&quot;,&quot;contractdate&quot;,&quot;quality&quot;,&quot;locations&quot;,&quot;plan&quot;,&quot;logo&quot;]" ignoreprojections="[&quot;logo&quot;,&quot;emails&quot;,&quot;locations&quot;,&quot;quality&quot;,&quot;contractdate&quot;,&quot;startdate&quot;,&quot;cycledate&quot;,&quot;address&quot;,&quot;vertical&quot;]" validations="{&quot;sf-i-name&quot;:  &quot;text-basic&quot;, &quot;sf-i-emails&quot;:  &quot;text-basic&quot;, &quot;sf-i-contractdate&quot;:  &quot;text-date&quot;, &quot;sf-i-quality&quot;:  &quot;text-basic&quot;}" mode="view">
+
+        <div slot="form">
+  
+          <div class="d-flex justify-center align-start">
+            <div class="w-100-m-0">
+              <label>Name *</label><br>
+              <input id="sf-i-name" type="text" class="w-100-m-0" mandatory="" disabled="disabled" style="display: block;">
+            <div class="error-icon d-flex justify-end color-error"><div class="material-icons">exclamation</div></div></div>
+          </div>
+          <br><br>
+          <!-- <div class="d-flex justify-center align-start">
+              <div class="w-100-m-0">
+                <label>Address *</label><br />
+                <input id="sf-i-address" type="text" class="w-100-m-0" mandatory/>
+              </div>
+          </div>
+          <br /><br /> 
+          <div class="d-flex justify-center align-start">
+              <div class="w-100-m-0">
+                <label>Emails * <small>(multiple allowed, separate by comma)</small></label><br>
+                <input id="sf-i-emails" type="text" class="w-100-m-0" mandatory="" disabled="disabled" style="display: block;">
+              </div>
+          </div>
+          <!-- <br /><br />
+          <div class="d-flex justify-center align-start">
+              <div class="w-100-m-0">
+                <label>Business Vertical *</label><br />
+                <input id="sf-i-vertical" type="text" class="w-100-m-0" mandatory/>
+              </div>
+          </div> 
+          <br><br>
+          <div class="d-flex justify-center align-start">
+              <div class="w-100-m-0">
+                <label>Contract Start Date *</label><br>
+                <input id="sf-i-startdate" type="text" class="w-100-m-0" mandatory="" disabled="disabled" style="display: block;">
+              </div>
+          </div>
+          <br><br>
+          <div class="d-flex justify-center align-start">
+              <div class="w-100-m-0">
+                <label>Contract End Date *</label><br>
+                <input id="sf-i-contractdate" type="text" class="w-100-m-0" mandatory="" disabled="disabled" style="display: block;">
+              </div>
+          </div>
+          <br><br>
+          <div class="d-flex justify-center align-start">
+              <div class="w-100-m-0">
+                <label>Business Cycle Date *</label><br>
+                <input id="sf-i-cycledate" type="text" class="w-100-m-0" mandatory="" disabled="disabled" style="display: block;">
+              </div>
+          </div>
+          <br><br>
+          <div class="d-flex justify-center align-start">
+              <div class="w-100-m-0">
+                <label>Quality *</label><br>
+                <input id="sf-i-quality" type="text" class="w-100-m-0" mandatory="" disabled="disabled" style="display: block;">
+              </div>
+          </div>
+          <br><br>
+          <div class="d-flex justify-center align-start">
+            <div class="w-100-m-0 mb-20">
+              <label>Locations *</label><br>
+              <textarea rows="7" id="sf-i-locations" type="text" class="w-100-m-0" mandatory="" disabled="disabled" style="display: block;"></textarea>
+            </div>
+          </div>
+          <div class="d-flex justify-center align-start">
+            <div class="w-100-m-0 mb-20">
+  
+              <sf-i-form id="sf-i-plan" name="Plan" label="Select Plan *" apiid="dwqyez2puoxmu.cloudfront.net/plan" mode="select" searchstring="foo" selectprojection="name" ignoreprojections="[&quot;remindersdue&quot;,&quot;remindersreporting&quot;,&quot;remindersapproving&quot;,&quot;reminderswarning&quot;,&quot;remindersnoncompliance&quot;,&quot;shortid&quot;,&quot;shortnumid&quot;]" style="display: block;">
+              </sf-i-form>
+             
+            </div>
+          </div>
+          <br><br>
+          <div class="d-flex justify-center align-start">
+            <div class="w-100-m-0 mb-20">
+              <label>Logo</label><br>
+              <sf-i-uploader id="sf-i-logo" max="10" apiid="1peg5170d3" allowedextensions="[&quot;jpg&quot;,&quot;png&quot;,&quot;pdf&quot;]" extract="no" style="display: block;"></sf-i-uploader>
+            </div>
+          </div>
+          <br><br>
+        </div>
+  
+      </sf-i-form> -->
+      <!-- <sf-i-form name="Regulatory Change Management" apiId="dwqyez2puoxmu.cloudfront.net/rcm" dependencies="[]" inputIds="[&quot;sf-i-title&quot;, &quot;sf-i-description&quot;, &quot;sf-i-link&quot;, &quot;sf-i-statutes&quot;]" fields="[&quot;title&quot;,&quot;description&quot;,&quot;link&quot;,&quot;statute&quot;]" unitfiltersdetail="[]" unitfiltersnew="[]" ignoreProjections="[&quot;link&quot;,&quot;shortid&quot;,&quot;shortnumid&quot;]" mode="latest" noLatestMessage="No Latest RCM Logs"></sf-i-form> -->
+      <!-- <sf-i-form name="Preferences" apiid="dnytrdlrmxgsy.cloudfront.net/preference" dependencies="[]" inputids="[&quot;sf-i-userid&quot;, &quot;sf-i-fill&quot;, &quot;sf-i-updatetypes&quot;, &quot;sf-i-content&quot;, &quot;sf-i-document&quot;, &quot;sf-i-project&quot;]" fields="[&quot;userid&quot;,&quot;fill&quot;,&quot;updatetype&quot;,&quot;content&quot;,&quot;document&quot;,&quot;project&quot;]" encryptedfields="[&quot;userid&quot;]" unitfiltersdetail="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;}]" unitfiltersnew="[{&quot;op&quot;: &quot;select&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;64264b31-81ff-45bd-a1fa-04844984a35a&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;20851e13-f0f7-4f8d-9bb8-ab96b1df6160&quot;},{&quot;op&quot;: &quot;remove&quot;, &quot;input&quot;: &quot;sf-i-updatetypes&quot;, &quot;value&quot;: &quot;3fddd5ed-6e2f-4973-b3de-00d3f03130a9&quot;}]" ignoreprojections="[&quot;updatetype&quot;,&quot;shortid&quot;]" mode="view">
+      <div slot="form">
+        <div class="d-flex align-start justify-between">
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-updatetypes" apiid="dnytrdlrmxgsy.cloudfront.net/updatetype" name="UpdateTypes" label="Select Update Type *" mandatory="">
+            </sf-i-select>
+          </div>
+          <div class="w-10-p mb-20"></div>
+          <div class="w-100-m-0 mb-20">
+            <sf-i-form id="sf-i-userid" name="Users" label="Select User *" apiid="dnytrdlrmxgsy.cloudfront.net/userprofile" mode="select" ignoreprojections="[&quot;updatetype&quot;,&quot;name&quot;,&quot;project&quot;,&quot;function&quot;,&quot;location&quot;,&quot;shortid&quot;]" searchphrase="" mandatory="">
+            </sf-i-form>
+          </div>
+          <div class="w-10-p mb-20"></div>
+          <div class="w-300-p mb-20">
+            <sf-i-select id="sf-i-fill" apiid="dnytrdlrmxgsy.cloudfront.net/fill" name="Fills" label="Select Fill *" mandatory="">
+            </sf-i-select>
+          </div>
+          <div class="w-10-p mb-20"></div>
+          <div class="w-100-m-0 mb-20">
+            <label>Content *</label><br>
+            <input id="sf-i-content" type="text" class="w-100-m-0" mandatory="" />
+          </div>
+          <div class="w-100-m-0 mb-20">
+            <label>Documents</label><br>
+            <sf-i-uploader id="sf-i-document" max="10" apiid="1peg5170d3" allowedextensions="[&quot;jpg&quot;,&quot;png&quot;,&quot;pdf&quot;]" extract="no" projectid="41ab3c86-ccc0-4c0e-8e31-cd079a07a710"></sf-i-uploader>
+          </div>
+          <div class="w-100-m-0 mb-20">
+            <sf-i-form id="sf-i-project" name="Projects" label="Select Project *" apiid="dnytrdlrmxgsy.cloudfront.net/project" mode="multiselect-dropdown" selectprojection="name" searchphrase="" ignoreprojections="[&quot;logo&quot;,&quot;plan&quot;,&quot;address&quot;,&quot;emails&quot;,&quot;vertical&quot;,&quot;cycledate&quot;,&quot;shortid&quot;,&quot;startdate&quot;,&quot;contractdate&quot;,&quot;quality&quot;,&quot;locations&quot;,&quot;shortnumid&quot;]" mandatory="" maxselect="1">
+            </sf-i-form>
+          </div>
+        </div>
+        <br>
+      </div>
+    </sf-i-form> -->
 
     <!-- <sf-i-form id="tags-0" class="tags-input tags-0" name="Tags" label="Select locations" apiid="j385cxf2p0" mode="multiselect-dropdown" searchphrase="(BIDADI|Pune|Gujarat)&amp;Signode-India&amp;Location" selectprojection="name" mandatory=""></sf-i-form> -->
 

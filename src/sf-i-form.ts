@@ -1424,6 +1424,7 @@ export class SfIForm extends LitElement {
       }
 
       var checked = '';
+      console.log("Checking", values[i].id, this.selectedSearchId)
       console.log("Checking", values[i].id, this.selectedSearchId, this.selectedSearchId.includes(values[i].id))
       if(fromFetchDetails){
         if(this.selectedSearchId.includes(values[i].id)) {
@@ -3528,7 +3529,7 @@ export class SfIForm extends LitElement {
                 }
               }             
             } else {
-
+              console.log(inputElement);
               if((inputElement as SfISelect).selectedValues()[0] == value) {
 
                 if(Array.isArray(filters[i].target)) {
@@ -4151,9 +4152,9 @@ export class SfIForm extends LitElement {
 
       } else if (element.nodeName.toLowerCase() == "sf-i-form") {
 
-        console.log('populating selected form', (element as SfIForm).mode, element,(element as SfIForm).selectedSearchId, this.getSelectedViewToDetailValues()[i]);
+        console.log('populating selected form', (element as SfIForm).mode, element,(element as SfIForm).selectedSearchId, this.getSelectedViewToDetailValues()[i] ?? [], this.getSelectedViewToDetailValues());
         let oldSearcheId = (element as SfIForm).selectedSearchId; 
-        (element as SfIForm).selectedSearchId = this.getSelectedViewToDetailValues()[i];
+        (element as SfIForm).selectedSearchId = this.getSelectedViewToDetailValues()[i] ?? [];
         if((element as SfIForm).selectedSearchId != oldSearcheId){
           console.log('populating selected sf-i-form loadmode called', (element as SfIForm).selectedSearchId);
           (element as SfIForm).loadMode();
@@ -4198,9 +4199,9 @@ export class SfIForm extends LitElement {
 
       } else if (element.nodeName.toLowerCase() == "sf-i-form") {
 
-        console.log('populating selected form', (element as SfIForm).mode, element,(element as SfIForm).selectedSearchId, this.getSelectedViewToDetailValues()[i]);
+        console.log('populating selected form', i, (element as SfIForm).mode, element,(element as SfIForm).selectedSearchId, this.getSelectedViewToDetailValues()[i] ?? []);
         let oldSearcheId = (element as SfIForm).selectedSearchId; 
-        (element as SfIForm).selectedSearchId = this.getSelectedViewToDetailValues()[i];
+        (element as SfIForm).selectedSearchId = this.getSelectedViewToDetailValues()[i] ?? [];
         if((element as SfIForm).selectedSearchId != oldSearcheId){
           console.log('populating selected sf-i-form loadmode called', (element as SfIForm).selectedSearchId);
           (element as SfIForm).loadMode();
@@ -4542,7 +4543,9 @@ export class SfIForm extends LitElement {
           if(this.selectedSearchId.length > 0)
           this.fetchDetail()
         }else{
+          console.log('this.selectedSearchId', this.selectedSearchId);
           this.fetchSearchSelect("", this.selectedSearchId.length > 0);
+          
         }
         this.initListenersSearch();
       }, 500)
