@@ -126,6 +126,9 @@ export class SfIForm extends LitElement {
   selectedId!: string;
 
   @property()
+  selectedObj!: any;
+
+  @property()
   // selectedSearchId: string[] = ["f0f17ddb-546a-45f5-8a94-a5689fde8e64"] ;
   // selectedSearchId: string[] = ["41ab3c86-ccc0-4c0e-8e31-cd079a07a710"];
   // selectedSearchId: any = ["96316acb-6d29-4fe9-912a-3b0d53e965fb"];
@@ -284,6 +287,10 @@ export class SfIForm extends LitElement {
 
     }
 
+  }
+
+  selectedEntireValues = () => {
+    return this.selectedObj;
   }
 
   // @property()
@@ -1585,9 +1592,13 @@ export class SfIForm extends LitElement {
       console.log('inputs', inputElements);
 
       for(var i = 0; i < inputElements.length; i++) {
-
-        (inputElements[i] as HTMLInputElement).addEventListener('click', () => {
+        let tempObj: any = values[i] ?? {};
+        (inputElements[i] as HTMLInputElement).addEventListener('click', (ev: any) => {
           //console.log('event', (ev.currentTarget as HTMLInputElement).id);
+          if(ev.target.checked){
+            this.selectedObj = tempObj
+            console.group('selected obj', this.selectedObj)
+          }
           this.dispatchMyEvent("valueChanged", {bubbles: true, newValue: {}, newText: {}});
         })
 
@@ -1661,11 +1672,15 @@ export class SfIForm extends LitElement {
       }
 
       const inputElements = (this._SfSearchSelectContainer as HTMLDivElement).querySelectorAll('.search-select-input') as NodeListOf<HTMLInputElement>;
-
-      for(var i = 0; i < inputElements.length; i++) {
-
-        (inputElements[i] as HTMLInputElement).addEventListener('click', () => {
-          //console.log('event', (ev.currentTarget as HTMLInputElement).id);
+      
+      for(var i = (this.nextCursor.length * 10); i < inputElements.length; i++) {  
+        let tempObj:any = {};
+          tempObj = values[i - (this.nextCursor.length * 10)];
+        (inputElements[i] as HTMLInputElement).addEventListener('click', (ev: any) => {
+          if(ev.target.checked){
+            this.selectedObj = tempObj
+            console.log('selected Obj 1', this.selectedObj);
+          }
           this.dispatchMyEvent("valueChanged", {bubbles: true, newValue: {}, newText: {}});
         })
 
@@ -2223,7 +2238,6 @@ export class SfIForm extends LitElement {
       if(xhr.status == 200) {
         const jsonRespose = JSON.parse(xhr.responseText);
         console.log('fetchsearchselect', jsonRespose);
-        console.log(jsonRespose);
         if(this.mode == "select" ) {
           //this.renderSelect(jsonRespose.values);
           this.renderList(jsonRespose.values, jsonRespose.found, jsonRespose.cursor, false, hideEdit);
@@ -4544,7 +4558,9 @@ export class SfIForm extends LitElement {
           this.fetchDetail()
         }else{
           console.log('this.selectedSearchId', this.selectedSearchId);
-          this.fetchSearchSelect("", this.selectedSearchId.length > 0);
+          if(this.nextCursor.length == 0){
+            this.fetchSearchSelect("", this.selectedSearchId.length > 0);
+          }
           
         }
         this.initListenersSearch();
