@@ -195,7 +195,7 @@ export class SfIForm extends LitElement {
         if(this.flow == "read" || this.maxSelect != null){
           values.push((divArr[i]).getAttribute('value'));
         }else{
-          values.push(divArr[i].innerHTML);
+          values.push(divArr[i].innerText);
         }
 
       }
@@ -247,7 +247,7 @@ export class SfIForm extends LitElement {
 
       for(var i = 0; i < divArr.length; i++) {
 
-        values.push(divArr[i].innerHTML);
+        values.push(divArr[i].innerText);
 
       }
 
@@ -265,7 +265,7 @@ export class SfIForm extends LitElement {
         const div = divs[i] as HTMLDivElement;
         const cb = checkboxes[i] as HTMLInputElement;
         if(cb.checked) {
-          values.push(div.innerHTML);
+          values.push(div.innerText);
         }
       }
   
