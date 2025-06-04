@@ -2205,7 +2205,7 @@ export class SfIForm extends LitElement {
     this._SfLoader.innerHTML = '';
     if(xhr.status == 200) {
       const jsonRespose = JSON.parse(xhr.responseText);
-      console.log('multiselected', jsonRespose);
+      console.log('multiselected', jsonRespose,  this.selectedSearchId);
       if(this.flow == "read"){
         this.renderSearchMultiselectRead(jsonRespose.values as Array<any>, jsonRespose.cursor, preselect);
       }else{
@@ -4534,7 +4534,10 @@ export class SfIForm extends LitElement {
         }
         this.initListenersMultiselect();
         if(this.flow == "read"){
-          this.fetchSearchMultiselect("", true)
+          console.log('loadmode fetching', this.selectedSearchId)
+          if(this.selectedSearchId.length > 0 && this.selectedSearchId[0] != ''){
+            this.fetchSearchMultiselect("", true)
+          }
         }
         this.populatePreselected();
       }, 500)
