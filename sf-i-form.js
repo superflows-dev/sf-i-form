@@ -63,6 +63,7 @@ let SfIForm = class SfIForm extends LitElement {
         this.unitFiltersNew = "[]";
         this.unitFiltersDetail = "[]";
         this.apiIdCalendarDetail = "";
+        this.selectedObjArr = [];
         // selectedSearchId: string[] = ["f0f17ddb-546a-45f5-8a94-a5689fde8e64"] ;
         // selectedSearchId: string[] = ["41ab3c86-ccc0-4c0e-8e31-cd079a07a710"];
         // selectedSearchId: any = ["96316acb-6d29-4fe9-912a-3b0d53e965fb"];
@@ -99,7 +100,7 @@ let SfIForm = class SfIForm extends LitElement {
                 }
                 return values;
             }
-            else if (this.mode == "list" || this.mode == "select") {
+            else if (this.mode == "list" || this.mode == "select" || this.mode == "multiselect-list") {
                 const values = [];
                 const checkboxes = this._SfSearchSelectContainer.querySelectorAll('input');
                 const len = checkboxes.length;
@@ -133,7 +134,7 @@ let SfIForm = class SfIForm extends LitElement {
                 }
                 return values;
             }
-            if (this.mode == "list" || this.mode == "select") {
+            if (this.mode == "list" || this.mode == "select" || this.mode == "multiselect-list") {
                 const values = [];
                 const checkboxes = this._SfSearchSelectContainer.querySelectorAll('input');
                 const divs = this._SfSearchSelectContainer.querySelectorAll('.append-str');
@@ -160,8 +161,9 @@ let SfIForm = class SfIForm extends LitElement {
             }
         };
         this.selectedEntireValues = () => {
-            return this.selectedObj;
+            return this.mode == "select" ? this.selectedObj : this.selectedObjArr;
         };
+        this.flagValChange = false;
         this.getInputFromField = (field) => {
             for (var i = 0; i < this.getFields().length; i++) {
                 if (field == this.getFields()[i]) {
@@ -474,7 +476,7 @@ let SfIForm = class SfIForm extends LitElement {
                     html += '<span part="td-head">&nbsp;&nbsp;' + (this.prevCursor.length + 1) + "/" + (Math.ceil(parseInt(found) / this.blockSize)) + '&nbsp;&nbsp;</span>';
                     html += '</div>';
                 }
-                html += '<table>';
+                html += '<table class="pb-10">';
                 //console.log('search', values)
                 html += '<thead>';
                 // html += '<th part="td-action" class="td-head left-sticky">'
@@ -591,16 +593,20 @@ let SfIForm = class SfIForm extends LitElement {
                     // console.log('data[j]', data[j]);
                     console.log('this.getIgnoreProjections()', this.getIgnoreProjections().includes(cols[j].toLowerCase()), cols[j].toLowerCase());
                     if (!(this.getIgnoreProjections().includes(cols[j].toLowerCase())) && cols[j] != "id") {
+                        if (appendStr != "") {
+                            appendStr += " ";
+                        }
                         if (Array.isArray(data[j])) {
                             for (var k = 0; k < data[j].length; k++) {
-                                appendStr += (data[j][k] + " ");
+                                appendStr += (data[j][k]);
                                 if (k < (data[j].length - 1)) {
                                     appendStr += "";
                                 }
                             }
                         }
                         else {
-                            appendStr += ((fromFetchDetails ? JSON.parse(data[j]) : data[j]) + " ");
+                            // appendStr += ((fromFetchDetails ? JSON.parse(data[j]) : data[j]) + " ");
+                            appendStr += ((fromFetchDetails ? JSON.parse(data[j]) : data[j]));
                         }
                     }
                     //console.log('append', appendStr);
@@ -642,7 +648,7 @@ let SfIForm = class SfIForm extends LitElement {
                     rowhtml += '<div><input id="search-' + i + '" part="input-checkbox" type="checkbox" value="' + values[i].id + '" ' + checked + ' ' + disabled + '/><div class="append-str gone">' + appendStr + '</div></div>';
                 }
                 else {
-                    rowhtml += '<div><input id="search-' + values[i].id + '" class="search-select-input" name="select-statute" part="input-checkbox" type="radio" value="' + values[i].id + '" ' + checked + ' ' + disabled + '/><div class="append-str gone">' + appendStr + '</div></div>';
+                    rowhtml += '<div><input id="search-' + values[i].id + '" class="search-select-input" name="select-statute" part="input-checkbox" type="' + (this.mode == "select" ? "radio" : "checkbox") + '" value="' + values[i].id + '" ' + checked + ' ' + disabled + '/><div class="append-str gone">' + appendStr + '</div></div>';
                 }
                 rowhtml += '</td>';
                 for (j = 0; j < cols.length; j++) {
@@ -683,9 +689,23 @@ let SfIForm = class SfIForm extends LitElement {
             console.log('returning html', html);
             return [html, foundFlag];
         };
+        this.clearSearchSelection = () => {
+            this.selectedSearchId = [];
+            this.selectedObjArr = [];
+            this.flagValChange = true;
+            // this.dispatchMyEvent("valueChanged", {bubbles: true, newValue: {}, newText: {}});
+            this.loadMode();
+        };
         this.renderList = (values, found, cursor, multiSelect = false, hideEdit = true, fromFetchDetails = false) => {
             var _a, _b, _c, _d, _e, _f;
-            console.log('renderlist search', values, this.nextCursor, this.prevCursor, this.searchPhrase, hideEdit);
+            console.log('renderlist search', values, this.nextCursor, this.prevCursor, this.searchPhrase, hideEdit, this.selectedSearchId);
+            if (this._sfButtonClearSelection != null) {
+                this._sfButtonClearSelection.style.display = (this.selectedSearchId.length == 0) ? 'none' : 'flex';
+            }
+            if (this._sfSelectionCount != null) {
+                this._sfSelectionCount.style.display = (this.selectedSearchId.length == 0) ? 'none' : 'flex';
+                this._sfSelectionCount.innerHTML = this.selectedSearchId.length + ' selected';
+            }
             let html = '';
             if (fromFetchDetails) {
                 html += '<table id="select-list-table">';
@@ -756,10 +776,34 @@ let SfIForm = class SfIForm extends LitElement {
                         //console.log('event', (ev.currentTarget as HTMLInputElement).id);
                         if (ev.target.checked) {
                             this.selectedObj = tempObj;
+                            this.selectedObjArr.push(tempObj);
+                            this.selectedSearchId.push(tempObj.id);
                             console.group('selected obj', this.selectedObj);
                         }
+                        else {
+                            for (let obj of this.selectedObjArr) {
+                                if (obj.id == tempObj.id) {
+                                    this.selectedObjArr.splice(this.selectedObjArr.indexOf(obj), 1);
+                                    if (this.selectedSearchId.indexOf(obj.id) >= 0) {
+                                        this.selectedSearchId.splice(this.selectedSearchId.indexOf(obj.id), 1);
+                                    }
+                                }
+                            }
+                        }
                         this.dispatchMyEvent("valueChanged", { bubbles: true, newValue: {}, newText: {} });
+                        if (this._sfButtonClearSelection != null) {
+                            this._sfButtonClearSelection.style.display = (this.selectedSearchId.length == 0) ? 'none' : 'flex';
+                        }
+                        if (this._sfSelectionCount != null) {
+                            this._sfSelectionCount.style.display = (this.selectedSearchId.length == 0) ? 'none' : 'flex';
+                            this._sfSelectionCount.innerHTML = this.selectedSearchId.length + ' selected';
+                        }
+                        console.log('selection:', this.selectedObjArr, this.selectedEntireValues());
                     });
+                }
+                if (this._sfButtonClearSelection != null) {
+                    this._sfButtonClearSelection.removeEventListener('click', this.clearSearchSelection);
+                    this._sfButtonClearSelection.addEventListener('click', this.clearSearchSelection);
                 }
                 // for(var i = 0; i < values.length; i++) {
                 //  // console.log(this._SfSearchSelectContainer.querySelector('#search-' + i))
@@ -835,7 +879,15 @@ let SfIForm = class SfIForm extends LitElement {
                     inputElements[i].addEventListener('click', (ev) => {
                         if (ev.target.checked) {
                             this.selectedObj = tempObj;
+                            this.selectedObjArr.push(tempObj);
                             console.log('selected Obj 1', this.selectedObj);
+                        }
+                        else {
+                            for (let obj of this.selectedObjArr) {
+                                if (obj.id == tempObj.id) {
+                                    this.selectedObjArr.splice(this.selectedObjArr.indexOf(obj), 1);
+                                }
+                            }
                         }
                         this.dispatchMyEvent("valueChanged", { bubbles: true, newValue: {}, newText: {} });
                     });
@@ -875,6 +927,10 @@ let SfIForm = class SfIForm extends LitElement {
             else {
                 html += '<h3>No Records Found</h3>';
                 this._SfSearchSelectContainer.innerHTML = html;
+            }
+            if (this.flagValChange) {
+                this.flagValChange = false;
+                this.dispatchMyEvent("valueChanged", { bubbles: true, newValue: {}, newText: {} });
             }
         };
         this.renderLogs = (values) => {
@@ -1279,7 +1335,7 @@ let SfIForm = class SfIForm extends LitElement {
                 if (xhr.status == 200) {
                     const jsonRespose = JSON.parse(xhr.responseText);
                     console.log('fetchsearchselect', jsonRespose);
-                    if (this.mode == "select") {
+                    if (this.mode == "select" || this.mode == "multiselect-list") {
                         //this.renderSelect(jsonRespose.values);
                         this.renderList(jsonRespose.values, jsonRespose.found, jsonRespose.cursor, false, hideEdit);
                     }
@@ -1550,6 +1606,7 @@ let SfIForm = class SfIForm extends LitElement {
                             }
                         }
                         else {
+                            console.log('elementSfIForm selected values', element.hasAttribute('mandatory'), element.id, elementSfIForm.selectedValues());
                             if (element.hasAttribute('mandatory') && elementSfIForm.selectedValues().length === 0) {
                                 const errorHtml = '<div class="error-icon d-flex justify-end color-error"><div class="material-symbols-outlined">exclamation</div></div>';
                                 parentElement.insertAdjacentHTML('beforeend', errorHtml);
@@ -3200,7 +3257,7 @@ let SfIForm = class SfIForm extends LitElement {
             else if (this.mode == "text") {
                 this.selectedTextPhrase = await this.fetchDetail();
             }
-            else if (this.mode == "select" || this.mode == "list") {
+            else if (this.mode == "select" || this.mode == "list" || this.mode == "multiselect-list") {
                 setTimeout(() => {
                     // this.initListenersTrail();
                     this.searchPhraseOriginal = this.searchPhrase;
@@ -3398,7 +3455,7 @@ let SfIForm = class SfIForm extends LitElement {
       
       `;
         }
-        else if (this.mode == "select") {
+        else if (this.mode == "select" || this.mode == "multiselect-list") {
             if (this.flow == "read") {
                 return html `
 
@@ -3429,6 +3486,8 @@ let SfIForm = class SfIForm extends LitElement {
               <div id="search-select-container">
                 <h3 part="results-title" class="left-sticky">No Results</h3>
               </div>
+              <h6 id="selection-count" class="hide"></h6>
+              <button id="button-clear-selection" part="button-icon-small" class="align-center button-icon d-flex hide"><span class="material-icons mr-10">clear</span>Clear Selection</button>
               <div class="loader-element"></div>
             </div>
           </div>
@@ -3799,9 +3858,15 @@ SfIForm.styles = css `
     .mb-10 {
       margin-bottom: 10px;
     }
+    .mr-10 {
+      margin-right: 10px;
+    }
 
     .mt-10 {
       margin-top: 10px;
+    }
+    .pb-10 {
+      padding-bottom: 10px;
     }
 
     .flex-grow {
@@ -4265,6 +4330,9 @@ __decorate([
 ], SfIForm.prototype, "selectedObj", void 0);
 __decorate([
     property()
+], SfIForm.prototype, "selectedObjArr", void 0);
+__decorate([
+    property()
 ], SfIForm.prototype, "selectedSearchId", void 0);
 __decorate([
     property()
@@ -4335,6 +4403,12 @@ __decorate([
 __decorate([
     query('#sf-button-delete')
 ], SfIForm.prototype, "_sfButtonDelete", void 0);
+__decorate([
+    query('#selection-count')
+], SfIForm.prototype, "_sfSelectionCount", void 0);
+__decorate([
+    query('#button-clear-selection')
+], SfIForm.prototype, "_sfButtonClearSelection", void 0);
 __decorate([
     query('.div-row-error')
 ], SfIForm.prototype, "_SfRowError", void 0);

@@ -46,6 +46,7 @@ export declare class SfIForm extends LitElement {
     searchIndex: string;
     selectedId: string;
     selectedObj: any;
+    selectedObjArr: any;
     selectedSearchId: any;
     preselectedValues: string;
     getPreselectedValues: () => any;
@@ -75,6 +76,8 @@ export declare class SfIForm extends LitElement {
     _sfInputSearchSelect: any;
     _sfInputList: any;
     _sfButtonDelete: any;
+    _sfSelectionCount: any;
+    _sfButtonClearSelection: any;
     _SfRowError: any;
     _SfRowErrorMessage: any;
     _SfRowSuccess: any;
@@ -108,6 +111,7 @@ export declare class SfIForm extends LitElement {
     _SfButtonFetchLog: any;
     _SfFormC: any;
     _SfCalendarC: any;
+    flagValChange: boolean;
     getInputFromField: (field: string) => any;
     getFieldFromInput: (input: string) => any;
     getUseInApi: () => any;
@@ -135,6 +139,7 @@ export declare class SfIForm extends LitElement {
     clickTablePrev: () => void;
     renderSearch: (values: any, found: any, cursor: any) => void;
     renderListRows: (values: any, multiSelect: boolean, cursor?: string, fromFetchDetails?: boolean) => (string | boolean)[];
+    clearSearchSelection: () => void;
     renderList: (values: any, found: any, cursor: any, multiSelect?: boolean, hideEdit?: boolean, fromFetchDetails?: boolean) => void;
     renderLogs: (values: any) => void;
     renderLatestListRows: (values: any) => string;

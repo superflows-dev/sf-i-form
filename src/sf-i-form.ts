@@ -396,6 +396,9 @@ export class SfIForm extends LitElement {
     .mt-10 {
       margin-top: 10px;
     }
+    .pb-10 {
+      padding-bottom: 10px;
+    }
 
     .flex-grow {
       flex-grow: 1;
@@ -1281,7 +1284,7 @@ export class SfIForm extends LitElement {
         html += '</div>';
       }
 
-      html += '<table>';
+      html += '<table class="pb-10">';
       //console.log('search', values)
 
       html += '<thead>';
@@ -1426,18 +1429,21 @@ export class SfIForm extends LitElement {
         // console.log('data[j]', data[j]);
         console.log('this.getIgnoreProjections()', this.getIgnoreProjections().includes(cols[j].toLowerCase()), cols[j].toLowerCase())
         if (!(this.getIgnoreProjections().includes(cols[j].toLowerCase())) && cols[j] != "id") {
-
+          if(appendStr != ""){
+            appendStr += " "
+          }
           if (Array.isArray(data[j])) {
 
             for (var k = 0; k < data[j].length; k++) {
-              appendStr += (data[j][k] + " ");
+              appendStr += (data[j][k]);
               if (k < (data[j].length - 1)) {
                 appendStr += "";
               }
             }
 
           } else {
-            appendStr += ((fromFetchDetails ? JSON.parse(data[j]) : data[j]) + " ");
+            // appendStr += ((fromFetchDetails ? JSON.parse(data[j]) : data[j]) + " ");
+            appendStr += ((fromFetchDetails ? JSON.parse(data[j]) : data[j]));
           }
 
         }
